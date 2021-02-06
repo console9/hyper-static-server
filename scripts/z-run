@@ -1,0 +1,203 @@
+#!/dev/null
+
+
+
+
+::// docs / ...
+::// watch / ...
+::// *
+
+
+
+
+&&== env-path _RUST_SOURCES ./sources
+&&== env-path _RUST_TARGET ./.target
+&&== env-path _EXAMPLES ./examples
+
+
+
+
+<< debug / build / lib
+	#! <bash+>
+	Z_expect_no_arguments
+	Z_zexec ':: cargo / run' build --lib --no-default-features --features "${_RUST_FEATURES:-default}"
+!!
+
+<< debug / run / example
+	#! <bash+>
+	Z_zexec ':: cargo / run' run --bin example --no-default-features --features "${_RUST_FEATURES:-default}" -- "${@}"
+!!
+
+<< debug / check / lib
+	#! <bash+>
+	Z_expect_no_arguments
+	Z_zexec ':: cargo / run' check --lib --no-default-features --features "${_RUST_FEATURES:-default}"
+!!
+
+<< debug / lint / lib
+	#! <bash+>
+	Z_expect_no_arguments
+	Z_zexec ':: cargo / run' clippy --lib --no-default-features --features "${_RUST_FEATURES:-default}"
+!!
+
+
+
+
+<< dependencies / update / conservative
+	#! <bash+>
+	Z_expect_no_arguments
+	Z_zexec ':: cargo / run' update
+!!
+
+<< dependencies / update / aggressive
+	#! <bash+>
+	Z_expect_no_arguments
+	Z_zexec ':: cargo / run' update --aggressive
+!!
+
+
+
+
+<< docs / crate / internals / build
+	#! <bash+>
+	Z_expect_no_arguments
+	rm -R -f -- "${_RUST_TARGET}/doc"
+	Z_zexec ':: cargo / run' doc --lib --no-deps --document-private-items --no-default-features --features "${_RUST_FEATURES:-default}"
+!!
+
+<< docs / crate / exports / build
+	#! <bash+>
+	Z_expect_no_arguments
+	rm -R -f -- "${_RUST_TARGET}/doc"
+	Z_zexec ':: cargo / run' doc --lib --no-deps --no-default-features --features "${_RUST_FEATURES:-default}"
+!!
+
+<< docs / crate / dependencies / build
+	#! <bash+>
+	Z_expect_no_arguments
+	rm -R -f -- "${_RUST_TARGET}/doc"
+	Z_zexec ':: cargo / run' doc --lib
+!!
+
+<< docs / crate / open
+	#! <bash+>
+	Z_expect_no_arguments
+	exec -- x-www guest:rust-docs open "file:${_RUST_TARGET}/doc/hyper_simple_server/index.html"
+!!
+
+
+
+
+<< release / run / example
+	#! <bash+>
+	Z_zexec ':: cargo / run' run --bin example --release -- "${@}"
+!!
+
+
+
+
+<<== __ / generate
+	#! <template>
+	
+	{{ $_watch_actions := array }}
+	{{ $_watch_actions = array_append $_watch_actions "debug / build / lib" "debug / check / lib" "debug / lint / lib" }}
+	{{ $_watch_actions = array_append $_watch_actions "debug / run / example" }}
+	{{ $_watch_actions = array_append $_watch_actions "docs / crate / internals / build" "docs / crate / exports / build" "docs / crate / dependencies / build" }}
+	
+	{{ range $_, $_action := $_watch_actions }}
+	<< watch / {{ $_action }}
+		#! <bash+>
+		Z_zexec ':: watch / run' ':: '{{ $_action | shell_quote }} "${@}"
+	!!
+	{{ end }}
+!!
+
+
+
+
+<< curl / http
+	#! <bash+>
+	Z_expect_no_arguments
+	exec -- curl -v -s -- http://127.0.0.1:8080/
+!!
+
+<< curl / https
+	#! <bash+>
+	Z_expect_no_arguments
+	exec -- curl -v -s -- https://127.0.0.1:8443/
+!!
+
+
+
+
+--<< cargo / run
+	#! <bash+>
+	
+	Z_enforce 0xd425e0f4 'expected command!' test "${#}" -ge 1
+	
+	_command="${1}"
+	shift -- 1
+	
+	_arguments=()
+	
+	case "${_command}" in
+		( check | build | run | doc | clippy )
+			_arguments+=(
+					--manifest-path "${_RUST_SOURCES}/Cargo.toml"
+					--target-dir "${_RUST_TARGET}"
+				)
+		;;
+		( metadata | update )
+			_arguments+=(
+					--manifest-path "${_RUST_SOURCES}/Cargo.toml"
+				)
+		;;
+		( * )
+			Z_panic 0x510d7e97 'invalid command `%s`!' "${_command}"
+		;;
+	esac
+	
+	exec -- \
+		nice -n 19 -- \
+	cargo \
+			"${_command}" \
+			"${_arguments[@]}" \
+			"${@}" \
+	#
+!!
+
+
+
+
+--<< watch / run
+	#! <bash+>
+	exec -- \
+		nodaemon \
+	watchexec \
+			\
+			--watch "${_RUST_SOURCES}" \
+			\
+			--restart \
+			--debounce 100 \
+			\
+			--no-shell \
+			--no-ignore \
+			--no-vcs-ignore \
+			--no-default-ignore \
+			\
+			-- \
+			\
+		nodaemon \
+	"${ZRUN[@]}" \
+			':: watch / delegate' \
+			"${@}"
+	#
+!!
+
+
+--<< watch / delegate
+	#! <bash+>
+	Z_log_cut
+	Z_zexec "${@}"
+!!
+
