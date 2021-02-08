@@ -1,0 +1,15 @@
+
+template! (HomeResource, HomeTemplate, Html, "home.html", "home");
+resource! (FaviconResource, Icon, "../examples/files/favicon.ico", "favicon");
+resource! (RobotsResource, Text, "../examples/files/robots.txt", "robots");
+
+route! (HomeRoute, HomeResource, "/");
+route! (FaviconRoute, FaviconResource, "/favicon.ico");
+route! (RobotsRoute, RobotsResource, "/robots.txt");
+
+routes! (Routes, [
+		HomeRoute,
+		FaviconRoute,
+		RobotsRoute,
+	]);
+

@@ -1,0 +1,6 @@
+
+[general]
+dirs = [
+	"../examples/askama",
+]
+
