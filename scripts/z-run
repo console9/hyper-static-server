@@ -118,13 +118,13 @@
 << curl / http
 	#! <bash+>
 	Z_expect_no_arguments
-	exec -- curl -v -s -- http://127.0.0.1:8080/
+	exec -- curl -v -s -k -- http://127.0.0.1:8080/
 !!
 
 << curl / https
 	#! <bash+>
 	Z_expect_no_arguments
-	exec -- curl -v -s -- https://127.0.0.1:8443/
+	exec -- curl -v -s -k -- https://127.0.0.1:8443/
 !!
 
 
@@ -156,6 +156,13 @@
 			Z_panic 0x510d7e97 'invalid command `%s`!' "${_command}"
 		;;
 	esac
+	
+	if test ! -e "${_RUST_TARGET}" -a -h "${_RUST_TARGET}" ; then
+		mkdir -- "$( exec -- readlink -f -- "${_RUST_TARGET}" )"
+	fi
+	if test ! -e "${_RUST_TARGET}" ; then
+		mkdir -- "${_RUST_TARGET}"
+	fi
 	
 	exec -- \
 		nice -n 19 -- \
