@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	
+	
+	<head>
+		
+		
+		<title>{% block page_title %}{% endblock %}</title>
+		
+		<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0, minimum-scale=0.5, maximum-scale=1.0, user-scalable=yes" />
+		
+		{% block head %}{% endblock %}
+		
+		<script src="/__/reload.js" defer></script>
+		
+	</head>
+	
+	
+	<body class="{% block page_identifier %}{% endblock %}">
+		
+		<div class="container">
+			
+			{% block header %}{% include "_header.html" %}{% endblock %}
+			
+			{% block main %}<h1>TBD</h1>{% endblock %}
+			
+			{% block footer %}{% include "_footer.html" %}{% endblock %}
+			
+		</div>
+		
+	</body>
+	
+	
+</html>
+
