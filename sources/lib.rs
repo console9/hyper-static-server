@@ -1,12 +1,16 @@
 
-#![ no_implicit_prelude ]
+
 
 
 pub(crate) mod main;
-pub(crate) mod prelude;
-pub(crate) mod resources;
 pub(crate) mod server;
+pub(crate) mod macros;
 
 
-pub use main::main;
+
+
+pub use main::main_with_static;
+
+pub use ::hyper_simple_server as hss;
+pub use ::hyper_simple_server::*;
 

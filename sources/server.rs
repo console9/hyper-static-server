@@ -1,17 +1,20 @@
 
 
-use crate::prelude::*;
+use crate::hss;
+
+use crate::hss::RequestExt as _;
+use crate::hss::ResponseExtBuild as _;
 
 
 
 
-pub struct Handler {
+pub struct StaticHandler {
 	routes : hss::Routes,
 	random_token : String,
 }
 
 
-impl Handler {
+impl StaticHandler {
 	
 	pub fn new (_routes : hss::Routes) -> Self {
 		Self {
@@ -24,14 +27,14 @@ impl Handler {
 
 
 
-impl Handler {
+impl StaticHandler {
 	
 	
-	pub fn serve (&self, _request : Request) -> ServerResponseFuture {
+	pub fn serve (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		if ! _request.is_get () {
 			eprintln! ("[ww] [1211a46c]  failing `{}` with 405 (method not allowed)", _request.uri_path ());
-			return Response::new_method_not_allowed () .into ();
+			return hss::Response::new_method_not_allowed () .into ();
 		}
 		
 		if _request.uri_path () .starts_with ("/__/") {
@@ -50,22 +53,22 @@ impl Handler {
 	}
 	
 	
-	fn serve_special (&self, _request : Request) -> ServerResponseFuture {
+	pub fn serve_special (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		match _request.uri_path () {
 			"/__/routes" =>
 				return self.serve_routes_index (_request),
 			"/__/heartbeat" =>
-				return Response::new_200 () .into (),
+				return hss::Response::new_200 () .into (),
 			"/__/reload.txt" =>
-				return Response::new_200_with_text (self.random_token.clone ()) .into (),
+				return hss::Response::new_200_with_text (self.random_token.clone ()) .into (),
 			_ =>
 				return self.serve_404 (_request),
 		}
 	}
 	
 	
-	fn serve_routes_index (&self, _request : Request) -> ServerResponseFuture {
+	pub fn serve_routes_index (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		let mut _buffer = String::with_capacity (128 * 1024);
 		
@@ -94,23 +97,33 @@ impl Handler {
 		}
 		_buffer.push_str ("</ul></body>\n");
 		
-		return Response::new_200_with_html (_buffer) .into ();
+		return hss::Response::new_200_with_html (_buffer) .into ();
 	}
 	
 	
-	fn serve_404 (&self, _request : Request) -> ServerResponseFuture {
+	pub fn serve_404 (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		eprintln! ("[ee] [4ba52b89]  failing `{}` with 404 (not found)", _request.uri_path ());
-		return Response::new_404 () .into ();
+		return hss::Response::new_404 () .into ();
 	}
 }
 
 
 
 
-impl hss::HandlerDyn for Handler {
+impl hss::HandlerDyn for StaticHandler {
 	
-	fn handle (&self, _request : Request) -> ServerResponseFuture {
+	fn handle (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		return self.serve (_request);
 	}
+}
+
+
+
+
+fn random_token () -> String {
+	use ::rand::Rng as _;
+	let mut _rand = ::rand::thread_rng ();
+	let _token = _rand.gen::<u128> ();
+	format! ("{:0x}", _token)
 }
 

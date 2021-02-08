@@ -16,28 +16,25 @@ autobenches = false
 name = "hyper_static_server"
 path = "./lib.rs"
 
-[[bin]]
-name = "example"
-path = "./example.rs"
-
-
-
 
 [features]
 
-default = []
+default = ["runtime"]
 
+runtime = [
+	"hyper-simple-server",
+	"rand",
+]
 
+build = [
+	"sass-alt",
+	"walkdir",
+]
 
 
 [dependencies]
-hyper-simple-server = { path = "../../hyper-simple-server/sources", default-features = true }
-askama = { package = "askama_patched", version = "*", default-features = true }
-sass-rs = { version = "*", default-features = false }
-walkdir = { version = "*", default-features = false }
-rand = { version = "*", default-features = true }
-
-
-[patch.crates-io]
-askama_patched = { version = "*", git = "https://github.com/cipriancraciun/askama", branch = "fork/merged" }
+hyper-simple-server = { path = "../../hyper-simple-server/sources", default-features = true, optional = true }
+rand = { version = "*", default-features = true, optional = true }
+sass-alt = { version = "*", default-features = false, optional = true }
+walkdir = { version = "*", default-features = false, optional = true }
 
