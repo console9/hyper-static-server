@@ -1,15 +1,19 @@
 
 template! (HomeResource, HomeTemplate, Html, "home.html", "home");
-resource! (FaviconResource, Icon, "../examples/files/favicon.ico", "favicon");
-resource! (RobotsResource, Text, "../examples/files/robots.txt", "robots");
+resource! (FaviconResource, Icon, embedded, "../examples/files/favicon.ico", "favicon");
+resource! (RobotsResource, Text, embedded, "../examples/files/robots.txt", "robots");
 
 route! (HomeRoute, HomeResource, "/");
 route! (FaviconRoute, FaviconResource, "/favicon.ico");
 route! (RobotsRoute, RobotsResource, "/robots.txt");
 
+resource! (DataResource, Text, dynamic, "./examples/files/data.txt", "data");
+route! (DataRoute, DataResource, "/data.txt");
+
 routes! (Routes, [
 		HomeRoute,
 		FaviconRoute,
 		RobotsRoute,
+		DataRoute,
 	]);
 

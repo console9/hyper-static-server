@@ -18,7 +18,7 @@ pub(crate) use ::hyper_simple_server as hss;
 pub(crate) type Request = hss::Request<hss::Body>;
 pub(crate) type Response = hss::Response<hss::Body>;
 pub(crate) type ServerResponseFuture = hss::HandlerFutureDynBox;
-pub(crate) type ServerResult = hss::ServerResult;
+pub(crate) type ServerResult<V = ()> = hss::ServerResult<V>;
 pub(crate) type ServerError = hss::ServerError;
 
 pub(crate) use hss::RequestExt as _;
