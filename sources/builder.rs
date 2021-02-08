@@ -16,6 +16,7 @@ use ::blake2;
 
 
 
+#[ derive (Clone, Debug) ]
 pub struct BuilderConfiguration {
 	
 	pub sources : Option<PathBuf>,
@@ -44,15 +45,9 @@ impl Default for BuilderConfiguration {
 	
 	fn default () -> Self {
 		
-		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .expect ("[4c6c04d8]"));
-		if ! _sources.is_dir () {
-			panic! ("[148bc689]");
-		}
-		
-		let _outputs = PathBuf::from (env::var ("OUT_DIR") .expect ("[f039039f]"));
-		if ! _outputs.is_dir () {
-			panic! ("[fcee6b4d]");
-		}
+		let _sources = Self::resolve_sources ();
+		let _outputs = Self::resolve_outputs ();
+		let _generated = _outputs.join ("./hss-builder-generated-default.in");
 		
 		let _assets_sources = _sources.join ("./assets");
 		let _css_sources = _assets_sources.join ("./css");
@@ -74,13 +69,11 @@ impl Default for BuilderConfiguration {
 		let _askama_sources = _sources.join ("./templates");
 		let _askama_sources = if _askama_sources.exists () { Some (_askama_sources) } else { None };
 		
-		let _sources = Some (_sources);
-		
-		let _outputs = _outputs;
-		let _generated = _outputs.join ("./hss-builder-generated-default.in");
-		
 		Self {
-				sources : _sources,
+				sources : Some (_sources),
+				
+				outputs : _outputs,
+				generated : _generated,
 				
 				assets_sources : _assets_sources,
 				assets_route_base : _assets_route_base,
@@ -96,10 +89,56 @@ impl Default for BuilderConfiguration {
 				fonts_route_base : _fonts_route_base,
 				
 				askama_sources : _askama_sources,
-				
+			}
+	}
+}
+
+
+impl BuilderConfiguration {
+	
+	pub fn minimal () -> Self {
+		
+		let _sources = Self::resolve_sources ();
+		let _outputs = Self::resolve_outputs ();
+		let _generated = _outputs.join ("./hss-builder-generated-default.in");
+		
+		Self {
+				sources : Some (_sources),
 				outputs : _outputs,
 				generated : _generated,
+				
+				assets_sources : None,
+				assets_route_base : None,
+				
+				css_sources : None,
+				css_route_base : None,
+				
+				js_sources : None,
+				js_route_base : None,
+				
+				images_route_base : None,
+				favicons_route_base : None,
+				fonts_route_base : None,
+				
+				askama_sources : None,
 			}
+		
+	}
+	
+	pub fn resolve_sources () -> PathBuf {
+		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .expect ("[4c6c04d8]"));
+		if ! _sources.is_dir () {
+			panic! ("[148bc689]");
+		}
+		_sources
+	}
+	
+	pub fn resolve_outputs () -> PathBuf {
+		let _outputs = PathBuf::from (env::var ("OUT_DIR") .expect ("[f039039f]"));
+		if ! _outputs.is_dir () {
+			panic! ("[fcee6b4d]");
+		}
+		_outputs
 	}
 }
 
