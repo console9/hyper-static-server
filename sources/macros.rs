@@ -93,7 +93,7 @@ macro_rules! resource {
 			pub const RESOURCE : $crate::EmbeddedResource =
 					$crate::EmbeddedResource::new (
 							::std::option::Option::Some ($crate::ContentType::$_content_type),
-							::std::include_bytes! ($_resource_path),
+							::std::include_bytes! (::std::concat! (::std::env! ("CARGO_MANIFEST_DIR"), "/", $_resource_path)),
 						);
 		}
 		
@@ -123,7 +123,7 @@ macro_rules! resource {
 			pub fn new () -> Self {
 				Self {
 						resource : $crate::FileResource::new (
-								$_resource_path,
+								::std::concat! (::std::env! ("CARGO_MANIFEST_DIR"), "/", $_resource_path),
 								::std::option::Option::Some ($crate::ContentType::$_content_type),
 								false,
 							)
