@@ -1,0 +1,13 @@
+{
+	
+	askama! ("/home.html" => "/");
+	asset_sass! ("/main.scss");
+	asset_js! ("/main.js");
+	
+	assets_favicons! ("/favicons");
+	asset! ("/favicons/favicon.ico" => "/favicon.ico");
+	
+	asset! ("/files/robots.txt" => "/robots.txt");
+	asset! ("/files/data.txt" => "/data.txt");
+	
+}
