@@ -2,7 +2,7 @@
 
 
 
-#[macro_export]
+#[ macro_export ]
 macro_rules! askama {
 	
 	
@@ -62,11 +62,11 @@ macro_rules! askama {
 
 
 
-#[macro_export]
+#[ macro_export ]
 macro_rules! resource {
 	
 	
-	( $_resource_name : ident, $_content_type : ident, embedded, $_resource_path : literal, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : ident, embedded, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_resource_name ();
@@ -93,7 +93,7 @@ macro_rules! resource {
 			pub const RESOURCE : $crate::EmbeddedResource =
 					$crate::EmbeddedResource::new (
 							::std::option::Option::Some ($crate::ContentType::$_content_type),
-							::std::include_bytes! (::std::concat! (::std::env! ("CARGO_MANIFEST_DIR"), "/", $_resource_path)),
+							::std::include_bytes! ($crate::resource_path! ($_resource_path)),
 						);
 		}
 		
@@ -110,7 +110,7 @@ macro_rules! resource {
 	};
 	
 	
-	( $_resource_name : ident, $_content_type : ident, dynamic, $_resource_path : literal, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : ident, dynamic, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_resource_name {
@@ -123,7 +123,7 @@ macro_rules! resource {
 			pub fn new () -> Self {
 				Self {
 						resource : $crate::FileResource::new (
-								::std::concat! (::std::env! ("CARGO_MANIFEST_DIR"), "/", $_resource_path),
+								$crate::resource_path! ($_resource_path),
 								::std::option::Option::Some ($crate::ContentType::$_content_type),
 								false,
 							)
@@ -159,7 +159,7 @@ macro_rules! resource {
 
 
 
-#[macro_export]
+#[ macro_export ]
 macro_rules! route {
 	
 	
@@ -188,7 +188,7 @@ macro_rules! route {
 
 
 
-#[macro_export]
+#[ macro_export ]
 macro_rules! routes {
 	
 	
@@ -213,6 +213,40 @@ macro_rules! routes {
 				_routes
 			}
 		}
+	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! builder_generated {
+	
+	
+	() => {
+		::std::include! (::std::concat! (::std::env! ("OUT_DIR"), "/hss-builder-generated-default.in"));
+	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! resource_path {
+	
+	
+	( ( relative_to_crate, $_path : literal ) ) => {
+		::std::concat! (::std::env! ("CARGO_MANIFEST_DIR"), "/", $_path)
+	};
+	
+	
+	( ( relative_to_cwd, $_path : literal ) ) => {
+		$_path
+	};
+	
+	
+	( $_path : literal ) => {
+		$crate::resource_path! ( ( relative_to_crate, $_path ) )
 	};
 }
 
