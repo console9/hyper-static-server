@@ -5,17 +5,21 @@ version = "0.0.0"
 authors = ["Ciprian Dorin Craciun <ciprian@volution.ro>"]
 edition = "2018"
 license = "MIT"
+build = "./sources/build.rs"
 
 [[bin]]
 name = "example"
-path = "./main.rs"
+path = "./sources/main.rs"
 
 [features]
 default = []
 
 [dependencies]
-hyper-static-server = { path = "../sources", default-features = true }
+hyper-static-server = { path = "../sources", default-features = false, features = ["runtime"] }
 askama = { package = "askama_patched", version = "*", default-features = true }
+
+[build-dependencies]
+hyper-static-server = { path = "../sources", default-features = false, features = ["builder"] }
 
 [patch.crates-io]
 askama_patched = { version = "*", git = "https://github.com/cipriancraciun/askama", branch = "fork/merged" }

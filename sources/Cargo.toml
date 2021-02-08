@@ -19,22 +19,27 @@ path = "./lib.rs"
 
 [features]
 
-default = ["runtime"]
+default = [
+	"runtime",
+	"builder",
+]
 
 runtime = [
 	"hyper-simple-server",
 	"rand",
 ]
 
-build = [
-	"sass-alt",
+builder = [
+	"sass-rs",
 	"walkdir",
+	"blake2",
 ]
 
 
 [dependencies]
 hyper-simple-server = { path = "../../hyper-simple-server/sources", default-features = true, optional = true }
 rand = { version = "*", default-features = true, optional = true }
-sass-alt = { version = "*", default-features = false, optional = true }
+sass-rs = { version = "*", default-features = false, optional = true }
 walkdir = { version = "*", default-features = false, optional = true }
+blake2 = { version = "*", default-features = false, features = ["std"], optional = true }
 
