@@ -11,8 +11,8 @@
 
 
 &&== env-path _RUST_SOURCES ./sources
+&&== env-path _RUST_EXAMPLES ./examples
 &&== env-path _RUST_TARGET ./.target
-&&== env-path _EXAMPLES ./examples
 
 
 
@@ -25,6 +25,7 @@
 
 << debug / run / example
 	#! <bash+>
+	export -- _RUST_MANIFEST="${_RUST_EXAMPLES}/Cargo.toml"
 	Z_zexec ':: cargo / run' run --bin example --no-default-features --features "${_RUST_FEATURES:-default}" -- "${@}"
 !!
 
@@ -90,6 +91,7 @@
 
 << release / run / example
 	#! <bash+>
+	export -- _RUST_MANIFEST="${_RUST_EXAMPLES}/Cargo.toml"
 	Z_zexec ':: cargo / run' run --bin example --release -- "${@}"
 !!
 
@@ -143,13 +145,13 @@
 	case "${_command}" in
 		( check | build | run | doc | clippy )
 			_arguments+=(
-					--manifest-path "${_RUST_SOURCES}/Cargo.toml"
+					--manifest-path "${_RUST_MANIFEST:-${_RUST_SOURCES}/Cargo.toml}"
 					--target-dir "${_RUST_TARGET}"
 				)
 		;;
 		( metadata | update )
 			_arguments+=(
-					--manifest-path "${_RUST_SOURCES}/Cargo.toml"
+					--manifest-path "${_RUST_MANIFEST:-${_RUST_SOURCES}/Cargo.toml}"
 				)
 		;;
 		( * )
@@ -183,6 +185,7 @@
 	watchexec \
 			\
 			--watch "${_RUST_SOURCES}" \
+			--watch "${_RUST_EXAMPLES}" \
 			\
 			--restart \
 			--debounce 100 \
