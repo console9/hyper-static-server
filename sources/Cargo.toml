@@ -2,10 +2,13 @@
 
 [package]
 name = "hyper-static-server"
-version = "0.0.0"
+version = "0.1.1"
 authors = ["Ciprian Dorin Craciun <ciprian@volution.ro>"]
 edition = "2018"
 license = "MIT"
+repository = "https://github.com/console9/hyper-static-server"
+documentation = "https://docs.rs/hyper-static-server"
+description = "Simple friendly library to build static servers with hyper HTTP server."
 autobins = false
 autoexamples = false
 autotests = false
@@ -42,4 +45,8 @@ rand = { version = "0.8.3", default-features = false, optional = true }
 sass-rs = { version = "0.2.2", default-features = false, optional = true }
 walkdir = { version = "2.3.1", default-features = false, optional = true }
 blake2 = { version = "0.9.1", default-features = false, features = ["std"], optional = true }
+
+
+# [patch.crates-io]
+# hyper-simple-server = { path = "../../hyper-simple-server/sources" }
 
