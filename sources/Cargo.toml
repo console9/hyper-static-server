@@ -51,14 +51,13 @@ builder-sass-alt = [
 
 
 [dependencies]
+
+# hyper-simple-server = { path = "../../hyper-simple-server/sources", default-features = false, features = ["hss-full"], optional = true }
 hyper-simple-server = { version = "0.1.1", default-features = false, features = ["hss-full"], optional = true }
+
 rand = { version = "0.8.3", default-features = false, optional = true }
 sass-rs = { version = "0.2.2", default-features = false, optional = true }
 sass-alt = { version = "0.2.7", default-features = false, optional = true }
 walkdir = { version = "2.3.1", default-features = false, optional = true }
 blake2 = { version = "0.9.1", default-features = false, features = ["std"], optional = true }
-
-
-# [patch.crates-io]
-# hyper-simple-server = { path = "../../hyper-simple-server/sources" }
 
