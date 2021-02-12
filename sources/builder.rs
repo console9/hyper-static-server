@@ -191,7 +191,7 @@ impl Builder {
 		self.dependencies.push (_source.clone ());
 		
 		let _content_type = "Html";
-		let _description = format! ("askama ({}, source = {:?})", _content_type, _relative);
+		let _description = format! ("askama ({}, source = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, &_relative[1..], _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -213,7 +213,7 @@ impl Builder {
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
 		let _content_type = "Css";
-		let _description = format! ("resource_css ({}, source = {:?})", _content_type, _relative);
+		let _description = format! ("resource_css ({}, source = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -229,7 +229,7 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
 		
-		let _relative = PathBuf::from (_relative) .with_extension ("css");
+		let _relative = PathBuf::from (_relative) .with_extension ("css") .to_string_lossy () .into_owned ();
 		
 		let _route_base = self.configuration.css_route_base.as_ref () .map (PathBuf::as_path);
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
@@ -239,7 +239,7 @@ impl Builder {
 		create_file_from_str (&_source, &_compiled) .expect ("[bd7285f4]");
 		
 		let _content_type = "Css";
-		let _description = format! ("resource_sass ({}, source = {:?})", _content_type, _relative);
+		let _description = format! ("resource_sass ({}, source = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -261,7 +261,7 @@ impl Builder {
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
 		let _content_type = "Js";
-		let _description = format! ("resource_js ({}, path = {:?})", _content_type, _relative);
+		let _description = format! ("resource_js ({}, path = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -321,7 +321,7 @@ impl Builder {
 				panic! ("[0fd2d804] {:?}", _source),
 		};
 		
-		let _description = format! ("resource_image ({}, path = {:?})", _content_type, _relative);
+		let _description = format! ("resource_image ({}, path = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -365,7 +365,7 @@ impl Builder {
 				panic! ("[1a4ccbf4] {:?}", _source),
 		};
 		
-		let _description = format! ("resource_font ({}, source = {:?})", _content_type, _relative);
+		let _description = format! ("resource_font ({}, source = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -443,7 +443,7 @@ impl Builder {
 			}
 		};
 		
-		let _description = format! ("resource_asset ({}, path = {:?})", _content_type, _relative);
+		let _description = format! ("resource_asset ({}, path = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
