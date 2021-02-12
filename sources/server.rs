@@ -56,8 +56,6 @@ impl StaticHandler {
 	pub fn serve_special (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		match _request.uri_path () {
-			"/__/routes" =>
-				return self.serve_routes_index (_request),
 			"/__/heartbeat" =>
 				return hss::Response::new_200 () .into (),
 			"/__/reload.txt" =>
@@ -67,13 +65,17 @@ impl StaticHandler {
 						Some (hss::ContentType::Js),
 						& include_bytes! ("./reload.js") [..],
 					) .into (),
+			"/__/routes.html" =>
+				return self.serve_routes_index_html (_request),
+			"/__/routes.txt" =>
+				return self.serve_routes_index_txt (_request),
 			_ =>
 				return self.serve_404 (_request),
 		}
 	}
 	
 	
-	pub fn serve_routes_index (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
+	pub fn serve_routes_index_html (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		let mut _buffer = String::with_capacity (128 * 1024);
 		
@@ -96,13 +98,34 @@ impl StaticHandler {
 			_buffer.push_str (& _sanitize (&_route.path, true));
 			_buffer.push_str ("\">");
 			_buffer.push_str (& _sanitize (&_route.path, false));
-			_buffer.push_str ("</a> -> <span>");
-			_buffer.push_str (& _sanitize (& format! ("{:?}", _route.debug), false));
-			_buffer.push_str ("</span></code></li>\n");
+			_buffer.push_str ("</a>");
+			if let Some (_debug) = _route.debug.as_ref () {
+				_buffer.push_str (" -> <span>");
+				_buffer.push_str (& _sanitize (& format! ("{:?}", _debug), false));
+				_buffer.push_str ("</span>");
+			}
+			_buffer.push_str ("</code></li>\n");
 		}
 		_buffer.push_str ("</ul></body>\n");
 		
 		return hss::Response::new_200_with_html (_buffer) .into ();
+	}
+	
+	pub fn serve_routes_index_txt (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
+		
+		let mut _buffer = String::with_capacity (128 * 1024);
+		
+		for _route in self.routes.routes () {
+			_buffer.push_str ("* ");
+			_buffer.push_str (&_route.path);
+			if let Some (_debug) = _route.debug.as_ref () {
+				_buffer.push_str (" -> ");
+				_buffer.push_str (& format! ("{:?}", _debug));
+			}
+			_buffer.push_str ("\n");
+		}
+		
+		return hss::Response::new_200_with_text (_buffer) .into ();
 	}
 	
 	
