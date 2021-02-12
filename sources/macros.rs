@@ -174,7 +174,13 @@ macro_rules! route {
 				use ::std::convert::From as _;
 				let _resource = <$_resource_name>::new ();
 				let _path = ::std::string::String::from ($_route_path);
-				let _description = ::std::string::String::from (_resource.description ());
+				let _description = Description (_resource.description ());
+				struct Description (&'static str);
+				impl ::std::fmt::Debug for Description {
+					fn fmt (&self, _formatter : &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
+						_formatter.write_str (self.0)
+					}
+				}
 				$crate::Route {
 						path : _path,
 						handler : $crate::HandlerDynArc::new (_resource.into_handler ()),
