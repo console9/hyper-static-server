@@ -389,7 +389,7 @@ dependencies = [
 
 [[package]]
 name = "hyper-static-server"
-version = "0.1.1"
+version = "0.1.2"
 dependencies = [
  "blake2",
  "hyper-simple-server",
