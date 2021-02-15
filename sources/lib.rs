@@ -10,7 +10,7 @@ pub(crate) mod main;
 pub(crate) mod server;
 
 #[ cfg (feature = "runtime") ]
-pub(crate) mod macros;
+pub(crate) mod macros_runtime;
 
 
 #[ cfg (feature = "runtime") ]
@@ -28,6 +28,9 @@ pub use ::hyper_simple_server::*;
 
 #[ cfg (feature = "builder") ]
 pub(crate) mod builder;
+
+#[ cfg (feature = "builder") ]
+pub(crate) mod macros_builder;
 
 #[ cfg (feature = "builder") ]
 pub use builder::*;
