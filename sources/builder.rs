@@ -634,10 +634,20 @@ impl Builder {
 	#[ cfg (feature = "sass-rs") ]
 	fn compile_sass (&self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
 		
+		let _extension = _source.extension () .expect ("[836ff108]") .to_str () .expect ("[4068e13f]");
+		let _indented_syntax = match _extension {
+			"sass" =>
+				true,
+			"scss" =>
+				false,
+			_ =>
+				panic! ("[720c0c23]"),
+		};
+		
 		let _options = sass::Options {
 				output_style : sass::OutputStyle::Expanded,
 				precision : 4,
-				indented_syntax : true,
+				indented_syntax : _indented_syntax,
 				include_paths : vec! [],
 			};
 		
