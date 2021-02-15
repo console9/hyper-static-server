@@ -8,6 +8,7 @@ use ::std::fs;
 use ::std::io;
 use ::std::io::{Write as _};
 use ::std::path::{Path, PathBuf};
+use ::std::collections::BTreeSet;
 
 use ::sass_rs as sass;
 use ::walkdir;
@@ -154,7 +155,7 @@ pub struct Builder {
 	generated : String,
 	counter : u32,
 	route_names : Vec<String>,
-	dependencies : Vec<PathBuf>,
+	dependencies : BTreeSet<PathBuf>,
 }
 
 
@@ -166,7 +167,7 @@ impl Builder {
 				generated : String::with_capacity (1024 * 1024),
 				counter : 0,
 				route_names : Vec::new (),
-				dependencies : Vec::new (),
+				dependencies : BTreeSet::new (),
 			}
 	}
 	
@@ -196,7 +197,7 @@ impl Builder {
 		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
+		self.dependencies.insert (_source.clone ());
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -219,7 +220,7 @@ impl Builder {
 		let _description = format! ("askama ({}, source = `...{}`)", _content_type, _relative);
 		
 		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
+		self.dependencies.insert (_source.clone ());
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, &_relative[1..], _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -245,7 +246,7 @@ impl Builder {
 		let _css_sources = self.configuration.css_sources.as_ref () .expect ("[0d19f056]") .to_owned ();
 		let (_relative, _source) = self.resolve_file (&_css_sources, _source) .expect ("[4f6f6f41]");
 		
-		self.dependencies.push (_source.clone ());
+		self.dependencies.insert (_source.clone ());
 		
 		let _relative = PathBuf::from (_relative) .with_extension ("css") .to_string_lossy () .into_owned ();
 		
@@ -256,7 +257,9 @@ impl Builder {
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		self.route_asset_raw (_relative, _source, "Css", _route_base, _route_builder, "resource_sass", None);
+		self.route_asset_raw (_relative, _source.clone (), "Css", _route_base, _route_builder, "resource_sass", None);
+		
+		self.dependencies.remove (&_source);
 	}
 	
 	
@@ -426,7 +429,6 @@ impl Builder {
 		
 		self.route_asset_0 (_relative, _source, _content_type, _route_base, _route_builder, None);
 	}
-	
 	
 	pub fn route_assets (&mut self, _sources : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
