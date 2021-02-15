@@ -261,7 +261,7 @@ impl Builder {
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
 		let _content_type = "Js";
-		let _description = format! ("resource_js ({}, path = `...{}`)", _content_type, _relative);
+		let _description = format! ("resource_js ({}, source = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -280,7 +280,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
+		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, None);
 	}
 	
 	pub fn route_images (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -296,7 +296,7 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
+			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
 		}
 	}
 	
@@ -310,7 +310,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
+		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, None);
 	}
 	
 	pub fn route_favicons (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -326,11 +326,11 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
+			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
 		}
 	}
 	
-	fn route_image_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	fn route_image_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) -> () {
 		
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
@@ -347,7 +347,11 @@ impl Builder {
 				panic! ("[0fd2d804] {:?}", _source),
 		};
 		
-		let _description = format! ("resource_image ({}, path = `...{}`)", _content_type, _relative);
+		let _description = if let Some (_from) = _from {
+			format! ("resource_image ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
+		} else {
+			format! ("resource_image ({}, file = `...{}`)", _content_type, _relative)
+		};
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -366,7 +370,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_font_0 (_id, _relative, _source, _route_base, _route_builder);
+		self.route_font_0 (_id, _relative, _source, _route_base, _route_builder, None);
 	}
 	
 	pub fn route_fonts (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -382,12 +386,12 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_font_0 (_id, _relative, _source, _route_base, _route_builder);
+			self.route_font_0 (_id, _relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
 		}
 	}
 	
 	
-	fn route_font_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	fn route_font_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) -> () {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
@@ -404,7 +408,11 @@ impl Builder {
 				panic! ("[1a4ccbf4] {:?}", _source),
 		};
 		
-		let _description = format! ("resource_font ({}, source = `...{}`)", _content_type, _relative);
+		let _description = if let Some (_from) = _from {
+			format! ("resource_font ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
+		} else {
+			format! ("resource_font ({}, file = `...{}`)", _content_type, _relative)
+		};
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -423,7 +431,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder);
+		self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder, None);
 	}
 	
 	
@@ -440,12 +448,12 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder);
+			self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder, Some (_sources.as_ref ()));
 		}
 	}
 	
 	
-	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
+	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
@@ -476,7 +484,11 @@ impl Builder {
 			}
 		};
 		
-		let _description = format! ("resource_asset ({}, path = `...{}`)", _content_type, _relative);
+		let _description = if let Some (_from) = _from {
+			format! ("resource_asset ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
+		} else {
+			format! ("resource_asset ({}, file = `...{}`)", _content_type, _relative)
+		};
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
