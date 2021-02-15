@@ -7,6 +7,7 @@ use ::std::fmt::{Write as _};
 use ::std::fs;
 use ::std::io;
 use ::std::io::{Write as _};
+use ::std::iter::Iterator;
 use ::std::path::{Path, PathBuf};
 use ::std::collections::BTreeSet;
 
@@ -197,7 +198,7 @@ impl Builder {
 		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.insert (_source.clone ());
+		self.dependencies_include (&_source);
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -220,7 +221,7 @@ impl Builder {
 		let _description = format! ("askama ({}, source = `...{}`)", _content_type, _relative);
 		
 		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.insert (_source.clone ());
+		self.dependencies_include (&_source);
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, &_relative[1..], _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -246,7 +247,7 @@ impl Builder {
 		let _css_sources = self.configuration.css_sources.as_ref () .expect ("[0d19f056]") .to_owned ();
 		let (_relative, _source) = self.resolve_file (&_css_sources, _source) .expect ("[4f6f6f41]");
 		
-		self.dependencies.insert (_source.clone ());
+		self.dependencies_include (&_source);
 		
 		let _relative = PathBuf::from (_relative) .with_extension ("css") .to_string_lossy () .into_owned ();
 		
@@ -259,7 +260,7 @@ impl Builder {
 		
 		self.route_asset_raw (_relative, _source.clone (), "Css", _route_base, _route_builder, "resource_sass", None);
 		
-		self.dependencies.remove (&_source);
+		self.dependencies_exclude (&_source);
 	}
 	
 	
@@ -294,7 +295,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
-		self.dependencies.extend (_folders);
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.images_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -321,7 +322,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
-		self.dependencies.extend (_folders);
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.icons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -348,7 +349,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
-		self.dependencies.extend (_folders);
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.favicons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -391,7 +392,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
-		self.dependencies.extend (_folders);
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.fonts_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -434,7 +435,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[d807eb26]");
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
-		self.dependencies.extend (_folders);
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.assets_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -457,6 +458,8 @@ impl Builder {
 	
 	
 	pub fn generate (mut self) -> () {
+		
+		self.dependencies_extend ();
 		
 		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .unwrap ();
 		for _route_name in self.route_names.into_iter () {
@@ -558,6 +561,44 @@ impl Builder {
 		
 		return Ok ((_paths, _folders));
 	}
+	
+	
+	
+	
+	fn dependencies_include (&mut self, _path : &Path) -> () {
+		self.dependencies.insert (_path.into ());
+	}
+	
+	fn dependencies_include_all <'a> (&mut self, _paths : impl Iterator<Item = &'a Path>) -> () {
+		for _path in _paths {
+			self.dependencies_include (_path);
+		}
+	}
+	
+	fn dependencies_exclude (&mut self, _path : &Path) -> () {
+		self.dependencies.remove (_path.into ());
+	}
+	
+	fn dependencies_extend (&mut self) -> () {
+		
+		let mut _extra = Vec::new ();
+		
+		for _dependency in self.dependencies.iter () {
+			
+			let _metadata = fs::symlink_metadata (_dependency) .expect ("[e5c6e436]");
+			
+			if _metadata.file_type () .is_symlink () {
+				let _target = _dependency.canonicalize () .expect ("[12da2ba1]");
+				_extra.push (_target);
+			}
+		}
+		
+		for _dependency in _extra.into_iter () {
+			self.dependencies.insert (_dependency);
+		}
+	}
+	
+	
 	
 	
 	fn generate_id (&mut self) -> u32 {
