@@ -5,14 +5,20 @@
 #[ allow (unused_imports) ]
 use ::std::{
 		
-		collections::BTreeSet,
+		cell,
 		env,
 		ffi,
+		fmt,
 		fs,
 		io,
+		iter,
+		mem,
+		path,
+		rc,
+		
+		collections::BTreeSet,
 		iter::Iterator,
 		path::{Path, PathBuf},
-		rc,
 		
 		fmt::{Write as _},
 		io::{Write as _},
@@ -632,7 +638,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "sass-rs") ]
-	fn compile_sass (&self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
+	fn compile_sass (&mut self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
 		
 		let _extension = _source.extension () .expect ("[836ff108]") .to_str () .expect ("[4068e13f]");
 		let _indented_syntax = match _extension {
@@ -660,7 +666,9 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "sass-alt") ]
-	fn compile_sass (&self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
+	fn compile_sass (&mut self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
+		
+		let _parent = _source.parent () .expect ("[f6ce0d79]");
 		
 		let _extension = _source.extension () .expect ("[f2cd37bc]") .to_str () .expect ("[db216e38]");
 		let _input_syntax = match _extension {
@@ -671,6 +679,42 @@ impl Builder {
 			_ =>
 				panic! ("[90668feb]"),
 		};
+		
+		pub struct Importer { parent : PathBuf, resolved : rc::Rc<cell::RefCell<Vec<Box<Path>>>> }
+		impl sass::SassImporter for Importer {
+			fn callback (&mut self, _path_0 : &ffi::CStr, _compiler : sass::SassCompiler) -> Result<Option<Vec<sass::SassImportEntry>>, sass::SassImporterError> {
+				
+				let _path_0 = Path::new (_path_0.to_str () .expect ("[fd5fc0a2]"));
+				let _path = self.parent.join (_path_0);
+				
+				for _extension in &["sass", "scss", "css"] {
+					let _path = _path.with_extension (_extension);
+					if ! _path.exists () {
+						continue;
+					}
+					let _path = normalize_path (&_path);
+					// eprintln! ("[dd] [d84fd5f5] {} -> {}", _path_0.display (), _path.display ());
+					
+					// NOTE:  The code bellow will keep a reference to `_path` that should live until after the compilation completes.
+					let mut _resolved = self.resolved.borrow_mut ();
+					_resolved.push (_path.into_boxed_path ());
+					let _path = _resolved.last () .expect ("[5d9cba96]") .as_ref ();
+					let _entry = sass::SassImport::AbsolutePath (_path);
+					
+					return Ok (Some (vec! (_entry.into_sass_import_entry ())));
+				}
+				
+				panic! ("[e9c920d0] {}", _path.display ());
+			}
+		}
+		impl fmt::Debug for Importer {
+			fn fmt (&self, _formatter: &mut fmt::Formatter<'_>) -> fmt::Result {
+				_formatter.write_str ("SassImporter()")
+			}
+		}
+		
+		let _resolved = rc::Rc::new (cell::RefCell::new (Vec::new ()));
+		let _importer = Box::new (Importer { parent : _parent.into (), resolved : _resolved.clone () });
 		
 		let _options = sass::SassOptions {
 				output_style : sass::OutputStyle::Expanded,
@@ -685,11 +729,15 @@ impl Builder {
 				input_syntax : _input_syntax,
 				include_paths : &[],
 				function_list : rc::Rc::new (sass::SassFunctionList::new (Vec::new ())),
-				importer_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
+				importer_list : rc::Rc::new (sass::SassImporterList::new (vec! (_importer))),
 				header_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
 			};
 		
 		let _data = _options.compile_file (_source) .expect ("[bbaffa6f]");
+		
+		for _dependency in _resolved.borrow () .iter () {
+			self.dependencies_include (_dependency.as_ref ());
+		}
 		
 		return Ok (_data);
 	}
