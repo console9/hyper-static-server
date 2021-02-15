@@ -66,6 +66,14 @@ macro_rules! askama {
 macro_rules! resource {
 	
 	
+	( $_resource_name : ident, $_content_type : ident, auto, $_resource_path : tt, $_description : literal ) => {
+		#[ cfg (debug_assertions) ]
+		$crate::resource! ($_resource_name, $_content_type, dynamic, $_resource_path, $_description);
+		#[ cfg (not (debug_assertions)) ]
+		$crate::resource! ($_resource_name, $_content_type, embedded, $_resource_path, $_description);
+	};
+	
+	
 	( $_resource_name : ident, $_content_type : ident, embedded, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
