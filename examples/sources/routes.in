@@ -6,10 +6,10 @@
 	asset_js! ("/main.js");
 	
 	assets_images! ("/images");
-	assets_images! ("/icons" => "/assets/icons");
+	assets_icons! ("/icons");
 	
 	assets_favicons! ("/favicons");
-	assets_favicon! ("/favicons/favicon.ico" => "/favicon.ico");
+	asset_favicon! ("/favicons/favicon.ico" => "/favicon.ico");
 	
 	asset! ("/files/robots.txt" => "/robots.txt");
 	asset! ("/files/data.txt" => "/data.txt");
