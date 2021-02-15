@@ -480,6 +480,26 @@ impl Builder {
 	
 	
 	
+	pub fn watch_asset (&mut self, _source : &str) {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[443c8ae5]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[256c60bf]");
+		
+		self.dependencies_include (&_source);
+	}
+	
+	pub fn watch_assets (&mut self, _sources : &str) -> () {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[d807eb26]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
+		
+		self.dependencies_include_all (_paths.iter () .map (|_pair| _pair.1.as_path ()));
+	}
+	
+	
+	
+	
 	pub fn generate (mut self) -> () {
 		
 		self.dependencies_extend ();

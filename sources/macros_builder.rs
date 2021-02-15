@@ -172,6 +172,21 @@ macro_rules! builder_macros {
 		}
 		
 		
+		#[ allow (unused_macros) ]
+		macro_rules! asset_watch {
+			( $_source : literal ) => {
+				$_builder.watch_asset ($_source);
+			};
+		}
+		
+		#[ allow (unused_macros) ]
+		macro_rules! assets_watch {
+			( $_source : literal ) => {
+				$_builder.watch_assets ($_source);
+			};
+		}
+		
+		
 	};
 }
 
