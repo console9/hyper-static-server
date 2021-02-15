@@ -618,6 +618,7 @@ impl Builder {
 		}
 	}
 	
+	#[ allow (dead_code) ]
 	fn dependencies_exclude (&mut self, _path : &Path) -> () {
 		self.dependencies.remove (_path.into ());
 	}
@@ -899,6 +900,7 @@ fn detect_content_type_from_extension (_source : &Path) -> &'static str {
 
 
 
+#[ allow (dead_code) ]
 fn fingerprint_data (_data : impl AsRef<[u8]>) -> String {
 	use blake2::Digest as _;
 	let mut _hasher = blake2::Blake2b::new ();
