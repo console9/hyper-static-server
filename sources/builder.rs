@@ -423,7 +423,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, None, _route_builder);
+		self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder);
 	}
 	
 	
@@ -440,17 +440,17 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, None, _route_builder);
+			self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder);
 		}
 	}
 	
 	
-	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_infix : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
+	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
 		
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, _route_infix);
+		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
 		let _extension = _source.extension () .expect ("[29957dc8]") .to_str () .expect ("[908aeea6]");
 		let _content_type = if let Some (_content_type) = _content_type {
