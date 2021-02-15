@@ -620,47 +620,23 @@ fn create_file_from_str (_path : &Path, _data : &str) -> Result<(), io::Error> {
 
 pub trait RoutePathBuilder {
 	
-	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_base_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf;
+	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf;
 }
 
 
 impl RoutePathBuilder for () {
 	
-	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_base_hint : Option<&Path>, _route_infix : Option<&Path>) -> PathBuf {
-		
-		let _route_base = _route_base_hint.expect ("[1ba00780]");
-		
-		if ! _route_base.starts_with ("/") || _route_base.ends_with ("/") {
-			panic! ("[6fc9256c]");
-		}
-		if ! _source_relative.starts_with ("/") || _source_relative.ends_with ("/") {
-			panic! ("[ace09af4]");
-		}
-		if let Some (_route_infix) = _route_infix {
-			if _route_infix.starts_with ("/") || _route_infix.ends_with ("/") {
-				panic! ("[d224b592]");
-			}
-		}
-		
-		let _source_relative = _source_relative.strip_prefix ("/") .expect ("[bd4b80bd]");
-		
-		let _route = if let Some (_route_infix) = _route_infix {
-			let _route_infix = _route_infix.strip_prefix ("/") .expect ("[1a7e3353]");
-			_route_base.join (_route_infix) .join (_source_relative)
-		} else {
-			_route_base.join (_source_relative)
-		};
-		
-		normalize_route (&_route, false, false)
+	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf {
+		generate_route (_source_relative, _route_prefix_hint, _route_infix_hint)
 	}
 }
 
 
 impl RoutePathBuilder for (bool, &str) {
 	
-	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_base_hint : Option<&Path>, _route_infix : Option<&Path>) -> PathBuf {
+	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf {
 		if self.0 {
-			().build (_source_relative, _source_path, Some (Path::new (self.1)), _route_infix)
+			generate_route (_source_relative, Some (Path::new (self.1)), None)
 		} else {
 			normalize_route (Path::new (self.1), true, false)
 		}
@@ -668,6 +644,35 @@ impl RoutePathBuilder for (bool, &str) {
 }
 
 
+
+
+fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _route_infix : Option<&Path>) -> PathBuf {
+	
+	let _route_prefix = _route_prefix.expect ("[1ba00780]");
+	
+	if ! _route_prefix.starts_with ("/") || _route_prefix.ends_with ("/") {
+		panic! ("[6fc9256c]");
+	}
+	if ! _source_relative.starts_with ("/") || _source_relative.ends_with ("/") {
+		panic! ("[ace09af4]");
+	}
+	if let Some (_route_infix) = _route_infix {
+		if _route_infix.starts_with ("/") || _route_infix.ends_with ("/") {
+			panic! ("[d224b592]");
+		}
+	}
+	
+	let _source_relative = _source_relative.strip_prefix ("/") .expect ("[bd4b80bd]");
+	
+	let _route = if let Some (_route_infix) = _route_infix {
+		let _route_infix = _route_infix.strip_prefix ("/") .expect ("[1a7e3353]");
+		_route_prefix.join (_route_infix) .join (_source_relative)
+	} else {
+		_route_prefix.join (_source_relative)
+	};
+	
+	normalize_route (&_route, false, false)
+}
 
 
 fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailing_slash : bool) -> PathBuf {
