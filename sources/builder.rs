@@ -413,7 +413,7 @@ impl Builder {
 	
 	
 	
-	pub fn route_asset (&mut self, _source : &str, _content_type : Option<&str>, _route : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
+	pub fn route_asset (&mut self, _source : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[443c8ae5]");
 		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[256c60bf]");
@@ -423,40 +423,34 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_asset_0 (_id, _relative, _source, _content_type, _route.as_ref () .map (Path::new), _route_base, None, _route_builder);
+		self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, None, _route_builder);
 	}
 	
 	
-	pub fn route_assets (&mut self, _sources : &str, _content_type : Option<&str>, _route_base : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_assets (&mut self, _sources : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[d807eb26]");
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
 		self.dependencies.extend (_folders);
 		
-		let _route_base_0 = self.configuration.assets_route_base.clone ();
-		let _route_base_0 = _route_base_0.as_ref () .map (PathBuf::as_path);
-		let _route_base = _route_base.map (Path::new);
-		let _route_base = _route_base.or (_route_base_0);
+		let _route_base = self.configuration.assets_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
 		for (_relative, _source) in _paths.into_iter () {
 			
 			let _id = self.generate_id ();
 			
-			self.route_asset_0 (_id, _relative, _source, _content_type, None, _route_base, None, _route_builder);
+			self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, None, _route_builder);
 		}
 	}
 	
 	
-	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route : Option<&Path>, _route_base : Option<&Path>, _route_infix : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
+	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_infix : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
 		
-		let _route = if let Some (_route) = _route {
-			normalize_route (_route, false, false)
-		} else {
-			_route_builder.build (_relative.as_ref (), &_source, _route_base, _route_infix)
-		};
+		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, _route_infix);
 		
 		let _extension = _source.extension () .expect ("[29957dc8]") .to_str () .expect ("[908aeea6]");
 		let _content_type = if let Some (_content_type) = _content_type {
@@ -844,27 +838,21 @@ macro_rules! builder_macros {
 		#[ allow (unused_macros) ]
 		macro_rules! asset {
 			( $_source : literal => $_route : literal ) => {
-				asset! (internal, $_source, $_route, ::std::option::Option::None)
+				$_builder.route_asset ($_source, ::std::option::Option::None, route_path_builder! (perhaps (exact), $_route));
 			};
 			( $_source : literal : $_content_type : ident => $_route : literal ) => {
-				asset! (internal, $_source, $_route, ::std::option::Option::Some (std::stringify! ($_content_type)))
+				$_builder.route_asset ($_source, ::std::option::Option::Some (::std::stringify! ($_content_type)), route_path_builder! (perhaps (exact), $_route));
 			};
-			( internal, $_source : literal, $_route : literal, $_content_type : expr ) => {
-				$_builder.route_asset ($_source, $_content_type, ::std::option::Option::Some ($_route), route_path_builder! (default));
-			}
 		}
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets {
 			( $_source : literal => $_route : literal ) => {
-				assets! (internal, $_source, $_route, ::std::option::Option::None)
+				$_builder.route_assets ($_source, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
 			( $_source : literal : $_content_type : ident => $_route : literal ) => {
-				assets! (internal, $_source, $_route, ::std::option::Option::Some (std::stringify! ($_content_type)))
+				$_builder.route_assets ($_source, ::std::option::Option::Some (::std::stringify! ($_content_type)), route_path_builder! (perhaps (prefix), $_route));
 			};
-			( internal, $_source : literal, $_route : literal, $_content_type : expr ) => {
-				$_builder.route_assets ($_source, $_content_type, ::std::option::Option::Some ($_route), route_path_builder! (default));
-			}
 		}
 		
 		
