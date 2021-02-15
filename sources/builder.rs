@@ -462,6 +462,12 @@ impl Builder {
 		}
 		writeln! (self.generated, "]);") .unwrap ();
 		
+		writeln! (self.generated, "::hyper_static_server::dependencies! (Dependencies, [") .unwrap ();
+		for _dependency in self.dependencies.iter () {
+			writeln! (self.generated, "\t{:?},", _dependency) .unwrap ();
+		}
+		writeln! (self.generated, "]);") .unwrap ();
+		
 		create_file_from_str (&self.configuration.generated, &self.generated) .expect ("[9796aa67]");
 		
 		if false {

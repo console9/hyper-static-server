@@ -206,17 +206,69 @@ macro_rules! routes {
 		impl $_name {
 			
 			pub fn new () -> $crate::Routes {
-				
+				use ::std::iter::IntoIterator as _;
 				let mut _routes = $crate::RoutesBuilder::new ();
-				
-				$( {
-					let _route = <$_route>::new ();
+				for _route in Self::routes () .into_iter () {
 					_routes = _routes.with_route_object (_route);
-				} )*
-				
+				}
 				let _routes = _routes.build () .expect ("[630a415a]");
-				
 				_routes
+			}
+		}
+		
+		impl $_name {
+			
+			pub fn routes () -> ::std::vec::Vec<$crate::Route> {
+				::std::vec! (
+					$( <$_route>::new (), )*
+				)
+			}
+		}
+		
+		impl $_name {
+			
+			pub fn eprintln_routes () -> () {
+				use ::std::iter::IntoIterator as _;
+				for _route in Self::routes () .into_iter () {
+					if let ::std::option::Option::Some (_debug) = _route.debug.as_ref () {
+						::std::eprintln! ("[dd] [825798f8]  **  {} -> {:?}", _route.path, _debug);
+					} else {
+						::std::eprintln! ("[dd] [df531ca1]  **  {}", _route.path);
+					}
+				}
+			}
+		}
+	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! dependencies {
+	
+	
+	( $_name : ident, [ $( $_dependency : literal, )* ] ) => {
+		
+		#[ allow (non_camel_case_types) ]
+		pub(crate) struct $_name ();
+		
+		impl $_name {
+			
+			pub fn dependencies () -> ::std::vec::Vec<&'static ::std::path::Path> {
+				::std::vec! (
+					$( ::std::path::Path::new ($_dependency), )*
+				)
+			}
+		}
+		
+		impl $_name {
+			
+			pub fn eprintln_dependencies () -> () {
+				use ::std::iter::IntoIterator as _;
+				for _dependency in Self::dependencies () .into_iter () {
+					::std::eprintln! ("[dd] [402419e4]  !!  {}", _dependency.display ());
+				}
 			}
 		}
 	};
