@@ -31,6 +31,7 @@ pub struct BuilderConfiguration {
 	pub js_route_base : Option<PathBuf>,
 	
 	pub images_route_base : Option<PathBuf>,
+	pub icons_route_base : Option<PathBuf>,
 	pub favicons_route_base : Option<PathBuf>,
 	pub fonts_route_base : Option<PathBuf>,
 	
@@ -63,6 +64,7 @@ impl Default for BuilderConfiguration {
 		let _js_route_base = Some (PathBuf::from ("/assets/js"));
 		
 		let _images_route_base = Some (PathBuf::from ("/assets/images"));
+		let _icons_route_base = Some (PathBuf::from ("/assets/icons"));
 		let _favicons_route_base = Some (PathBuf::from ("/assets/favicons"));
 		let _fonts_route_base = Some (PathBuf::from ("/assets/fonts"));
 		
@@ -85,6 +87,7 @@ impl Default for BuilderConfiguration {
 				js_route_base : _js_route_base,
 				
 				images_route_base : _images_route_base,
+				icons_route_base : _icons_route_base,
 				favicons_route_base : _favicons_route_base,
 				fonts_route_base : _fonts_route_base,
 				
@@ -117,6 +120,7 @@ impl BuilderConfiguration {
 				js_route_base : None,
 				
 				images_route_base : None,
+				icons_route_base : None,
 				favicons_route_base : None,
 				fonts_route_base : None,
 				
@@ -295,6 +299,33 @@ impl Builder {
 		for (_relative, _source) in _paths.into_iter () {
 			
 			self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_image", Some (_sources.as_ref ()));
+		}
+	}
+	
+	
+	pub fn route_icon (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		
+		let _route_base = self.configuration.icons_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
+		
+		self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_icon", None);
+	}
+	
+	pub fn route_icons (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
+		self.dependencies.extend (_folders);
+		
+		let _route_base = self.configuration.icons_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
+		
+		for (_relative, _source) in _paths.into_iter () {
+			
+			self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_icon", Some (_sources.as_ref ()));
 		}
 	}
 	
@@ -764,6 +795,28 @@ macro_rules! builder_macros {
 			};
 		}
 		
+		
+		#[ allow (unused_macros) ]
+		macro_rules! assets_icon {
+			( $_sources : literal ) => {
+				$_builder.route_icon ($_sources, route_path_builder! (default));
+			};
+			( $_sources : literal => $_route : literal ) => {
+				$_builder.route_icon ($_sources, route_path_builder! (perhaps (exact), $_route));
+			};
+		}
+		
+		#[ allow (unused_macros) ]
+		macro_rules! assets_icons {
+			( $_sources : literal ) => {
+				$_builder.route_icons ($_sources, route_path_builder! (default));
+			};
+			( $_sources : literal => $_route : literal ) => {
+				$_builder.route_icons ($_sources, route_path_builder! (perhaps (prefix), $_route));
+			};
+		}
+		
+		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_favicon {
 			( $_sources : literal ) => {
@@ -783,6 +836,7 @@ macro_rules! builder_macros {
 				$_builder.route_favicons ($_sources, route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
+		
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_font {
