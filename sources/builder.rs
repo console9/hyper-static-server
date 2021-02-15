@@ -337,14 +337,12 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
 		
-		let _extension = _source.extension () .expect ("[4b7affbe]") .to_str () .expect ("[a874a519]");
-		let _content_type = match _extension {
-			"png" => "Png",
-			"jpeg" | "jpg" => "Jpeg",
-			"ico" => "Icon",
-			"svg" => "Svg",
+		let _content_type = detect_content_type_from_extension (&_source);
+		match _content_type {
+			"Png" | "Jpeg" | "Icon" | "Svg" =>
+				(),
 			_ =>
-				panic! ("[0fd2d804] {:?}", _source),
+				panic! ("[0fd2d804] {}", _source.display ()),
 		};
 		
 		let _description = if let Some (_from) = _from {
@@ -398,14 +396,12 @@ impl Builder {
 		
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
-		let _extension = _source.extension () .expect ("[d4f695e7]") .to_str () .expect ("[53aff957]");
-		let _content_type = match _extension {
-			"ttf" => "FontTtf",
-			"otf" => "FontOtf",
-			"woff" => "FontWoff",
-			"woff2" => "FontWoff2",
+		let _content_type = detect_content_type_from_extension (&_source);
+		match _content_type {
+			"FontTtf" | "FontOtf" | "FontWoff" | "FontWoff2" =>
+				(),
 			_ =>
-				panic! ("[1a4ccbf4] {:?}", _source),
+				panic! ("[1a4ccbf4] {}", _source.display ()),
 		};
 		
 		let _description = if let Some (_from) = _from {
@@ -460,29 +456,7 @@ impl Builder {
 		
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
-		let _extension = _source.extension () .expect ("[29957dc8]") .to_str () .expect ("[908aeea6]");
-		let _content_type = if let Some (_content_type) = _content_type {
-			_content_type
-		} else {
-			match _extension {
-				"text" | "txt" => "Text",
-				"html" | "htm" => "Html",
-				"css" => "Css",
-				"js" => "Js",
-				"json" => "Json",
-				"xml" => "Xml",
-				"png" => "Png",
-				"jpeg" | "jpg" => "Jpeg",
-				"ico" => "Icon",
-				"svg" => "Svg",
-				"ttf" => "FontTtf",
-				"otf" => "FontOtf",
-				"woff" => "FontWoff",
-				"woff2" => "FontWoff2",
-				_ =>
-					panic! ("[2bd15bab] {:?}", _source),
-			}
-		};
+		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source));
 		
 		let _description = if let Some (_from) = _from {
 			format! ("resource_asset ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
@@ -538,7 +512,7 @@ impl Builder {
 		let _path = _root.join (&_source[1..]);
 		
 		if ! _path.is_file () {
-			return Err (io::Error::new (io::ErrorKind::Other, format! ("[039d945b] {:?}", _path)));
+			return Err (io::Error::new (io::ErrorKind::Other, format! ("[039d945b] {}", _path.display ())));
 		}
 		
 		let _relative = _path.strip_prefix (_root) .expect ("[546e7cd9]") .to_str () .expect ("[a48f283c]");
@@ -708,6 +682,33 @@ fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailin
 	}
 	
 	_path
+}
+
+
+
+
+fn detect_content_type_from_extension (_source : &Path) -> &'static str {
+	
+	let _extension = _source.extension () .expect ("[29957dc8]") .to_str () .expect ("[908aeea6]");
+	
+	match _extension {
+		"text" | "txt" => "Text",
+		"html" | "htm" => "Html",
+		"css" => "Css",
+		"js" => "Js",
+		"json" => "Json",
+		"xml" => "Xml",
+		"png" => "Png",
+		"jpeg" | "jpg" => "Jpeg",
+		"ico" => "Icon",
+		"svg" => "Svg",
+		"ttf" => "FontTtf",
+		"otf" => "FontOtf",
+		"woff" => "FontWoff",
+		"woff2" => "FontWoff2",
+		_ =>
+			panic! ("[2bd15bab] {}", _source.display ()),
+	}
 }
 
 
