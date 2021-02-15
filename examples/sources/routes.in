@@ -1,15 +1,15 @@
 {
 	
 	askama! ("/home.html" => "/");
+	
 	asset_sass! ("/main.scss");
 	asset_js! ("/main.js");
 	
-	assets_image! ("/favicons/favicon.ico");
-	assets_images! ("/favicons");
+	assets_images! ("/images");
+	assets_images! ("/icons" => "/assets/icons");
 	
-	assets_favicon! ("/favicons/favicon.ico");
 	assets_favicons! ("/favicons");
-	asset! ("/favicons/favicon.ico" => "/favicon.ico");
+	assets_favicon! ("/favicons/favicon.ico" => "/favicon.ico");
 	
 	asset! ("/files/robots.txt" => "/robots.txt");
 	asset! ("/files/data.txt" => "/data.txt");
