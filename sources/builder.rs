@@ -179,19 +179,43 @@ impl Builder {
 	
 	
 	
+	fn route_asset_raw (&mut self, _relative : String, _source : PathBuf, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _from : Option<&Path>) {
+		
+		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
+		
+		let _id = self.generate_id ();
+		
+		let _description = if let Some (_from) = _from {
+			format! ("{} ({}, from = `...{}`, file = `...{}`)", _macro, _content_type, _from.display (), _relative)
+		} else {
+			format! ("{} ({}, file = `...{}`)", _macro, _content_type, _relative)
+		};
+		
+		self.route_names.push (format! ("Route_{}", _id));
+		self.dependencies.push (_source.clone ());
+		
+		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+	}
+	
+	
+	
+	
 	pub fn route_askama (&mut self, _source : &str, _route : &str) -> () {
 		
 		let _askama_sources = self.configuration.askama_sources.as_ref () .expect ("[b4034d6e]");
 		let (_relative, _source) = self.resolve_file (_askama_sources, _source) .expect ("[c1ef5a99]");
 		
+		let _content_type = "Html";
+		
 		let _route = normalize_route (_route.as_ref (), true, false);
 		
 		let _id = self.generate_id ();
+		
+		let _description = format! ("askama ({}, source = `...{}`)", _content_type, _relative);
+		
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
-		
-		let _content_type = "Html";
-		let _description = format! ("askama ({}, source = `...{}`)", _content_type, _relative);
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, &_relative[1..], _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
@@ -205,18 +229,10 @@ impl Builder {
 		let _css_sources = self.configuration.css_sources.as_ref () .expect ("[7844407c]");
 		let (_relative, _source) = self.resolve_file (_css_sources, _source) .expect ("[c6442f7b]");
 		
-		let _id = self.generate_id ();
-		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
+		let _route_base = self.configuration.css_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		let _route_base = self.configuration.css_route_base.as_ref () .map (PathBuf::as_path);
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
-		
-		let _content_type = "Css";
-		let _description = format! ("resource_css ({}, source = `...{}`)", _content_type, _relative);
-		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		self.route_asset_raw (_relative, _source, "Css", _route_base, _route_builder, "resource_css", None);
 	}
 	
 	
@@ -225,24 +241,18 @@ impl Builder {
 		let _css_sources = self.configuration.css_sources.as_ref () .expect ("[0d19f056]") .to_owned ();
 		let (_relative, _source) = self.resolve_file (&_css_sources, _source) .expect ("[4f6f6f41]");
 		
-		let _id = self.generate_id ();
-		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies.push (_source.clone ());
 		
 		let _relative = PathBuf::from (_relative) .with_extension ("css") .to_string_lossy () .into_owned ();
-		
-		let _route_base = self.configuration.css_route_base.as_ref () .map (PathBuf::as_path);
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
 		let _compiled = self.compile_sass (&_source, &_css_sources) .expect ("[cf9af211]");
 		let _source = self.configuration.outputs.join (fingerprint_data (_source.to_string_lossy ().as_bytes ())) .with_extension ("css");
 		create_file_from_str (&_source, &_compiled) .expect ("[bd7285f4]");
 		
-		let _content_type = "Css";
-		let _description = format! ("resource_sass ({}, source = `...{}`)", _content_type, _relative);
+		let _route_base = self.configuration.css_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		self.route_asset_raw (_relative, _source, "Css", _route_base, _route_builder, "resource_sass", None);
 	}
 	
 	
@@ -253,18 +263,10 @@ impl Builder {
 		let _js_sources = self.configuration.js_sources.as_ref () .expect ("[ce97440c]");
 		let (_relative, _source) = self.resolve_file (_js_sources, _source) .expect ("[3acb623e]");
 		
-		let _id = self.generate_id ();
-		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
+		let _route_base = self.configuration.js_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		let _route_base = self.configuration.js_route_base.as_ref () .map (PathBuf::as_path);
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
-		
-		let _content_type = "Js";
-		let _description = format! ("resource_js ({}, source = `...{}`)", _content_type, _relative);
-		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		self.route_asset_raw (_relative, _source, "Js", _route_base, _route_builder, "resource_js", None);
 	}
 	
 	
@@ -278,9 +280,7 @@ impl Builder {
 		let _route_base = self.configuration.images_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		let _id = self.generate_id ();
-		
-		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_image", None);
+		self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_image", None);
 	}
 	
 	pub fn route_images (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -294,9 +294,7 @@ impl Builder {
 		
 		for (_relative, _source) in _paths.into_iter () {
 			
-			let _id = self.generate_id ();
-			
-			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_image", Some (_sources.as_ref ()));
+			self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_image", Some (_sources.as_ref ()));
 		}
 	}
 	
@@ -309,9 +307,7 @@ impl Builder {
 		let _route_base = self.configuration.favicons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		let _id = self.generate_id ();
-		
-		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_favicon", None);
+		self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_favicon", None);
 	}
 	
 	pub fn route_favicons (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -325,14 +321,12 @@ impl Builder {
 		
 		for (_relative, _source) in _paths.into_iter () {
 			
-			let _id = self.generate_id ();
-			
-			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_favicon", Some (_sources.as_ref ()));
+			self.route_image_0 (_relative, _source, _route_base, _route_builder, "resource_favicon", Some (_sources.as_ref ()));
 		}
 	}
 	
 	
-	fn route_image_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _from : Option<&Path>) -> () {
+	fn route_image_0 (&mut self, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _from : Option<&Path>) -> () {
 		
 		let _content_type = detect_content_type_from_extension (&_source);
 		match _content_type {
@@ -342,7 +336,7 @@ impl Builder {
 				panic! ("[0fd2d804] {}", _source.display ()),
 		};
 		
-		self.route_asset_00 (_id, _relative, _source, _content_type, _route_base, _route_builder, _macro, _from);
+		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, _macro, _from);
 	}
 	
 	
@@ -356,9 +350,7 @@ impl Builder {
 		let _route_base = self.configuration.fonts_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		let _id = self.generate_id ();
-		
-		self.route_font_0 (_id, _relative, _source, _route_base, _route_builder, None);
+		self.route_font_0 (_relative, _source, _route_base, _route_builder, None);
 	}
 	
 	pub fn route_fonts (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -372,14 +364,12 @@ impl Builder {
 		
 		for (_relative, _source) in _paths.into_iter () {
 			
-			let _id = self.generate_id ();
-			
-			self.route_font_0 (_id, _relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
+			self.route_font_0 (_relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
 		}
 	}
 	
 	
-	fn route_font_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) -> () {
+	fn route_font_0 (&mut self, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) -> () {
 		
 		let _content_type = detect_content_type_from_extension (&_source);
 		match _content_type {
@@ -389,7 +379,7 @@ impl Builder {
 				panic! ("[1a4ccbf4] {}", _source.display ()),
 		};
 		
-		self.route_asset_00 (_id, _relative, _source, _content_type, _route_base, _route_builder, "resource_font", _from);
+		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, "resource_font", _from);
 	}
 	
 	
@@ -403,9 +393,7 @@ impl Builder {
 		let _route_base = self.configuration.assets_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		let _id = self.generate_id ();
-		
-		self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder, None);
+		self.route_asset_0 (_relative, _source, _content_type, _route_base, _route_builder, None);
 	}
 	
 	
@@ -420,38 +408,16 @@ impl Builder {
 		
 		for (_relative, _source) in _paths.into_iter () {
 			
-			let _id = self.generate_id ();
-			
-			self.route_asset_0 (_id, _relative, _source, _content_type, _route_base, _route_builder, Some (_sources.as_ref ()));
+			self.route_asset_0 (_relative, _source, _content_type, _route_base, _route_builder, Some (_sources.as_ref ()));
 		}
 	}
 	
 	
-	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) {
+	fn route_asset_0 (&mut self, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) {
 		
 		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source));
 		
-		self.route_asset_00 (_id, _relative, _source, _content_type, _route_base, _route_builder, "resource_asset", _from);
-	}
-	
-	
-	
-	
-	fn route_asset_00 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _from : Option<&Path>) {
-		
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
-		
-		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
-		
-		let _description = if let Some (_from) = _from {
-			format! ("{} ({}, from = `...{}`, file = `...{}`)", _macro, _content_type, _from.display (), _relative)
-		} else {
-			format! ("{} ({}, file = `...{}`)", _macro, _content_type, _relative)
-		};
-		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, "resource_asset", _from);
 	}
 	
 	
