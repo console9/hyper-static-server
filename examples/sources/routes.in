@@ -4,6 +4,10 @@
 	asset_sass! ("/main.scss");
 	asset_js! ("/main.js");
 	
+	assets_image! ("/favicons/favicon.ico");
+	assets_images! ("/favicons");
+	
+	assets_favicon! ("/favicons/favicon.ico");
 	assets_favicons! ("/favicons");
 	asset! ("/favicons/favicon.ico" => "/favicon.ico");
 	

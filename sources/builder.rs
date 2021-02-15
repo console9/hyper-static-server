@@ -270,6 +270,19 @@ impl Builder {
 	
 	
 	
+	pub fn route_image (&mut self, _source : &str, _route_builder : &impl RoutePathBuilder) -> () {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		
+		let _route_base = self.configuration.images_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
+		
+		let _id = self.generate_id ();
+		
+		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
+	}
+	
 	pub fn route_images (&mut self, _sources : &str, _route_builder : &impl RoutePathBuilder) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
@@ -285,6 +298,19 @@ impl Builder {
 			
 			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
 		}
+	}
+	
+	pub fn route_favicon (&mut self, _source : &str, _route_builder : &impl RoutePathBuilder) -> () {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		
+		let _route_base = self.configuration.favicons_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
+		
+		let _id = self.generate_id ();
+		
+		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder);
 	}
 	
 	pub fn route_favicons (&mut self, _sources : &str, _route_builder : &impl RoutePathBuilder) -> () {
@@ -329,6 +355,19 @@ impl Builder {
 	
 	
 	
+	
+	pub fn route_font (&mut self, _source : &str, _route_builder : &impl RoutePathBuilder) -> () {
+		
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		
+		let _route_base = self.configuration.fonts_route_base.clone ();
+		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
+		
+		let _id = self.generate_id ();
+		
+		self.route_font_0 (_id, _relative, _source, _route_base, _route_builder);
+	}
 	
 	pub fn route_fonts (&mut self, _sources : &str, _route_builder : &impl RoutePathBuilder) -> () {
 		
@@ -704,6 +743,13 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
+		macro_rules! assets_image {
+			( $_sources : literal ) => {
+				$_builder.route_image ($_sources, &());
+			};
+		}
+		
+		#[ allow (unused_macros) ]
 		macro_rules! assets_images {
 			( $_sources : literal ) => {
 				$_builder.route_images ($_sources, &());
@@ -711,9 +757,23 @@ macro_rules! builder_macros {
 		}
 		
 		#[ allow (unused_macros) ]
+		macro_rules! assets_favicon {
+			( $_sources : literal ) => {
+				$_builder.route_favicon ($_sources, &());
+			};
+		}
+		
+		#[ allow (unused_macros) ]
 		macro_rules! assets_favicons {
 			( $_sources : literal ) => {
 				$_builder.route_favicons ($_sources, &());
+			};
+		}
+		
+		#[ allow (unused_macros) ]
+		macro_rules! assets_font {
+			( $_sources : literal ) => {
+				$_builder.route_font ($_sources, &());
 			};
 		}
 		
