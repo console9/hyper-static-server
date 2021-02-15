@@ -776,7 +776,7 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
-		macro_rules! assets_image {
+		macro_rules! asset_image {
 			( $_sources : literal ) => {
 				$_builder.route_image ($_sources, route_path_builder! (default));
 			};
@@ -797,7 +797,7 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
-		macro_rules! assets_icon {
+		macro_rules! asset_icon {
 			( $_sources : literal ) => {
 				$_builder.route_icon ($_sources, route_path_builder! (default));
 			};
@@ -818,7 +818,7 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
-		macro_rules! assets_favicon {
+		macro_rules! asset_favicon {
 			( $_sources : literal ) => {
 				$_builder.route_favicon ($_sources, route_path_builder! (default));
 			};
@@ -839,7 +839,7 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
-		macro_rules! assets_font {
+		macro_rules! asset_font {
 			( $_sources : literal ) => {
 				$_builder.route_font ($_sources, route_path_builder! (default));
 			};
