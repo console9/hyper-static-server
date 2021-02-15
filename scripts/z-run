@@ -7,6 +7,7 @@
 ::// docs / ...
 ::// watch / ...
 ::// testing / ...
+::// sources / ...
 ::// *
 
 
@@ -21,6 +22,7 @@
 
 
 && ../hyper-simple-server/scripts/project-common.z-run
+&& ../hyper-simple-server/scripts/project-sources.z-run
 
 && ../hyper-simple-server/scripts/cargo-dependencies.z-run
 && ../hyper-simple-server/scripts/cargo-publish.z-run

@@ -296,8 +296,8 @@ impl Builder {
 	
 	pub fn route_image (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[788b3ded]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[febbd06b]");
 		
 		let _route_base = self.configuration.images_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -307,8 +307,8 @@ impl Builder {
 	
 	pub fn route_images (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[caeff919]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[31f1c7d2]");
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.images_route_base.clone ();
@@ -323,8 +323,8 @@ impl Builder {
 	
 	pub fn route_icon (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[ef886823]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[ec14448c]");
 		
 		let _route_base = self.configuration.icons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -334,8 +334,8 @@ impl Builder {
 	
 	pub fn route_icons (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[75244526]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[9aa78087]");
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.icons_route_base.clone ();
@@ -350,8 +350,8 @@ impl Builder {
 	
 	pub fn route_favicon (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[4a4753e5]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[26c3b248]");
 		
 		let _route_base = self.configuration.favicons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -361,8 +361,8 @@ impl Builder {
 	
 	pub fn route_favicons (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[1902de70]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[a8b294f4]");
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.favicons_route_base.clone ();
@@ -393,8 +393,8 @@ impl Builder {
 	
 	pub fn route_font (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[e606a001]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[eb8f86f3]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[d84bbf42]");
 		
 		let _route_base = self.configuration.fonts_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -404,8 +404,8 @@ impl Builder {
 	
 	pub fn route_fonts (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[24f74a86]");
-		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[1f210617]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[61b17646]");
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.fonts_route_base.clone ();
@@ -436,8 +436,8 @@ impl Builder {
 	
 	pub fn route_asset (&mut self, _source : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[443c8ae5]");
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[256c60bf]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[69bac9fb]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[8a973b98]");
 		
 		let _route_base = self.configuration.assets_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -447,8 +447,8 @@ impl Builder {
 	
 	pub fn route_assets (&mut self, _sources : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[d807eb26]");
-		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[a2a0463e]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[cf4c2fb3]");
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.assets_route_base.clone ();
@@ -473,16 +473,16 @@ impl Builder {
 	
 	pub fn watch_asset (&mut self, _source : &str) {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[443c8ae5]");
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[256c60bf]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[775ef48b]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[81a2a321]");
 		
 		self.dependencies_include (&_source);
 	}
 	
 	pub fn watch_assets (&mut self, _sources : &str) -> () {
 		
-		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[d807eb26]");
-		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[5ffa5360]");
+		let _assets_sources = self.configuration.assets_sources.as_ref () .expect ("[b5ea01bd]");
+		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[ae5a3a79]");
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		self.dependencies_include_all (_paths.iter () .map (|_pair| _pair.1.as_path ()));
