@@ -2,10 +2,10 @@
 	
 	askama! ("/home.html" => "/");
 	
-	asset_sass! ("/main.scss");
+	asset_sass! ("/css/main.scss");
 	assets_watch! ("/css");
 	
-	asset_js! ("/main.js");
+	asset_js! ("/js/main.js");
 	
 	assets_images! ("/images");
 	assets_icons! ("/icons");
