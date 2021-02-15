@@ -280,7 +280,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, None);
+		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_image", None);
 	}
 	
 	pub fn route_images (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -296,9 +296,10 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
+			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_image", Some (_sources.as_ref ()));
 		}
 	}
+	
 	
 	pub fn route_favicon (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
@@ -310,7 +311,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, None);
+		self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_favicon", None);
 	}
 	
 	pub fn route_favicons (&mut self, _sources : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
@@ -326,16 +327,12 @@ impl Builder {
 			
 			let _id = self.generate_id ();
 			
-			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, Some (_sources.as_ref ()));
+			self.route_image_0 (_id, _relative, _source, _route_base, _route_builder, "resource_favicon", Some (_sources.as_ref ()));
 		}
 	}
 	
-	fn route_image_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) -> () {
-		
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
-		
-		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
+	
+	fn route_image_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _from : Option<&Path>) -> () {
 		
 		let _content_type = detect_content_type_from_extension (&_source);
 		match _content_type {
@@ -345,14 +342,7 @@ impl Builder {
 				panic! ("[0fd2d804] {}", _source.display ()),
 		};
 		
-		let _description = if let Some (_from) = _from {
-			format! ("resource_image ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
-		} else {
-			format! ("resource_image ({}, file = `...{}`)", _content_type, _relative)
-		};
-		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		self.route_asset_00 (_id, _relative, _source, _content_type, _route_base, _route_builder, _macro, _from);
 	}
 	
 	
@@ -391,11 +381,6 @@ impl Builder {
 	
 	fn route_font_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) -> () {
 		
-		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
-		
-		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
-		
 		let _content_type = detect_content_type_from_extension (&_source);
 		match _content_type {
 			"FontTtf" | "FontOtf" | "FontWoff" | "FontWoff2" =>
@@ -404,14 +389,7 @@ impl Builder {
 				panic! ("[1a4ccbf4] {}", _source.display ()),
 		};
 		
-		let _description = if let Some (_from) = _from {
-			format! ("resource_font ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
-		} else {
-			format! ("resource_font ({}, file = `...{}`)", _content_type, _relative)
-		};
-		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		self.route_asset_00 (_id, _relative, _source, _content_type, _route_base, _route_builder, "resource_font", _from);
 	}
 	
 	
@@ -451,17 +429,25 @@ impl Builder {
 	
 	fn route_asset_0 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _from : Option<&Path>) {
 		
-		self.route_names.push (format! ("Route_{}", _id));
-		self.dependencies.push (_source.clone ());
+		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source));
+		
+		self.route_asset_00 (_id, _relative, _source, _content_type, _route_base, _route_builder, "resource_asset", _from);
+	}
+	
+	
+	
+	
+	fn route_asset_00 (&mut self, _id : u32, _relative : String, _source : PathBuf, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _from : Option<&Path>) {
 		
 		let _route = _route_builder.build (_relative.as_ref (), &_source, _route_base, None);
 		
-		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source));
+		self.route_names.push (format! ("Route_{}", _id));
+		self.dependencies.push (_source.clone ());
 		
 		let _description = if let Some (_from) = _from {
-			format! ("resource_asset ({}, from = `...{}`, file = `...{}`)", _content_type, _from.display (), _relative)
+			format! ("{} ({}, from = `...{}`, file = `...{}`)", _macro, _content_type, _from.display (), _relative)
 		} else {
-			format! ("resource_asset ({}, file = `...{}`)", _content_type, _relative)
+			format! ("{} ({}, file = `...{}`)", _macro, _content_type, _relative)
 		};
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, embedded, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _source, _description) .unwrap ();
