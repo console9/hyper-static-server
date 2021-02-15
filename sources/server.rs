@@ -22,6 +22,16 @@ impl StaticHandler {
 				random_token : random_token (),
 			}
 	}
+	
+	pub fn eprintln_routes (&self) -> () {
+		for _route in self.routes.routes () {
+			if let Some (_debug) = _route.debug.as_ref () {
+				eprintln! ("* {} -> {:?}", _route.path, _debug);
+			} else {
+				eprintln! ("* {}", _route.path);
+			}
+		}
+	}
 }
 
 
