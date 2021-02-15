@@ -235,7 +235,7 @@ macro_rules! routes {
 		
 		impl $_name {
 			
-			pub fn eprintln_routes () -> () {
+			pub fn eprintln () -> () {
 				use ::std::iter::IntoIterator as _;
 				for _route in Self::routes () .into_iter () {
 					if let ::std::option::Option::Some (_debug) = _route.debug.as_ref () {
@@ -272,7 +272,7 @@ macro_rules! dependencies {
 		
 		impl $_name {
 			
-			pub fn eprintln_dependencies () -> () {
+			pub fn eprintln () -> () {
 				use ::std::iter::IntoIterator as _;
 				for _dependency in Self::dependencies () .into_iter () {
 					::std::eprintln! ("[dd] [402419e4]  !!  {}", _dependency.display ());
