@@ -571,7 +571,11 @@ impl Builder {
 		let mut _paths = Vec::new ();
 		let mut _folders = Vec::new ();
 		
-		for _entry in walkdir::WalkDir::new (&_root) {
+		let _walker = walkdir::WalkDir::new (&_root)
+				.follow_links (true)
+				.sort_by (|_left, _right| ffi::OsStr::cmp (_left.file_name (), _right.file_name ()));
+		
+		for _entry in _walker {
 			let _entry = _entry ?;
 			let _path = _entry.path ();
 			
