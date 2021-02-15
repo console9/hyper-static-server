@@ -2,18 +2,32 @@
 
 
 
-use ::std::env;
-use ::std::fmt::{Write as _};
-use ::std::fs;
-use ::std::io;
-use ::std::io::{Write as _};
-use ::std::iter::Iterator;
-use ::std::path::{Path, PathBuf};
-use ::std::collections::BTreeSet;
+#[ allow (unused_imports) ]
+use ::std::{
+		
+		collections::BTreeSet,
+		env,
+		ffi,
+		fs,
+		io,
+		iter::Iterator,
+		path::{Path, PathBuf},
+		rc,
+		
+		fmt::{Write as _},
+		io::{Write as _},
+		
+	};
 
-use ::sass_rs as sass;
+
 use ::walkdir;
 use ::blake2;
+
+#[ cfg (feature = "sass-rs") ]
+use ::sass_rs as sass;
+
+#[ cfg (feature = "sass-alt") ]
+use ::sass_alt as sass;
 
 
 
@@ -244,6 +258,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (any (feature = "sass-rs", feature = "sass-alt")) ]
 	pub fn route_sass (&mut self, _source : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _css_sources = self.configuration.css_sources.as_ref () .expect ("[0d19f056]") .to_owned ();
@@ -616,6 +631,7 @@ impl Builder {
 impl Builder {
 	
 	
+	#[ cfg (feature = "sass-rs") ]
 	fn compile_sass (&self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
 		
 		let _options = sass::Options {
@@ -628,6 +644,42 @@ impl Builder {
 		let mut _context = sass::Context::new_file (&_source) .expect ("[5ebe6232]");
 		_context.set_options (_options);
 		let _data = _context.compile () .expect ("[31841210]");
+		
+		return Ok (_data);
+	}
+	
+	
+	#[ cfg (feature = "sass-alt") ]
+	fn compile_sass (&self, _source : &Path, _search : &Path) -> Result<String, io::Error> {
+		
+		let _extension = _source.extension () .expect ("[f2cd37bc]") .to_str () .expect ("[db216e38]");
+		let _input_syntax = match _extension {
+			"sass" =>
+				sass::InputSyntax::SASS,
+			"scss" =>
+				sass::InputSyntax::SCSS,
+			_ =>
+				panic! ("[90668feb]"),
+		};
+		
+		let _options = sass::SassOptions {
+				output_style : sass::OutputStyle::Expanded,
+				source_comments : true,
+				source_map_embed : false,
+				source_map_contents : false,
+				source_map_file_urls : false,
+				omit_source_map_url : true,
+				indent : ffi::CString::new ("\t") .expect ("[77771198]"),
+				linefeed : ffi::CString::new ("\n") .expect ("[ef2eea09]"),
+				precision : 4,
+				input_syntax : _input_syntax,
+				include_paths : &[],
+				function_list : rc::Rc::new (sass::SassFunctionList::new (Vec::new ())),
+				importer_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
+				header_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
+			};
+		
+		let _data = _options.compile_file (_source) .expect ("[bbaffa6f]");
 		
 		return Ok (_data);
 	}

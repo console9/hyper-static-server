@@ -316,7 +316,7 @@ dependencies = [
  "blake2",
  "hyper-simple-server",
  "rand",
- "sass-rs",
+ "sass-alt",
  "walkdir",
 ]
 
@@ -557,6 +557,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "quick-error"
+version = "1.2.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a1d01941d82fa2ab50be1e79e6714289dd7cde78eba4c074bc5a4374f650dfe0"
+
+[[package]]
 name = "quote"
 version = "1.0.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -670,12 +676,13 @@ dependencies = [
 ]
 
 [[package]]
-name = "sass-rs"
-version = "0.2.2"
+name = "sass-alt"
+version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cabcf7c6e55053f359911187ac401409aad2dc14338cae972dec266fee486abd"
+checksum = "fda9036f860e43eb8295f582a6851fc1491529d50e24a2468b0592bcc9d48bee"
 dependencies = [
  "libc",
+ "quick-error",
  "sass-sys",
 ]
 

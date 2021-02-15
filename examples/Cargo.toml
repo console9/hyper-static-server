@@ -19,7 +19,7 @@ hyper-static-server = { path = "../sources", default-features = false, features 
 askama = { package = "askama_patched", version = "*", default-features = true }
 
 [build-dependencies]
-hyper-static-server = { path = "../sources", default-features = false, features = ["builder"] }
+hyper-static-server = { path = "../sources", default-features = false, features = ["builder", "builder-sass"] }
 
 [patch.crates-io]
 askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "forked/0.10.5/merged" }
