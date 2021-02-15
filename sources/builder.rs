@@ -135,7 +135,7 @@ impl BuilderConfiguration {
 		if ! _sources.is_dir () {
 			panic! ("[148bc689]");
 		}
-		_sources
+		normalize_path (&_sources)
 	}
 	
 	pub fn resolve_outputs () -> PathBuf {
@@ -143,7 +143,7 @@ impl BuilderConfiguration {
 		if ! _outputs.is_dir () {
 			panic! ("[fcee6b4d]");
 		}
-		_outputs
+		normalize_path (&_outputs)
 	}
 }
 
@@ -509,6 +509,8 @@ impl Builder {
 		let _relative = _path.strip_prefix (_root) .expect ("[546e7cd9]") .to_str () .expect ("[a48f283c]");
 		let _relative = ["/", _relative].concat ();
 		
+		let _path = normalize_path (&_path);
+		
 		return Ok ((_relative.into (), _path));
 	}
 	
@@ -535,12 +537,21 @@ impl Builder {
 		for _entry in walkdir::WalkDir::new (&_root) {
 			let _entry = _entry ?;
 			let _path = _entry.path ();
+			
 			if _path.is_file () {
+				
 				let _relative = _path.strip_prefix (&_root) .expect ("[703112d8]") .to_str () .expect ("[072ffc03]");
 				let _relative = ["/", _relative].concat ();
-				_paths.push ((_relative.into (), _path.into ()));
+				
+				let _path = normalize_path (_path);
+				
+				_paths.push ((_relative.into (), _path));
 			}
+			
 			if _path.is_dir () {
+				
+				let _path = normalize_path (_path);
+				
 				_folders.push (_path.into ());
 			}
 		}
@@ -672,6 +683,16 @@ fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailin
 		}
 	}
 	
+	_path
+}
+
+
+fn normalize_path (_path_0 : &Path) -> PathBuf {
+	
+	let mut _path = PathBuf::new ();
+	for _component in _path_0.components () {
+		_path.push (_component);
+	}
 	_path
 }
 
