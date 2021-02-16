@@ -195,15 +195,21 @@ macro_rules! builder_macros {
 		
 		#[ allow (unused_macros) ]
 		macro_rules! markdown {
-			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_markdown ($_sources, route_path_builder! (perhaps (exact), $_route));
+			( $_source : literal => $_route : literal ) => {
+				$_builder.route_markdown ($_source, ::std::option::Option::None, ::std::option::Option::None, route_path_builder! (perhaps (exact), $_route));
+			};
+			( $_source : literal, header : $_header : literal, footer : $_footer : literal => $_route : literal ) => {
+				$_builder.route_markdown ($_source, ::std::option::Option::Some ($_header), ::std::option::Option::Some ($_footer), route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		
 		#[ allow (unused_macros) ]
 		macro_rules! markdowns {
 			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_markdowns ($_sources, route_path_builder! (perhaps (prefix), $_route));
+				$_builder.route_markdowns ($_sources, ::std::option::Option::None, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
+			};
+			( $_sources : literal, header : $_header : literal, footer : $_footer : literal => $_route : literal ) => {
+				$_builder.route_markdowns ($_sources, ::std::option::Option::Some ($_header), ::std::option::Option::Some ($_footer), route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		

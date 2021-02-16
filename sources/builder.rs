@@ -244,16 +244,20 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "pulldown-cmark") ]
-	pub fn route_markdown (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_markdown (&mut self, _source_0 : &str, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+		
+		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source);
 		
 		let (_relative, _source) = self.resolve_file (None, _source_0) .expect ("[ddd22569]");
 		
 		let _route_base = Some (Path::new ("/"));
 		
-		self.route_markdown_0 (&_relative, &_source, _route_base, _route_builder, _source_0, None);
+		self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _source_0, None);
 	}
 	
-	pub fn route_markdowns (&mut self, _sources_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_markdowns (&mut self, _sources_0 : &str, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+		
+		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source);
 		
 		let (_files, _folders) = self.resolve_files (None, _sources_0) .expect ("[5965b056]");
 		
@@ -267,20 +271,64 @@ impl Builder {
 				panic! ("[393ea45d] {}", _source.display ());
 			}
 			
-			self.route_markdown_0 (&_relative, &_source, _route_base, _route_builder, _sources_0, Some (_relative.as_path ()));
+			self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _sources_0, Some (_relative.as_path ()));
 		}
 	}
 	
 	
-	fn route_markdown_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> () {
+	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> (Option<String>, Option<String>) {
+		
+		let _header_source = _header_source.map (|_source| self.resolve_file (None, _source) .expect ("[3b980a80]") .1);
+		let _footer_source = _footer_source.map (|_source| self.resolve_file (None, _source) .expect ("[090937fb]") .1);
+		
+		let _header_data = _header_source.as_ref () .map (
+				|_source| {
+					let _data = fs::read_to_string (_source) .expect ("[8c8dba7c]");
+					self.dependencies_include (_source);
+					_data
+				});
+		let _footer_data = _footer_source.as_ref () .map (
+				|_source| {
+					let _data = fs::read_to_string (_source) .expect ("[2fe05fcb]");
+					self.dependencies_include (_source);
+					_data
+				});
+		
+		(_header_data, _footer_data)
+	}
+	
+	
+	fn route_markdown_0 (&mut self, _relative : &Path, _source : &Path, _header_data : Option<&String>, _footer_data : Option<&String>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> () {
 		
 		let _relative_1 = _relative.with_extension ("");
 		
 		self.dependencies_include (&_source);
 		
-		let _compiled = self.compile_markdown (&_source, true, None) .expect ("[25af0b1e]");
+		let _compiled = if _header_data.is_some () || _footer_data.is_some () {
+			
+			let _header_data = _header_data.map (String::as_str) .unwrap_or ("");
+			let _footer_data = _footer_data.map (String::as_str) .unwrap_or ("");
+			
+			let (_title, _contents_data) = self.compile_markdown (&_source, false, true) .expect ("[ae68e096]");
+			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
+			let _title = {
+				let mut _buffer = String::with_capacity (_title.len () * 3 / 2);
+				cmark::escape::escape_html (&mut _buffer, &_title) .expect ("[fea93c74]");
+				_buffer
+			};
+			
+			let mut _buffer = String::with_capacity (_header_data.len () + _contents_data.len () + _footer_data.len ());
+			_buffer.push_str (&_header_data.replace ("@@{{HSS::Markdown::Title}}", &_title));
+			_buffer.push_str (&_contents_data);
+			_buffer.push_str (&_footer_data.replace ("@@{{HSS::Markdown::Title}}", &_title));
+			_buffer
+			
+		} else {
+			let (_title, _contents_data) = self.compile_markdown (&_source, true, true) .expect ("[25af0b1e]");
+			_contents_data
+		};
 		
-		let _source = self.configuration.outputs.join (fingerprint_data (_source.to_string_lossy ().as_bytes ())) .with_extension ("html");
+		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
 		create_file_from_str (&_source, &_compiled) .expect ("[81a9176a]");
 		
 		self.route_asset_raw (&_relative_1, &_source, "Html", _route_base, _route_builder, "markdown", _source_0, _source_relative);
@@ -315,7 +363,7 @@ impl Builder {
 		
 		let _compiled = self.compile_sass (&_source) .expect ("[cf9af211]");
 		
-		let _source = self.configuration.outputs.join (fingerprint_data (_source.to_string_lossy ().as_bytes ())) .with_extension ("css");
+		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
 		create_file_from_str (&_source, &_compiled) .expect ("[bd7285f4]");
 		
 		let _route_base = self.configuration.css_route_base.clone ();
@@ -846,7 +894,7 @@ impl Builder {
 impl Builder {
 	
 	
-	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _html_title : Option<&str>) -> Result<String, io::Error> {
+	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _title_detect : bool) -> Result<(Option<String>, String), io::Error> {
 		
 		let _input = fs::read_to_string (_source) ?;
 		
@@ -856,25 +904,29 @@ impl Builder {
 		_options.insert (cmark::Options::ENABLE_STRIKETHROUGH);
 		_options.insert (cmark::Options::ENABLE_TASKLISTS);
 		
+		let mut _contents = String::with_capacity (_input.len () * 2);
+		
+		let mut _title = None;
+		let mut _title_capture = None;
+		if ! _title_detect {
+			_title_capture = Some (false);
+		}
+		
 		let _parser = cmark::Parser::new_ext (&_input, _options);
 		
-		let mut _contents = String::with_capacity (_input.len () * 2);
-		let mut _title = None;
-		let mut _capture = None;
-		if ! _html_wrapper || _html_title.is_some () {
-			_capture = Some (false);
-		}
 		let _parser = _parser.into_iter () .inspect (
 				|_event| {
 					match _event {
 						cmark::Event::Start (cmark::Tag::Heading (1)) =>
-							if _capture == None {
-								_capture = Some (true);
+							if _title_capture == None {
+								_title_capture = Some (true);
 							},
 						cmark::Event::Text (_text) =>
-							if _capture == Some (true) {
-								_title = Some (_text.as_ref () .to_owned ());
-								_capture = Some (false);
+							if _title_capture == Some (true) {
+								if ! _text.is_empty () {
+									_title = Some (_text.as_ref () .to_owned ());
+								}
+								_title_capture = Some (false);
 							},
 						_ =>
 							(),
@@ -884,29 +936,35 @@ impl Builder {
 		cmark::html::push_html (&mut _contents, _parser);
 		
 		if ! _html_wrapper {
-			return Ok (_contents);
+			return Ok ((_title, _contents));
 		}
-		
-		let _title = _title.as_ref () .map (String::as_str) .or (_html_title) .unwrap_or ("");
 		
 		let mut _output = String::with_capacity (_contents.len () + 1024);
-		_output.push_str ("<!DOCTYPE html>\n");
-		_output.push_str ("<html>\n");
-		_output.push_str ("<head>\n");
-		if ! _title.is_empty () {
-			_output.push_str ("<title>");
-			cmark::escape::escape_html (&mut _output, &_title) .expect ("[dc5ea905]");
-			_output.push_str ("</title>\n");
-		}
-		_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
-		_output.push_str ("\n");
-		_output.push_str ("</head>\n");
-		_output.push_str ("<body>\n");
-		_output.push_str (&_contents);
-		_output.push_str ("</body>\n");
-		_output.push_str ("</html>\n");
 		
-		Ok (_output)
+		{
+			_output.push_str ("<!DOCTYPE html>\n");
+			_output.push_str ("<html>\n");
+			_output.push_str ("<head>\n");
+			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
+			if ! _title.is_empty () {
+				_output.push_str ("<title>");
+				cmark::escape::escape_html (&mut _output, &_title) .expect ("[dc5ea905]");
+				_output.push_str ("</title>\n");
+			}
+			_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
+			_output.push_str ("\n");
+			_output.push_str ("</head>\n");
+			_output.push_str ("<body>\n");
+		}
+		
+		_output.push_str (&_contents);
+		
+		{
+			_output.push_str ("</body>\n");
+			_output.push_str ("</html>\n");
+		}
+		
+		Ok ((_title, _output))
 	}
 }
 
