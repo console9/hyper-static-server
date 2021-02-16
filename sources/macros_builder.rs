@@ -12,14 +12,6 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
-		macro_rules! askama {
-			( $_source : literal => $_route : literal ) => {
-				$_builder.route_askama ($_source, $_route);
-			};
-		}
-		
-		
-		#[ allow (unused_macros) ]
 		macro_rules! route_path_builder {
 			(default) => {
 				&()
@@ -34,6 +26,8 @@ macro_rules! builder_macros {
 				route_path_builder! ($_type, $_route)
 			};
 		}
+		
+		
 		
 		
 		#[ allow (unused_macros) ]
@@ -183,6 +177,33 @@ macro_rules! builder_macros {
 		macro_rules! assets_watch {
 			( $_source : literal ) => {
 				$_builder.watch_assets ($_source);
+			};
+		}
+		
+		
+		
+		
+		#[ allow (unused_macros) ]
+		macro_rules! askama {
+			( $_source : literal => $_route : literal ) => {
+				$_builder.route_askama ($_source, $_route);
+			};
+		}
+		
+		
+		
+		
+		#[ allow (unused_macros) ]
+		macro_rules! markdown {
+			( $_sources : literal => $_route : literal ) => {
+				$_builder.route_markdown ($_sources, route_path_builder! (perhaps (exact), $_route));
+			};
+		}
+		
+		#[ allow (unused_macros) ]
+		macro_rules! markdowns {
+			( $_sources : literal => $_route : literal ) => {
+				$_builder.route_markdowns ($_sources, route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
 		
