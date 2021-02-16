@@ -1096,6 +1096,7 @@ fn detect_content_type_from_extension (_source : &Path) -> &'static str {
 	
 	match _extension {
 		"text" | "txt" => "Text",
+		"md" => "Text",
 		"html" | "htm" => "Html",
 		"css" => "Css",
 		"js" => "Js",
