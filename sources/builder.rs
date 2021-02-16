@@ -538,44 +538,19 @@ impl Builder {
 	
 	fn resolve_file (&self, _root : Option<&Path>, _source : &str) -> Result<(PathBuf, PathBuf), io::Error> {
 		
-		let _root = _root.expect ("[6e3319c9]");
-		
-		if ! _root.exists () {
-			panic! ("[776c6647]");
-		}
-		
-		if ! _source.starts_with ("/") {
-			return Err (io::Error::new (io::ErrorKind::Other, "[41071330]"));
-		}
-		
-		let _path = _root.join (&_source[1..]);
+		let (_path, _relative_root) = self.resolve_source (_root, _source) ?;
 		
 		if ! _path.is_file () {
 			return Err (io::Error::new (io::ErrorKind::Other, format! ("[039d945b] {}", _path.display ())));
 		}
 		
-		let _relative = _path.strip_prefix (_root) .expect ("[546e7cd9]") .to_str () .expect ("[a48f283c]");
-		let _relative = ["/", _relative].concat ();
-		
-		let _path = normalize_path (&_path);
-		
-		return Ok ((_relative.into (), _path));
+		self.resolve_relative_and_path (&_path, &_relative_root)
 	}
 	
 	
 	fn resolve_files (&self, _root : Option<&Path>, _sources : &str) -> Result<(Vec<(PathBuf, PathBuf)>, Vec<PathBuf>), io::Error> {
 		
-		let _root = _root.expect ("[6e3319c9]");
-		
-		if ! _root.exists () {
-			panic! ("[e6a5c950]");
-		}
-		
-		if ! _sources.starts_with ("/") {
-			return Err (io::Error::new (io::ErrorKind::Other, "[8e912b21]"));
-		}
-		
-		let _root = _root.join (&_sources[1..]);
+		let (_root, _relative_root) = self.resolve_source (_root, _sources) ?;
 		
 		if ! _root.is_dir () {
 			return Err (io::Error::new (io::ErrorKind::Other, "[621693a6]"));
@@ -594,19 +569,16 @@ impl Builder {
 			
 			if _path.is_file () {
 				
-				let _relative = _path.strip_prefix (&_root) .expect ("[703112d8]") .to_str () .expect ("[072ffc03]");
-				let _relative = ["/", _relative].concat ();
+				let _relative_and_path = self.resolve_relative_and_path (_path, &_relative_root) ?;
 				
-				let _path = normalize_path (_path);
-				
-				_paths.push ((_relative.into (), _path));
+				_paths.push (_relative_and_path);
 			}
 			
 			if _path.is_dir () {
 				
 				let _path = normalize_path (_path);
 				
-				_folders.push (_path.into ());
+				_folders.push (_path);
 			}
 		}
 		
@@ -614,6 +586,43 @@ impl Builder {
 	}
 	
 	
+	fn resolve_source (&self, _root : Option<&Path>, _source : &str) -> Result<(PathBuf, PathBuf), io::Error> {
+		
+		let _root = _root.expect ("[6e3319c9]");
+		
+		if ! _root.exists () {
+			panic! ("[776c6647]");
+		}
+		
+		if ! _source.starts_with ("/") {
+			return Err (io::Error::new (io::ErrorKind::Other, "[41071330]"));
+		}
+		
+		let _path = _root.join (&_source[1..]);
+		
+		if ! _path.exists () {
+			return Err (io::Error::new (io::ErrorKind::Other, format! ("[1086bd9d] {}", _path.display ())));
+		}
+		
+		Ok ((_path, _root.to_path_buf ()))
+	}
+	
+	
+	fn resolve_relative_and_path (&self, _path : &Path, _relative_root : &Path) -> Result<(PathBuf, PathBuf), io::Error> {
+		
+		let _relative = _path.strip_prefix (_relative_root) .expect ("[546e7cd9]") .to_str () .expect ("[a48f283c]");
+		let _relative = ["/", _relative].concat () .into ();
+		
+		let _path = normalize_path (&_path);
+		
+		Ok ((_relative, _path))
+	}
+}
+
+
+
+
+impl Builder {
 	
 	
 	fn dependencies_include (&mut self, _path : &Path) -> () {
