@@ -583,17 +583,20 @@ impl Builder {
 	
 	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> Result<(PathBuf, PathBuf), io::Error> {
 		
-		let _root = _root.expect ("[6e3319c9]");
-		
-		if ! _root.exists () {
-			panic! ("[776c6647]");
-		}
-		
-		if ! _source.starts_with ("_/") {
+		let _path = if _source.starts_with ("_/") {
+			let _root = _root.expect ("[6e3319c9]");
+			_root.join (&_source[2..])
+			
+		} else if _source.starts_with ("./") || _source.starts_with ("..") {
+			let _root = self.configuration.sources.as_ref () .expect ("[0791a9b4]");
+			_root.join (&_source)
+			
+		} else if _source.starts_with (">") {
+			PathBuf::from (&_source[1..])
+			
+		} else {
 			return Err (io::Error::new (io::ErrorKind::Other, "[41071330]"));
-		}
-		
-		let _path = _root.join (&_source[2..]);
+		};
 		
 		if ! _path.exists () {
 			return Err (io::Error::new (io::ErrorKind::Other, format! ("[1086bd9d] {}", _path.display ())));
