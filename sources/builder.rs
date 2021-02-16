@@ -860,7 +860,18 @@ impl Builder {
 		
 		let mut _output = String::with_capacity (_input.len () * 2);
 		
+		_output.push_str ("<!DOCTYPE html>\n");
+		_output.push_str ("<html>\n");
+		_output.push_str ("<head>\n");
+		_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
+		_output.push_str ("\n");
+		_output.push_str ("</head>\n");
+		_output.push_str ("<body>\n");
+		
 		cmark::html::push_html (&mut _output, _parser);
+		
+		_output.push_str ("</body>\n");
+		_output.push_str ("</html>\n");
 		
 		Ok (_output)
 	}
