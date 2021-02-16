@@ -178,7 +178,7 @@ macro_rules! builder_macros {
 			( $_source : literal => $_route : literal ) => {
 				$_builder.route_asset ($_source, ::std::option::Option::None, route_path_builder! (perhaps (exact), $_route));
 			};
-			( $_source : literal : $_content_type : ident => $_route : literal ) => {
+			( $_source : literal, content_type : $_content_type : ident => $_route : literal ) => {
 				$_builder.route_asset ($_source, ::std::option::Option::Some (::std::stringify! ($_content_type)), route_path_builder! (perhaps (exact), $_route));
 			};
 		}
@@ -188,13 +188,13 @@ macro_rules! builder_macros {
 			( $_sources : literal => $_route : literal ) => {
 				$_builder.route_assets ($_sources, ::std::option::Option::None, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
-			( $_sources : literal : $_content_type : ident => $_route : literal ) => {
+			( $_sources : literal, content_type : $_content_type : ident => $_route : literal ) => {
 				$_builder.route_assets ($_sources, ::std::option::Option::None, ::std::option::Option::Some (::std::stringify! ($_content_type)), route_path_builder! (perhaps (prefix), $_route));
 			};
 			( $_sources : literal / $_glob : literal => $_route : literal ) => {
 				$_builder.route_assets ($_sources, ::std::option::Option::Some ($_glob), ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
-			( $_sources : literal / $_glob : literal : $_content_type : ident => $_route : literal ) => {
+			( $_sources : literal / $_glob : literal, content_type : $_content_type : ident => $_route : literal ) => {
 				$_builder.route_assets ($_sources, ::std::option::Option::Some ($_glob), ::std::option::Option::Some (::std::stringify! ($_content_type)), route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
