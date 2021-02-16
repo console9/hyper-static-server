@@ -278,7 +278,7 @@ impl Builder {
 		
 		self.dependencies_include (&_source);
 		
-		let _compiled = self.compile_markdown (&_source) .expect ("[25af0b1e]");
+		let _compiled = self.compile_markdown (&_source, true, None) .expect ("[25af0b1e]");
 		
 		let _source = self.configuration.outputs.join (fingerprint_data (_source.to_string_lossy ().as_bytes ())) .with_extension ("html");
 		create_file_from_str (&_source, &_compiled) .expect ("[81a9176a]");
@@ -846,7 +846,7 @@ impl Builder {
 impl Builder {
 	
 	
-	fn compile_markdown (&self, _source : &Path) -> Result<String, io::Error> {
+	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _html_title : Option<&str>) -> Result<String, io::Error> {
 		
 		let _input = fs::read_to_string (_source) ?;
 		
@@ -859,8 +859,11 @@ impl Builder {
 		let _parser = cmark::Parser::new_ext (&_input, _options);
 		
 		let mut _contents = String::with_capacity (_input.len () * 2);
-		let mut _title = String::new ();
+		let mut _title = None;
 		let mut _capture = None;
+		if ! _html_wrapper || _html_title.is_some () {
+			_capture = Some (false);
+		}
 		let _parser = _parser.into_iter () .inspect (
 				|_event| {
 					match _event {
@@ -870,7 +873,7 @@ impl Builder {
 							},
 						cmark::Event::Text (_text) =>
 							if _capture == Some (true) {
-								_title.push_str (&_text);
+								_title = Some (_text.as_ref () .to_owned ());
 								_capture = Some (false);
 							},
 						_ =>
@@ -880,6 +883,11 @@ impl Builder {
 		
 		cmark::html::push_html (&mut _contents, _parser);
 		
+		if ! _html_wrapper {
+			return Ok (_contents);
+		}
+		
+		let _title = _title.as_ref () .map (String::as_str) .or (_html_title) .unwrap_or ("");
 		
 		let mut _output = String::with_capacity (_contents.len () + 1024);
 		_output.push_str ("<!DOCTYPE html>\n");
