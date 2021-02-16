@@ -256,6 +256,7 @@ impl Builder {
 		self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _source_0, None);
 	}
 	
+	#[ cfg (feature = "pulldown-cmark") ]
 	pub fn route_markdowns (&mut self, _sources_0 : &str, _glob : Option<&str>, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source);
@@ -277,6 +278,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "pulldown-cmark") ]
 	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> (Option<String>, Option<String>) {
 		
 		let _header_source = _header_source.map (|_source| self.resolve_file (None, _source) .expect ("[3b980a80]") .1);
@@ -299,6 +301,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "pulldown-cmark") ]
 	fn route_markdown_0 (&mut self, _relative : &Path, _source : &Path, _header_data : Option<&String>, _footer_data : Option<&String>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> () {
 		
 		let _relative_1 = _relative.with_extension ("");
