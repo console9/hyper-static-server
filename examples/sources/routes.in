@@ -1,19 +1,19 @@
 {
 	
-	askama! ("/home.html" => "/");
+	askama! ("_/home.html" => "/");
 	
-	asset_sass! ("/css/main.scss");
-	assets_watch! ("/css");
+	asset_sass! ("_/css/main.scss");
+	assets_watch! ("_/css");
 	
-	asset_js! ("/js/main.js");
+	asset_js! ("_/js/main.js");
 	
-	assets_images! ("/images");
-	assets_icons! ("/icons");
+	assets_images! ("_/images");
+	assets_icons! ("_/icons");
 	
-	assets_favicons! ("/favicons");
-	asset_favicon! ("/favicons/favicon.ico" => "/favicon.ico");
+	assets_favicons! ("_/favicons");
+	asset_favicon! ("_/favicons/favicon.ico" => "/favicon.ico");
 	
-	asset! ("/files/robots.txt" => "/robots.txt");
-	asset! ("/files/data.txt" => "/data.txt");
+	asset! ("_/files/robots.txt" => "/robots.txt");
+	asset! ("_/files/data.txt" => "/data.txt");
 	
 }
