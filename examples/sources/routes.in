@@ -13,7 +13,7 @@
 	assets_favicons! ("_/favicons");
 	asset_favicon! ("_/favicons/favicon.ico" => "/favicon.ico");
 	
-	asset! ("_/files/robots.txt" => "/robots.txt");
-	asset! ("_/files/data.txt" => "/data.txt");
+	asset! ("./files/robots.txt" => "/robots.txt");
+	asset! ("./files/data.txt" => "/data.txt");
 	
 }
