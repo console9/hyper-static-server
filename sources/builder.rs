@@ -858,18 +858,43 @@ impl Builder {
 		
 		let _parser = cmark::Parser::new_ext (&_input, _options);
 		
-		let mut _output = String::with_capacity (_input.len () * 2);
+		let mut _contents = String::with_capacity (_input.len () * 2);
+		let mut _title = String::new ();
+		let mut _capture = None;
+		let _parser = _parser.into_iter () .inspect (
+				|_event| {
+					match _event {
+						cmark::Event::Start (cmark::Tag::Heading (1)) =>
+							if _capture == None {
+								_capture = Some (true);
+							},
+						cmark::Event::Text (_text) =>
+							if _capture == Some (true) {
+								_title.push_str (&_text);
+								_capture = Some (false);
+							},
+						_ =>
+							(),
+					}
+				});
 		
+		cmark::html::push_html (&mut _contents, _parser);
+		
+		
+		let mut _output = String::with_capacity (_contents.len () + 1024);
 		_output.push_str ("<!DOCTYPE html>\n");
 		_output.push_str ("<html>\n");
 		_output.push_str ("<head>\n");
+		if ! _title.is_empty () {
+			_output.push_str ("<title>");
+			cmark::escape::escape_html (&mut _output, &_title) .expect ("[dc5ea905]");
+			_output.push_str ("</title>\n");
+		}
 		_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
 		_output.push_str ("\n");
 		_output.push_str ("</head>\n");
 		_output.push_str ("<body>\n");
-		
-		cmark::html::push_html (&mut _output, _parser);
-		
+		_output.push_str (&_contents);
 		_output.push_str ("</body>\n");
 		_output.push_str ("</html>\n");
 		
