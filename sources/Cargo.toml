@@ -49,12 +49,17 @@ builder-sass-alt = [
 	"sass-alt",
 ]
 
+builder-markdown = [
+	"pulldown-cmark",
+]
+
 
 [dependencies]
 
 # hyper-simple-server = { path = "../../hyper-simple-server/sources", default-features = false, features = ["hss-full"], optional = true }
 hyper-simple-server = { version = "0.1.1", default-features = false, features = ["hss-full"], optional = true }
 
+pulldown-cmark = { version = "0.8.0", default-features = false, optional = true }
 rand = { version = "0.8.3", default-features = false, optional = true }
 sass-rs = { version = "0.2.2", default-features = false, optional = true }
 sass-alt = { version = "0.2.7", default-features = false, optional = true }
