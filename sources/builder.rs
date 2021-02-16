@@ -236,7 +236,9 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies_include (&_source);
 		
-		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _relative.strip_prefix ("/") .expect ("[7285dc26]"), _description) .unwrap ();
+		let _template = _relative.strip_prefix ("/") .expect ("[7285dc26]");
+		
+		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .unwrap ();
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
 	}
 	
@@ -264,6 +266,7 @@ impl Builder {
 		self.dependencies_include (&_source);
 		
 		let _compiled = self.compile_sass (&_source) .expect ("[cf9af211]");
+		
 		let _source = self.configuration.outputs.join (fingerprint_data (_source.to_string_lossy ().as_bytes ())) .with_extension ("css");
 		create_file_from_str (&_source, &_compiled) .expect ("[bd7285f4]");
 		
@@ -309,6 +312,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[31f1c7d2]");
+		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.images_route_base.clone ();
@@ -336,6 +340,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[9aa78087]");
+		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.icons_route_base.clone ();
@@ -363,6 +368,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[a8b294f4]");
+		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.favicons_route_base.clone ();
@@ -406,6 +412,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[61b17646]");
+		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.fonts_route_base.clone ();
@@ -449,6 +456,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[cf4c2fb3]");
+		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		let _route_base = self.configuration.assets_route_base.clone ();
@@ -483,6 +491,7 @@ impl Builder {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_paths, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[ae5a3a79]");
+		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
 		self.dependencies_include_all (_paths.iter () .map (|_pair| _pair.1.as_path ()));
