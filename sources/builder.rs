@@ -26,6 +26,7 @@ use ::std::{
 	};
 
 
+use ::globset;
 use ::walkdir;
 use ::blake2;
 
@@ -255,11 +256,11 @@ impl Builder {
 		self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _source_0, None);
 	}
 	
-	pub fn route_markdowns (&mut self, _sources_0 : &str, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_markdowns (&mut self, _sources_0 : &str, _glob : Option<&str>, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source);
 		
-		let (_files, _folders) = self.resolve_files (None, _sources_0) .expect ("[5965b056]");
+		let (_files, _folders) = self.resolve_files (None, _sources_0, _glob) .expect ("[5965b056]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -402,10 +403,10 @@ impl Builder {
 		self.route_image_0 (&_relative, &_source, _route_base, _route_builder, "resource_image", _source_0, None);
 	}
 	
-	pub fn route_images (&mut self, _sources_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_images (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0) .expect ("[31f1c7d2]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[31f1c7d2]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -430,10 +431,10 @@ impl Builder {
 		self.route_image_0 (&_relative, &_source, _route_base, _route_builder, "resource_icon", _source_0, None);
 	}
 	
-	pub fn route_icons (&mut self, _sources_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_icons (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0) .expect ("[9aa78087]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[9aa78087]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -458,10 +459,10 @@ impl Builder {
 		self.route_image_0 (&_relative, &_source, _route_base, _route_builder, "resource_favicon", _source_0, None);
 	}
 	
-	pub fn route_favicons (&mut self, _sources_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_favicons (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0) .expect ("[a8b294f4]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[a8b294f4]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -502,10 +503,10 @@ impl Builder {
 		self.route_font_0 (&_relative, &_source, _route_base, _route_builder, _source_0, None);
 	}
 	
-	pub fn route_fonts (&mut self, _sources_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_fonts (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0) .expect ("[61b17646]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[61b17646]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -546,10 +547,10 @@ impl Builder {
 		self.route_asset_0 (&_relative, &_source, _content_type, _route_base, _route_builder, _source_0, None);
 	}
 	
-	pub fn route_assets (&mut self, _sources_0 : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
+	pub fn route_assets (&mut self, _sources_0 : &str, _glob : Option<&str>, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0) .expect ("[cf4c2fb3]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[cf4c2fb3]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -581,10 +582,10 @@ impl Builder {
 		self.dependencies_include (&_source);
 	}
 	
-	pub fn watch_assets (&mut self, _sources : &str) -> () {
+	pub fn watch_assets (&mut self, _sources : &str, _glob : Option<&str>) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources) .expect ("[ae5a3a79]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources, _glob) .expect ("[ae5a3a79]");
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -642,13 +643,16 @@ impl Builder {
 	}
 	
 	
-	fn resolve_files (&self, _root : Option<&Path>, _sources : &str) -> Result<(Vec<(PathBuf, PathBuf)>, Vec<PathBuf>), io::Error> {
+	fn resolve_files (&self, _root : Option<&Path>, _sources : &str, _glob : Option<&str>) -> Result<(Vec<(PathBuf, PathBuf)>, Vec<PathBuf>), io::Error> {
 		
 		let (_root, _relative_root) = self.resolve_source (_root, _sources, false) ?;
 		
 		if ! _root.is_dir () {
 			return Err (io::Error::new (io::ErrorKind::Other, "[621693a6]"));
 		}
+		
+		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .expect ("[f68023ce]"));
+		let _glob = _glob.map (|_pattern| _pattern.compile_matcher ());
 		
 		let mut _files = Vec::new ();
 		let mut _folders = Vec::new ();
@@ -662,6 +666,12 @@ impl Builder {
 			let _path = _entry.path ();
 			
 			if _path.is_file () {
+				
+				if let Some (_glob) = _glob.as_ref () {
+					if ! _glob.is_match (_path) {
+						continue;
+					}
+				}
 				
 				let _relative_and_path = self.resolve_relative_and_path (_path, &_relative_root) ?;
 				

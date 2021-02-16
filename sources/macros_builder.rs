@@ -63,84 +63,84 @@ macro_rules! builder_macros {
 		
 		#[ allow (unused_macros) ]
 		macro_rules! asset_image {
-			( $_sources : literal ) => {
-				$_builder.route_image ($_sources, route_path_builder! (default));
+			( $_source : literal ) => {
+				$_builder.route_image ($_source, route_path_builder! (default));
 			};
-			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_image ($_sources, route_path_builder! (perhaps (exact), $_route));
+			( $_source : literal => $_route : literal ) => {
+				$_builder.route_image ($_source, route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_images {
 			( $_sources : literal ) => {
-				$_builder.route_images ($_sources, route_path_builder! (default));
+				$_builder.route_images ($_sources, ::std::option::Option::None, route_path_builder! (default));
 			};
 			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_images ($_sources, route_path_builder! (perhaps (prefix), $_route));
+				$_builder.route_images ($_sources, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
 		
 		
 		#[ allow (unused_macros) ]
 		macro_rules! asset_icon {
-			( $_sources : literal ) => {
-				$_builder.route_icon ($_sources, route_path_builder! (default));
+			( $_source : literal ) => {
+				$_builder.route_icon ($_source, route_path_builder! (default));
 			};
-			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_icon ($_sources, route_path_builder! (perhaps (exact), $_route));
+			( $_source : literal => $_route : literal ) => {
+				$_builder.route_icon ($_source, route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_icons {
 			( $_sources : literal ) => {
-				$_builder.route_icons ($_sources, route_path_builder! (default));
+				$_builder.route_icons ($_sources, ::std::option::Option::None, route_path_builder! (default));
 			};
 			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_icons ($_sources, route_path_builder! (perhaps (prefix), $_route));
+				$_builder.route_icons ($_sources, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
 		
 		
 		#[ allow (unused_macros) ]
 		macro_rules! asset_favicon {
-			( $_sources : literal ) => {
-				$_builder.route_favicon ($_sources, route_path_builder! (default));
+			( $_source : literal ) => {
+				$_builder.route_favicon ($_source, route_path_builder! (default));
 			};
-			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_favicon ($_sources, route_path_builder! (perhaps (exact), $_route));
+			( $_source : literal => $_route : literal ) => {
+				$_builder.route_favicon ($_source, route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_favicons {
 			( $_sources : literal ) => {
-				$_builder.route_favicons ($_sources, route_path_builder! (default));
+				$_builder.route_favicons ($_sources, ::std::option::Option::None, route_path_builder! (default));
 			};
 			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_favicons ($_sources, route_path_builder! (perhaps (prefix), $_route));
+				$_builder.route_favicons ($_sources, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
 		
 		
 		#[ allow (unused_macros) ]
 		macro_rules! asset_font {
-			( $_sources : literal ) => {
-				$_builder.route_font ($_sources, route_path_builder! (default));
+			( $_source : literal ) => {
+				$_builder.route_font ($_source, route_path_builder! (default));
 			};
-			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_font ($_sources, route_path_builder! (perhaps (exact), $_route));
+			( $_source : literal => $_route : literal ) => {
+				$_builder.route_font ($_source, route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_fonts {
 			( $_sources : literal ) => {
-				$_builder.route_fonts ($_sources, route_path_builder! (default));
+				$_builder.route_fonts ($_sources, ::std::option::Option::None, route_path_builder! (default));
 			};
 			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_fonts ($_sources, route_path_builder! (perhaps (prefix), $_route));
+				$_builder.route_fonts ($_sources, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
 		}
 		
@@ -175,8 +175,8 @@ macro_rules! builder_macros {
 		
 		#[ allow (unused_macros) ]
 		macro_rules! assets_watch {
-			( $_source : literal ) => {
-				$_builder.watch_assets ($_source);
+			( $_sources : literal ) => {
+				$_builder.watch_assets ($_sources, ::std::option::Option::None);
 			};
 		}
 		
@@ -206,10 +206,10 @@ macro_rules! builder_macros {
 		#[ allow (unused_macros) ]
 		macro_rules! markdowns {
 			( $_sources : literal => $_route : literal ) => {
-				$_builder.route_markdowns ($_sources, ::std::option::Option::None, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
+				$_builder.route_markdowns ($_sources, ::std::option::Option::None, ::std::option::Option::None, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route));
 			};
 			( $_sources : literal, header : $_header : literal, footer : $_footer : literal => $_route : literal ) => {
-				$_builder.route_markdowns ($_sources, ::std::option::Option::Some ($_header), ::std::option::Option::Some ($_footer), route_path_builder! (perhaps (exact), $_route));
+				$_builder.route_markdowns ($_sources, ::std::option::Option::None, ::std::option::Option::Some ($_header), ::std::option::Option::Some ($_footer), route_path_builder! (perhaps (exact), $_route));
 			};
 		}
 		
