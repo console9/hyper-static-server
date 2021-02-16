@@ -16,7 +16,8 @@
 	asset! ("./files/robots.txt" => "/robots.txt");
 	asset! ("./files/data.txt" => "/data.txt");
 	
-	markdown! ("./markdown/hello.md", header : "./files/markdown-header.html", footer : "./files/markdown-footer.html" => "/hello");
-	markdowns! ("./markdown" => "/md");
+	markdowns! ("./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html" => "/");
+	markdowns! ("./markdown", glob : "*.md" => "/md-html");
+	assets! ("./markdown", glob : "*.md" => "/md-text");
 	
 }
