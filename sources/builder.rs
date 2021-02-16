@@ -658,14 +658,18 @@ impl Builder {
 			self.dependencies.insert (_dependency);
 		}
 	}
+}
+
+
+
+
+impl Builder {
 	
 	
-	
-	
-	fn generate_id (&mut self) -> u32 {
+	fn generate_id (&mut self) -> String {
 		let _id = self.counter;
 		self.counter += 1;
-		_id
+		format! ("{:04}", _id)
 	}
 }
 
