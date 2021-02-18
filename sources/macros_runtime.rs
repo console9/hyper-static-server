@@ -217,11 +217,12 @@ macro_rules! routes {
 			
 			pub fn new () -> $crate::hss::Routes {
 				use ::std::iter::IntoIterator as _;
+				use $crate::hss::internals::ResultExtPanic as _;
 				let mut _routes = $crate::hss::RoutesBuilder::new ();
 				for _route in Self::routes () .into_iter () {
 					_routes = _routes.with_route_object (_route);
 				}
-				let _routes = _routes.build () .expect ("[630a415a]");
+				let _routes = _routes.build () .or_panic (0x630a415a);
 				_routes
 			}
 		}

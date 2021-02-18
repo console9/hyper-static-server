@@ -28,11 +28,12 @@ default = [
 ]
 
 runtime = [
-	"hyper-simple-server",
+	"hyper-simple-server/hss-full",
 	"rand",
 ]
 
 builder = [
+	"hyper-simple-server/hss-internals",
 	"walkdir",
 	"globset",
 	"blake2",

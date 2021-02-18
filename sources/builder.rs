@@ -39,6 +39,8 @@ use ::sass_alt as sass;
 #[ cfg (feature = "pulldown-cmark") ]
 use ::pulldown_cmark as cmark;
 
+use ::hyper_simple_server::internals::*;
+
 
 
 
@@ -142,17 +144,17 @@ impl BuilderConfiguration {
 	}
 	
 	pub fn resolve_sources () -> PathBuf {
-		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .expect ("[4c6c04d8]"));
+		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .or_panic (0x4c6c04d8));
 		if ! _sources.is_dir () {
-			panic! ("[148bc689]");
+			panic_with_code (0x148bc689);
 		}
 		normalize_path (&_sources)
 	}
 	
 	pub fn resolve_outputs () -> PathBuf {
-		let _outputs = PathBuf::from (env::var ("OUT_DIR") .expect ("[f039039f]"));
+		let _outputs = PathBuf::from (env::var ("OUT_DIR") .or_panic (0xf039039f));
 		if ! _outputs.is_dir () {
-			panic! ("[fcee6b4d]");
+			panic_with_code (0xfcee6b4d);
 		}
 		normalize_path (&_outputs)
 	}
@@ -212,8 +214,8 @@ impl Builder {
 		
 		let _mode = "auto";
 		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _mode, _source, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _mode, _source, _description) .or_panic (0x5fa962ac);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .or_panic (0x46de4cc9);
 	}
 	
 	
@@ -224,9 +226,9 @@ impl Builder {
 		let _route = normalize_route (_route.as_ref (), true, false);
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) .expect ("[c1ef5a99]");
+		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) .or_panic (0xc1ef5a99);
 		
-		let _template = _relative.strip_prefix ("/") .expect ("[7285dc26]");
+		let _template = _relative.strip_prefix ("/") .or_panic (0x7285dc26);
 		
 		self.dependencies_include (&_source);
 		
@@ -237,8 +239,8 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .unwrap ();
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .unwrap ();
+		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .or_panic (0x35966385);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .or_panic (0x41a5ee4c);
 	}
 	
 	
@@ -249,7 +251,7 @@ impl Builder {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source);
 		
-		let (_relative, _source) = self.resolve_file (None, _source_0) .expect ("[ddd22569]");
+		let (_relative, _source) = self.resolve_file (None, _source_0) .or_panic (0xddd22569);
 		
 		let _route_base = Some (Path::new ("/"));
 		
@@ -261,7 +263,7 @@ impl Builder {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source);
 		
-		let (_files, _folders) = self.resolve_files (None, _sources_0, _glob) .expect ("[5965b056]");
+		let (_files, _folders) = self.resolve_files (None, _sources_0, _glob) .or_panic (0x5965b056);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -269,8 +271,8 @@ impl Builder {
 		
 		for (_relative, _source) in _files.into_iter () {
 			
-			if _source.extension () .expect ("[c1ecda55]") != "md" {
-				panic! ("[393ea45d] {}", _source.display ());
+			if _source.extension () .or_panic (0xc1ecda55) != "md" {
+				panic_with_format (0x393ea45d, format_args! ("{}", _source.display ()));
 			}
 			
 			self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _sources_0, Some (_relative.as_path ()));
@@ -281,18 +283,18 @@ impl Builder {
 	#[ cfg (feature = "pulldown-cmark") ]
 	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> (Option<String>, Option<String>) {
 		
-		let _header_source = _header_source.map (|_source| self.resolve_file (None, _source) .expect ("[3b980a80]") .1);
-		let _footer_source = _footer_source.map (|_source| self.resolve_file (None, _source) .expect ("[090937fb]") .1);
+		let _header_source = _header_source.map (|_source| self.resolve_file (None, _source) .or_panic (0x3b980a80) .1);
+		let _footer_source = _footer_source.map (|_source| self.resolve_file (None, _source) .or_panic (0x090937fb) .1);
 		
 		let _header_data = _header_source.as_ref () .map (
 				|_source| {
-					let _data = fs::read_to_string (_source) .expect ("[8c8dba7c]");
+					let _data = fs::read_to_string (_source) .or_panic (0x8c8dba7c);
 					self.dependencies_include (_source);
 					_data
 				});
 		let _footer_data = _footer_source.as_ref () .map (
 				|_source| {
-					let _data = fs::read_to_string (_source) .expect ("[2fe05fcb]");
+					let _data = fs::read_to_string (_source) .or_panic (0x2fe05fcb);
 					self.dependencies_include (_source);
 					_data
 				});
@@ -313,11 +315,11 @@ impl Builder {
 			let _header_data = _header_data.map (String::as_str) .unwrap_or ("");
 			let _footer_data = _footer_data.map (String::as_str) .unwrap_or ("");
 			
-			let (_title, _contents_data) = self.compile_markdown (&_source, false, true) .expect ("[ae68e096]");
+			let (_title, _contents_data) = self.compile_markdown (&_source, false, true) .or_panic (0xae68e096);
 			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
 			let _title = {
 				let mut _buffer = String::with_capacity (_title.len () * 3 / 2);
-				cmark::escape::escape_html (&mut _buffer, &_title) .expect ("[fea93c74]");
+				cmark::escape::escape_html (&mut _buffer, &_title) .or_panic (0xfea93c74);
 				_buffer
 			};
 			
@@ -328,12 +330,12 @@ impl Builder {
 			_buffer
 			
 		} else {
-			let (_title, _contents_data) = self.compile_markdown (&_source, true, true) .expect ("[25af0b1e]");
+			let (_title, _contents_data) = self.compile_markdown (&_source, true, true) .or_panic (0x25af0b1e);
 			_contents_data
 		};
 		
 		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
-		create_file_from_str (&_source, &_compiled) .expect ("[81a9176a]");
+		create_file_from_str (&_source, &_compiled) .or_panic (0x81a9176a);
 		
 		self.route_asset_raw (&_relative_1, &_source, "Html", _route_base, _route_builder, "markdown", _source_0, _source_relative);
 		
@@ -346,7 +348,7 @@ impl Builder {
 	pub fn route_css (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_css_sources, _source_0) .expect ("[c6442f7b]");
+		let (_relative, _source) = self.resolve_file (_css_sources, _source_0) .or_panic (0xc6442f7b);
 		
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -359,16 +361,16 @@ impl Builder {
 	pub fn route_sass (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_css_sources, _source_0) .expect ("[4f6f6f41]");
+		let (_relative, _source) = self.resolve_file (_css_sources, _source_0) .or_panic (0x4f6f6f41);
 		
 		let _relative_1 = _relative.with_extension ("css");
 		
 		self.dependencies_include (&_source);
 		
-		let _compiled = self.compile_sass (&_source) .expect ("[cf9af211]");
+		let _compiled = self.compile_sass (&_source) .or_panic (0xcf9af211);
 		
 		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
-		create_file_from_str (&_source, &_compiled) .expect ("[bd7285f4]");
+		create_file_from_str (&_source, &_compiled) .or_panic (0xbd7285f4);
 		
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -384,7 +386,7 @@ impl Builder {
 	pub fn route_js (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _js_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_js_sources, _source_0) .expect ("[3acb623e]");
+		let (_relative, _source) = self.resolve_file (_js_sources, _source_0) .or_panic (0x3acb623e);
 		
 		let _route_base = self.configuration.js_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -398,7 +400,7 @@ impl Builder {
 	pub fn route_image (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .expect ("[febbd06b]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .or_panic (0xfebbd06b);
 		
 		let _route_base = self.configuration.images_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -409,7 +411,7 @@ impl Builder {
 	pub fn route_images (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[31f1c7d2]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .or_panic (0x31f1c7d2);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -426,7 +428,7 @@ impl Builder {
 	pub fn route_icon (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .expect ("[ec14448c]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .or_panic (0xec14448c);
 		
 		let _route_base = self.configuration.icons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -437,7 +439,7 @@ impl Builder {
 	pub fn route_icons (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[9aa78087]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .or_panic (0x9aa78087);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -454,7 +456,7 @@ impl Builder {
 	pub fn route_favicon (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .expect ("[26c3b248]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .or_panic (0x26c3b248);
 		
 		let _route_base = self.configuration.favicons_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -465,7 +467,7 @@ impl Builder {
 	pub fn route_favicons (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[a8b294f4]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .or_panic (0xa8b294f4);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -486,7 +488,7 @@ impl Builder {
 			"Png" | "Jpeg" | "Icon" | "Svg" =>
 				(),
 			_ =>
-				panic! ("[0fd2d804] {}", _source.display ()),
+				panic_with_format (0x0fd2d804, format_args! ("{}", _source.display ())),
 		};
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, _macro, _source_0, _source_relative);
@@ -498,7 +500,7 @@ impl Builder {
 	pub fn route_font (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .expect ("[d84bbf42]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .or_panic (0xd84bbf42);
 		
 		let _route_base = self.configuration.fonts_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -509,7 +511,7 @@ impl Builder {
 	pub fn route_fonts (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[61b17646]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .or_panic (0x61b17646);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -530,7 +532,7 @@ impl Builder {
 			"FontTtf" | "FontOtf" | "FontWoff" | "FontWoff2" =>
 				(),
 			_ =>
-				panic! ("[1a4ccbf4] {}", _source.display ()),
+				panic_with_format (0x1a4ccbf4, format_args! ("{}", _source.display ())),
 		};
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, "resource_font", _source_0, _source_relative);
@@ -542,7 +544,7 @@ impl Builder {
 	pub fn route_asset (&mut self, _source_0 : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .expect ("[8a973b98]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .or_panic (0x8a973b98);
 		
 		let _route_base = self.configuration.assets_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -553,7 +555,7 @@ impl Builder {
 	pub fn route_assets (&mut self, _sources_0 : &str, _glob : Option<&str>, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .expect ("[cf4c2fb3]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) .or_panic (0xcf4c2fb3);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -580,7 +582,7 @@ impl Builder {
 	pub fn watch_asset (&mut self, _source : &str) {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .expect ("[81a2a321]");
+		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .or_panic (0x81a2a321);
 		
 		self.dependencies_include (&_source);
 	}
@@ -588,7 +590,7 @@ impl Builder {
 	pub fn watch_assets (&mut self, _sources : &str, _glob : Option<&str>) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
-		let (_files, _folders) = self.resolve_files (_assets_sources, _sources, _glob) .expect ("[ae5a3a79]");
+		let (_files, _folders) = self.resolve_files (_assets_sources, _sources, _glob) .or_panic (0xae5a3a79);
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path));
 		
@@ -602,19 +604,19 @@ impl Builder {
 		
 		self.dependencies_extend ();
 		
-		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .unwrap ();
+		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .or_panic (0x4bf5618f);
 		for _route_name in self.route_names.into_iter () {
-			writeln! (self.generated, "\t{},", _route_name) .unwrap ();
+			writeln! (self.generated, "\t{},", _route_name) .or_panic (0x894377dd);
 		}
-		writeln! (self.generated, "]);") .unwrap ();
+		writeln! (self.generated, "]);") .or_panic (0x28d1ed4d);
 		
-		writeln! (self.generated, "::hyper_static_server::dependencies! (Dependencies, [") .unwrap ();
+		writeln! (self.generated, "::hyper_static_server::dependencies! (Dependencies, [") .or_panic (0x1a6c02cd);
 		for _dependency in self.dependencies.iter () {
-			writeln! (self.generated, "\t{:?},", _dependency) .unwrap ();
+			writeln! (self.generated, "\t{:?},", _dependency) .or_panic (0x9df69eb7);
 		}
-		writeln! (self.generated, "]);") .unwrap ();
+		writeln! (self.generated, "]);") .or_panic (0x57d05438);
 		
-		create_file_from_str (&self.configuration.generated, &self.generated) .expect ("[9796aa67]");
+		create_file_from_str (&self.configuration.generated, &self.generated) .or_panic (0x9796aa67);
 		
 		if false {
 			eprintln! ("--------------------------------------------------------------------------------");
@@ -639,7 +641,7 @@ impl Builder {
 		let (_path, _relative_root) = self.resolve_source (_root, _source, true) ?;
 		
 		if ! _path.is_file () {
-			return Err (io::Error::new (io::ErrorKind::Other, format! ("[039d945b] {}", _path.display ())));
+			return Err (error_with_format (0x039d945b, format_args! ("{}", _path.display ())));
 		}
 		
 		self.resolve_relative_and_path (&_path, &_relative_root)
@@ -651,10 +653,10 @@ impl Builder {
 		let (_root, _relative_root) = self.resolve_source (_root, _sources, false) ?;
 		
 		if ! _root.is_dir () {
-			return Err (io::Error::new (io::ErrorKind::Other, "[621693a6]"));
+			return Err (error_with_code (0x621693a6));
 		}
 		
-		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .expect ("[f68023ce]"));
+		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .or_panic (0xf68023ce));
 		let _glob = _glob.map (|_pattern| _pattern.compile_matcher ());
 		
 		let mut _files = Vec::new ();
@@ -696,26 +698,26 @@ impl Builder {
 	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> Result<(PathBuf, PathBuf), io::Error> {
 		
 		let _path = if _source.starts_with ("_/") {
-			let _root = _root.expect ("[6e3319c9]");
+			let _root = _root.or_panic (0x6e3319c9);
 			_root.join (&_source[2..])
 			
 		} else if _source.starts_with ("./") || _source.starts_with ("..") {
-			let _root = self.configuration.sources.as_ref () .expect ("[0791a9b4]");
+			let _root = self.configuration.sources.as_ref () .or_panic (0x0791a9b4);
 			_root.join (&_source)
 			
 		} else if _source.starts_with (">") {
 			PathBuf::from (&_source[1..])
 			
 		} else {
-			return Err (io::Error::new (io::ErrorKind::Other, "[41071330]"));
+			return Err (error_with_code (0x41071330));
 		};
 		
 		if ! _path.exists () {
-			return Err (io::Error::new (io::ErrorKind::Other, format! ("[1086bd9d] {}", _path.display ())));
+			return Err (error_with_format (0x1086bd9d, format_args! ("{}", _path.display ())));
 		}
 		
 		if _name_only {
-			let _relative_root = _path.parent () .expect ("[067a2cad]") .to_path_buf ();
+			let _relative_root = _path.parent () .or_panic (0x067a2cad) .to_path_buf ();
 			Ok ((_path, _relative_root))
 		} else {
 			Ok ((_path.clone (), _path))
@@ -725,7 +727,7 @@ impl Builder {
 	
 	fn resolve_relative_and_path (&self, _path : &Path, _relative_root : &Path) -> Result<(PathBuf, PathBuf), io::Error> {
 		
-		let _relative = _path.strip_prefix (_relative_root) .expect ("[546e7cd9]") .to_str () .expect ("[a48f283c]");
+		let _relative = _path.strip_prefix (_relative_root) .or_panic (0x546e7cd9) .to_str () .or_panic (0xa48f283c);
 		let _relative = ["/", _relative].concat () .into ();
 		
 		let _path = normalize_path (&_path);
@@ -761,10 +763,10 @@ impl Builder {
 		
 		for _dependency in self.dependencies.iter () {
 			
-			let _metadata = fs::symlink_metadata (_dependency) .expect ("[e5c6e436]");
+			let _metadata = fs::symlink_metadata (_dependency) .or_panic (0xe5c6e436);
 			
 			if _metadata.file_type () .is_symlink () {
-				let _target = _dependency.canonicalize () .expect ("[12da2ba1]");
+				let _target = _dependency.canonicalize () .or_panic (0x12da2ba1);
 				_extra.push (_target);
 			}
 		}
@@ -797,14 +799,14 @@ impl Builder {
 	#[ cfg (feature = "sass-rs") ]
 	fn compile_sass (&mut self, _source : &Path) -> Result<String, io::Error> {
 		
-		let _extension = _source.extension () .expect ("[836ff108]") .to_str () .expect ("[4068e13f]");
+		let _extension = _source.extension () .or_panic (0x836ff108) .to_str () .or_panic (0x4068e13f);
 		let _indented_syntax = match _extension {
 			"sass" =>
 				true,
 			"scss" =>
 				false,
 			_ =>
-				panic! ("[720c0c23]"),
+				panic_with_code (0x720c0c23),
 		};
 		
 		let _options = sass::Options {
@@ -814,9 +816,9 @@ impl Builder {
 				include_paths : vec! [],
 			};
 		
-		let mut _context = sass::Context::new_file (&_source) .expect ("[5ebe6232]");
+		let mut _context = sass::Context::new_file (&_source) .map_err (|_message| error_with_message (0xfde48681, &_message)) .or_panic (0x5ebe6232);
 		_context.set_options (_options);
-		let _data = _context.compile () .expect ("[31841210]");
+		let _data = _context.compile () .map_err (|_message| error_with_message (0x00c4c0dd, &_message)) .or_panic (0x31841210);
 		
 		return Ok (_data);
 	}
@@ -825,23 +827,23 @@ impl Builder {
 	#[ cfg (feature = "sass-alt") ]
 	fn compile_sass (&mut self, _source : &Path) -> Result<String, io::Error> {
 		
-		let _parent = _source.parent () .expect ("[f6ce0d79]");
+		let _parent = _source.parent () .or_panic (0xf6ce0d79);
 		
-		let _extension = _source.extension () .expect ("[f2cd37bc]") .to_str () .expect ("[db216e38]");
+		let _extension = _source.extension () .or_panic (0xf2cd37bc) .to_str () .or_panic (0xdb216e38);
 		let _input_syntax = match _extension {
 			"sass" =>
 				sass::InputSyntax::SASS,
 			"scss" =>
 				sass::InputSyntax::SCSS,
 			_ =>
-				panic! ("[90668feb]"),
+				panic_with_code (0x90668feb),
 		};
 		
 		pub struct Importer { parent : PathBuf, resolved : rc::Rc<cell::RefCell<Vec<Box<Path>>>> }
 		impl sass::SassImporter for Importer {
 			fn callback (&mut self, _path_0 : &ffi::CStr, _compiler : sass::SassCompiler) -> Result<Option<Vec<sass::SassImportEntry>>, sass::SassImporterError> {
 				
-				let _path_0 = Path::new (_path_0.to_str () .expect ("[fd5fc0a2]"));
+				let _path_0 = Path::new (_path_0.to_str () .or_panic (0xfd5fc0a2));
 				let _path = self.parent.join (_path_0);
 				
 				for _extension in &["sass", "scss", "css"] {
@@ -855,13 +857,13 @@ impl Builder {
 					// NOTE:  The code bellow will keep a reference to `_path` that should live until after the compilation completes.
 					let mut _resolved = self.resolved.borrow_mut ();
 					_resolved.push (_path.into_boxed_path ());
-					let _path = _resolved.last () .expect ("[5d9cba96]") .as_ref ();
+					let _path = _resolved.last () .or_panic (0x5d9cba96) .as_ref ();
 					let _entry = sass::SassImport::AbsolutePath (_path);
 					
 					return Ok (Some (vec! (_entry.into_sass_import_entry ())));
 				}
 				
-				panic! ("[e9c920d0] {}", _path.display ());
+				panic_with_format (0xe9c920d0, format_args! ("{}", _path.display ()));
 			}
 		}
 		impl fmt::Debug for Importer {
@@ -880,8 +882,8 @@ impl Builder {
 				source_map_contents : false,
 				source_map_file_urls : false,
 				omit_source_map_url : true,
-				indent : ffi::CString::new ("\t") .expect ("[77771198]"),
-				linefeed : ffi::CString::new ("\n") .expect ("[ef2eea09]"),
+				indent : ffi::CString::new ("\t") .or_panic (0x77771198),
+				linefeed : ffi::CString::new ("\n") .or_panic (0xef2eea09),
 				precision : 4,
 				input_syntax : _input_syntax,
 				include_paths : &[],
@@ -890,7 +892,7 @@ impl Builder {
 				header_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
 			};
 		
-		let _data = _options.compile_file (_source) .expect ("[bbaffa6f]");
+		let _data = _options.compile_file (_source) .or_panic (0xbbaffa6f);
 		
 		for _dependency in _resolved.borrow () .iter () {
 			self.dependencies_include (_dependency.as_ref ());
@@ -961,7 +963,7 @@ impl Builder {
 			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
 			if ! _title.is_empty () {
 				_output.push_str ("<title>");
-				cmark::escape::escape_html (&mut _output, &_title) .expect ("[dc5ea905]");
+				cmark::escape::escape_html (&mut _output, &_title) .or_panic (0xdc5ea905);
 				_output.push_str ("</title>\n");
 			}
 			_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
@@ -986,7 +988,7 @@ impl Builder {
 
 fn create_file_from_str (_path : &Path, _data : &str) -> Result<(), io::Error> {
 	
-	fs::create_dir_all (_path.parent () .expect ("[370af23d]")) ?;
+	fs::create_dir_all (_path.parent () .or_panic (0x370af23d)) ?;
 	
 	let mut _file = fs::File::create (&_path) ?;
 	_file.write_all (_data.as_bytes ()) ?;
@@ -1027,24 +1029,24 @@ impl RoutePathBuilder for (bool, &str) {
 
 fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _route_infix : Option<&Path>) -> PathBuf {
 	
-	let _route_prefix = _route_prefix.expect ("[1ba00780]");
+	let _route_prefix = _route_prefix.or_panic (0x1ba00780);
 	
 	if ! _route_prefix.starts_with ("/") || (_route_prefix.ends_with ("/") && _route_prefix != Path::new ("/")) {
-		panic! ("[6fc9256c]");
+		panic_with_code (0x6fc9256c);
 	}
 	if ! _source_relative.starts_with ("/") || _source_relative.ends_with ("/") {
-		panic! ("[ace09af4]");
+		panic_with_code (0xace09af4);
 	}
 	if let Some (_route_infix) = _route_infix {
 		if _route_infix.starts_with ("/") || _route_infix.ends_with ("/") {
-			panic! ("[d224b592]");
+			panic_with_code (0xd224b592);
 		}
 	}
 	
-	let _source_relative = _source_relative.strip_prefix ("/") .expect ("[bd4b80bd]");
+	let _source_relative = _source_relative.strip_prefix ("/") .or_panic (0xbd4b80bd);
 	
 	let _route = if let Some (_route_infix) = _route_infix {
-		let _route_infix = _route_infix.strip_prefix ("/") .expect ("[1a7e3353]");
+		let _route_infix = _route_infix.strip_prefix ("/") .or_panic (0x1a7e3353);
 		_route_prefix.join (_route_infix) .join (_source_relative)
 	} else {
 		_route_prefix.join (_source_relative)
@@ -1057,7 +1059,7 @@ fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _rou
 fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailing_slash : bool) -> PathBuf {
 	
 	if ! _path_0.starts_with ("/") {
-		panic! ("[1e7f7bc0]");
+		panic_with_code (0x1e7f7bc0);
 	}
 	
 	let mut _path = PathBuf::new ();
@@ -1092,7 +1094,7 @@ fn normalize_path (_path_0 : &Path) -> PathBuf {
 
 fn detect_content_type_from_extension (_source : &Path) -> &'static str {
 	
-	let _extension = _source.extension () .expect ("[29957dc8]") .to_str () .expect ("[908aeea6]");
+	let _extension = _source.extension () .or_panic (0x29957dc8) .to_str () .or_panic (0x908aeea6);
 	
 	match _extension {
 		"text" | "txt" => "Text",
@@ -1111,7 +1113,7 @@ fn detect_content_type_from_extension (_source : &Path) -> &'static str {
 		"woff" => "FontWoff",
 		"woff2" => "FontWoff2",
 		_ =>
-			panic! ("[2bd15bab] {}", _source.display ()),
+			panic_with_format (0x2bd15bab, format_args! ("{}", _source.display ())),
 	}
 }
 
