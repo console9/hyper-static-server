@@ -232,7 +232,7 @@ impl Builder {
 	
 	pub fn route_askama (&mut self, _source_0 : &str, _route : &str) -> BuilderResult {
 		
-		let _route = normalize_route (_route.as_ref (), true, false) .or_panic (0xd4e624e4);
+		let _route = normalize_route (_route.as_ref (), true, false) ?;
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) ?;
@@ -282,8 +282,8 @@ impl Builder {
 		
 		for (_relative, _source) in _files.into_iter () {
 			
-			if _source.extension () .or_panic (0xc1ecda55) != "md" {
-				panic_with_format (0x393ea45d, format_args! ("{}", _source.display ()));
+			if _source.extension () .or_wrap (0xc1ecda55) ? != "md" {
+				return Err (error_with_format (0x393ea45d, format_args! ("{}", _source.display ())));
 			}
 			
 			self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _sources_0, Some (_relative.as_path ())) ?;
@@ -296,21 +296,23 @@ impl Builder {
 	#[ cfg (feature = "pulldown-cmark") ]
 	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> BuilderResult<(Option<String>, Option<String>)> {
 		
-		let _header_source = _header_source.map (|_source| self.resolve_file (None, _source) .or_panic (0x3b980a80) .1);
-		let _footer_source = _footer_source.map (|_source| self.resolve_file (None, _source) .or_panic (0x090937fb) .1);
+		let _header_source = _header_source.map (|_source| BuilderResult::Ok (self.resolve_file (None, _source) ? .1)) .transpose () ?;
+		let _footer_source = _footer_source.map (|_source| BuilderResult::Ok (self.resolve_file (None, _source) ? .1)) .transpose () ?;
 		
 		let _header_data = _header_source.as_ref () .map (
 				|_source| {
-					let _data = fs::read_to_string (_source) .or_panic (0x8c8dba7c);
-					self.dependencies_include (_source) .or_panic (0xb067e7a1);
-					_data
-				});
+					let _data = fs::read_to_string (_source) ?;
+					self.dependencies_include (_source) ?;
+					BuilderResult::Ok (_data)
+				})
+				.transpose () ?;
 		let _footer_data = _footer_source.as_ref () .map (
 				|_source| {
-					let _data = fs::read_to_string (_source) .or_panic (0x2fe05fcb);
-					self.dependencies_include (_source) .or_panic (0x885caa0f);
-					_data
-				});
+					let _data = fs::read_to_string (_source) ?;
+					self.dependencies_include (_source) ?;
+					BuilderResult::Ok (_data)
+				})
+				.transpose () ?;
 		
 		Ok ((_header_data, _footer_data))
 	}
@@ -332,7 +334,7 @@ impl Builder {
 			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
 			let _title = {
 				let mut _buffer = String::with_capacity (_title.len () * 3 / 2);
-				cmark::escape::escape_html (&mut _buffer, &_title) .or_panic (0xfea93c74);
+				cmark::escape::escape_html (&mut _buffer, &_title) .infallible (0xef399d64);
 				_buffer
 			};
 			
@@ -348,7 +350,7 @@ impl Builder {
 		};
 		
 		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
-		create_file_from_str (&_source, &_compiled) .or_panic (0x81a9176a);
+		create_file_from_str (&_source, &_compiled) ?;
 		
 		self.route_asset_raw (&_relative_1, &_source, "Html", _route_base, _route_builder, "markdown", _source_0, _source_relative) ?;
 		
@@ -506,12 +508,12 @@ impl Builder {
 	
 	fn route_image_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
-		let _content_type = detect_content_type_from_extension (&_source) .or_panic (0xadd54a6e);
+		let _content_type = detect_content_type_from_extension (&_source) ?;
 		match _content_type {
 			"Png" | "Jpeg" | "Icon" | "Svg" =>
 				(),
 			_ =>
-				panic_with_format (0x0fd2d804, format_args! ("{}", _source.display ())),
+				return Err (error_with_format (0x0fd2d804, format_args! ("{}", _source.display ()))),
 		};
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, _macro, _source_0, _source_relative)
@@ -552,12 +554,12 @@ impl Builder {
 	
 	fn route_font_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
-		let _content_type = detect_content_type_from_extension (&_source) .or_panic (0x767b6040);
+		let _content_type = detect_content_type_from_extension (&_source) ?;
 		match _content_type {
 			"FontTtf" | "FontOtf" | "FontWoff" | "FontWoff2" =>
 				(),
 			_ =>
-				panic_with_format (0x1a4ccbf4, format_args! ("{}", _source.display ())),
+				return Err (error_with_format (0x1a4ccbf4, format_args! ("{}", _source.display ()))),
 		};
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, "resource_font", _source_0, _source_relative)
@@ -598,7 +600,7 @@ impl Builder {
 	
 	fn route_asset_0 (&mut self, _relative : &Path, _source : &Path, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
-		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source) .or_panic (0xe9ddacef));
+		let _content_type = _content_type.map_or_else (|| detect_content_type_from_extension (&_source), |_content_type| Ok (_content_type)) ?;
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, "resource_asset", _source_0, _source_relative)
 	}
