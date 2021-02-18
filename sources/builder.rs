@@ -75,8 +75,8 @@ impl Default for BuilderConfiguration {
 	
 	fn default () -> Self {
 		
-		let _sources = Self::resolve_sources ();
-		let _outputs = Self::resolve_outputs ();
+		let _sources = Self::resolve_sources () .or_panic (0xc6e7914d);
+		let _outputs = Self::resolve_outputs () .or_panic (0x344e2c9e);
 		
 		let _assets_sources = _sources.join ("./assets");
 		let _assets_sources = if _assets_sources.exists () { Some (_assets_sources) } else { None };
@@ -123,8 +123,8 @@ impl BuilderConfiguration {
 	
 	pub fn minimal () -> Self {
 		
-		let _sources = Self::resolve_sources ();
-		let _outputs = Self::resolve_outputs ();
+		let _sources = Self::resolve_sources () .or_panic (0x84741eec);
+		let _outputs = Self::resolve_outputs () .or_panic (0x2fe58163);
 		let _generated = _outputs.join ("./hss-builder-generated-default.in");
 		
 		Self {
@@ -148,18 +148,18 @@ impl BuilderConfiguration {
 		
 	}
 	
-	pub fn resolve_sources () -> PathBuf {
-		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .or_panic (0x4c6c04d8));
+	pub fn resolve_sources () -> BuilderResult<PathBuf> {
+		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .or_wrap (0x4c6c04d8) ?);
 		if ! _sources.is_dir () {
-			panic_with_code (0x148bc689);
+			return Err (error_with_code (0x148bc689));
 		}
 		normalize_path (&_sources)
 	}
 	
-	pub fn resolve_outputs () -> PathBuf {
-		let _outputs = PathBuf::from (env::var ("OUT_DIR") .or_panic (0xf039039f));
+	pub fn resolve_outputs () -> BuilderResult<PathBuf> {
+		let _outputs = PathBuf::from (env::var ("OUT_DIR") .or_wrap (0xf039039f) ?);
 		if ! _outputs.is_dir () {
-			panic_with_code (0xfcee6b4d);
+			return Err (error_with_code (0xfcee6b4d));
 		}
 		normalize_path (&_outputs)
 	}
@@ -204,7 +204,7 @@ impl Builder {
 	
 	fn route_asset_raw (&mut self, _relative : &Path, _source : &Path, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) {
 		
-		let _route = _route_builder.build (_relative, &_source, _route_base, None);
+		let _route = _route_builder.build (_relative, &_source, _route_base, None) .or_panic (0xae78232b);
 		
 		let _id = self.generate_id ();
 		
@@ -228,7 +228,7 @@ impl Builder {
 	
 	pub fn route_askama (&mut self, _source_0 : &str, _route : &str) -> () {
 		
-		let _route = normalize_route (_route.as_ref (), true, false);
+		let _route = normalize_route (_route.as_ref (), true, false) .or_panic (0xd4e624e4);
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) .or_panic (0xc1ef5a99);
@@ -488,7 +488,7 @@ impl Builder {
 	
 	fn route_image_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) -> () {
 		
-		let _content_type = detect_content_type_from_extension (&_source);
+		let _content_type = detect_content_type_from_extension (&_source) .or_panic (0xadd54a6e);
 		match _content_type {
 			"Png" | "Jpeg" | "Icon" | "Svg" =>
 				(),
@@ -532,7 +532,7 @@ impl Builder {
 	
 	fn route_font_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> () {
 		
-		let _content_type = detect_content_type_from_extension (&_source);
+		let _content_type = detect_content_type_from_extension (&_source) .or_panic (0x767b6040);
 		match _content_type {
 			"FontTtf" | "FontOtf" | "FontWoff" | "FontWoff2" =>
 				(),
@@ -576,7 +576,7 @@ impl Builder {
 	
 	fn route_asset_0 (&mut self, _relative : &Path, _source : &Path, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) {
 		
-		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source));
+		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source) .or_panic (0xe9ddacef));
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, "resource_asset", _source_0, _source_relative);
 	}
@@ -607,7 +607,7 @@ impl Builder {
 	
 	pub fn generate (mut self) -> () {
 		
-		self.dependencies_extend ();
+		self.dependencies_extend () .or_panic (0x01513344);
 		
 		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .or_panic (0x4bf5618f);
 		for _route_name in self.route_names.into_iter () {
@@ -661,7 +661,7 @@ impl Builder {
 			return Err (error_with_code (0x621693a6));
 		}
 		
-		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .or_panic (0xf68023ce));
+		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .or_wrap (0xf68023ce)) .transpose () ?;
 		let _glob = _glob.map (|_pattern| _pattern.compile_matcher ());
 		
 		let mut _files = Vec::new ();
@@ -690,7 +690,7 @@ impl Builder {
 			
 			if _path.is_dir () {
 				
-				let _path = normalize_path (_path);
+				let _path = normalize_path (_path) ?;
 				
 				_folders.push (_path);
 			}
@@ -703,11 +703,11 @@ impl Builder {
 	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> BuilderResult<(PathBuf, PathBuf)> {
 		
 		let _path = if _source.starts_with ("_/") {
-			let _root = _root.or_panic (0x6e3319c9);
+			let _root = _root.or_wrap (0x6e3319c9) ?;
 			_root.join (&_source[2..])
 			
 		} else if _source.starts_with ("./") || _source.starts_with ("..") {
-			let _root = self.configuration.sources.as_ref () .or_panic (0x0791a9b4);
+			let _root = self.configuration.sources.as_ref () .or_wrap (0x0791a9b4) ?;
 			_root.join (&_source)
 			
 		} else if _source.starts_with (">") {
@@ -722,7 +722,7 @@ impl Builder {
 		}
 		
 		if _name_only {
-			let _relative_root = _path.parent () .or_panic (0x067a2cad) .to_path_buf ();
+			let _relative_root = _path.parent () .or_wrap (0x067a2cad) ? .to_path_buf ();
 			Ok ((_path, _relative_root))
 		} else {
 			Ok ((_path.clone (), _path))
@@ -732,10 +732,10 @@ impl Builder {
 	
 	fn resolve_relative_and_path (&self, _path : &Path, _relative_root : &Path) -> BuilderResult<(PathBuf, PathBuf)> {
 		
-		let _relative = _path.strip_prefix (_relative_root) .or_panic (0x546e7cd9) .to_str () .or_panic (0xa48f283c);
+		let _relative = _path.strip_prefix (_relative_root) .or_wrap (0x546e7cd9) ? .to_str () .or_wrap (0xa48f283c) ?;
 		let _relative = ["/", _relative].concat () .into ();
 		
-		let _path = normalize_path (&_path);
+		let _path = normalize_path (&_path) ?;
 		
 		Ok ((_relative, _path))
 	}
@@ -762,16 +762,16 @@ impl Builder {
 		self.dependencies.remove (_path.into ());
 	}
 	
-	fn dependencies_extend (&mut self) -> () {
+	fn dependencies_extend (&mut self) -> BuilderResult {
 		
 		let mut _extra = Vec::new ();
 		
 		for _dependency in self.dependencies.iter () {
 			
-			let _metadata = fs::symlink_metadata (_dependency) .or_panic (0xe5c6e436);
+			let _metadata = fs::symlink_metadata (_dependency) .or_wrap (0x06a4fbd5) ?;
 			
 			if _metadata.file_type () .is_symlink () {
-				let _target = _dependency.canonicalize () .or_panic (0x12da2ba1);
+				let _target = _dependency.canonicalize () .or_wrap (0x8df4310e) ?;
 				_extra.push (_target);
 			}
 		}
@@ -779,6 +779,8 @@ impl Builder {
 		for _dependency in _extra.into_iter () {
 			self.dependencies.insert (_dependency);
 		}
+		
+		Ok (())
 	}
 }
 
@@ -804,14 +806,14 @@ impl Builder {
 	#[ cfg (feature = "sass-rs") ]
 	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
-		let _extension = _source.extension () .or_panic (0x836ff108) .to_str () .or_panic (0x4068e13f);
+		let _extension = _source.extension () .or_wrap (0x836ff108) ? .to_str () .or_wrap (0x4068e13f) ?;
 		let _indented_syntax = match _extension {
 			"sass" =>
 				true,
 			"scss" =>
 				false,
 			_ =>
-				panic_with_code (0x720c0c23),
+				return Err (error_with_code (0x720c0c23)),
 		};
 		
 		let _options = sass::Options {
@@ -821,9 +823,9 @@ impl Builder {
 				include_paths : vec! [],
 			};
 		
-		let mut _context = sass::Context::new_file (&_source) .map_err (|_message| error_with_message (0xfde48681, &_message)) .or_panic (0x5ebe6232);
+		let mut _context = sass::Context::new_file (&_source) .map_err (|_message| error_with_message (0xfde48681, &_message)) ?;
 		_context.set_options (_options);
-		let _data = _context.compile () .map_err (|_message| error_with_message (0x00c4c0dd, &_message)) .or_panic (0x31841210);
+		let _data = _context.compile () .map_err (|_message| error_with_message (0x00c4c0dd, &_message)) ?;
 		
 		return Ok (_data);
 	}
@@ -832,16 +834,16 @@ impl Builder {
 	#[ cfg (feature = "sass-alt") ]
 	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
-		let _parent = _source.parent () .or_panic (0xf6ce0d79);
+		let _parent = _source.parent () .or_wrap (0xf6ce0d79) ?;
 		
-		let _extension = _source.extension () .or_panic (0xf2cd37bc) .to_str () .or_panic (0xdb216e38);
+		let _extension = _source.extension () .or_wrap (0xf2cd37bc) ? .to_str () .or_wrap (0xdb216e38) ?;
 		let _input_syntax = match _extension {
 			"sass" =>
 				sass::InputSyntax::SASS,
 			"scss" =>
 				sass::InputSyntax::SCSS,
 			_ =>
-				panic_with_code (0x90668feb),
+				return Err (error_with_code (0x90668feb)),
 		};
 		
 		pub struct Importer { parent : PathBuf, resolved : rc::Rc<cell::RefCell<Vec<Box<Path>>>> }
@@ -887,8 +889,8 @@ impl Builder {
 				source_map_contents : false,
 				source_map_file_urls : false,
 				omit_source_map_url : true,
-				indent : ffi::CString::new ("\t") .or_panic (0x77771198),
-				linefeed : ffi::CString::new ("\n") .or_panic (0xef2eea09),
+				indent : ffi::CString::new ("\t") .infallible (0x77771198),
+				linefeed : ffi::CString::new ("\n") .infallible (0xef2eea09),
 				precision : 4,
 				input_syntax : _input_syntax,
 				include_paths : &[],
@@ -897,7 +899,7 @@ impl Builder {
 				header_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
 			};
 		
-		let _data = _options.compile_file (_source) .or_panic (0xbbaffa6f);
+		let _data = _options.compile_file (_source) .or_wrap (0xbbaffa6f) ?;
 		
 		for _dependency in _resolved.borrow () .iter () {
 			self.dependencies_include (_dependency.as_ref ());
@@ -968,7 +970,7 @@ impl Builder {
 			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
 			if ! _title.is_empty () {
 				_output.push_str ("<title>");
-				cmark::escape::escape_html (&mut _output, &_title) .or_panic (0xdc5ea905);
+				cmark::escape::escape_html (&mut _output, &_title) .infallible (0xdc5ea905);
 				_output.push_str ("</title>\n");
 			}
 			_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
@@ -993,7 +995,7 @@ impl Builder {
 
 fn create_file_from_str (_path : &Path, _data : &str) -> BuilderResult {
 	
-	fs::create_dir_all (_path.parent () .or_panic (0x370af23d)) ?;
+	fs::create_dir_all (_path.parent () .or_wrap (0x370af23d) ?) ?;
 	
 	let mut _file = fs::File::create (&_path) ?;
 	_file.write_all (_data.as_bytes ()) ?;
@@ -1006,13 +1008,13 @@ fn create_file_from_str (_path : &Path, _data : &str) -> BuilderResult {
 
 pub trait RoutePathBuilder {
 	
-	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf;
+	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> BuilderResult<PathBuf>;
 }
 
 
 impl RoutePathBuilder for () {
 	
-	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf {
+	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> BuilderResult<PathBuf> {
 		generate_route (_source_relative, _route_prefix_hint, _route_infix_hint)
 	}
 }
@@ -1020,7 +1022,7 @@ impl RoutePathBuilder for () {
 
 impl RoutePathBuilder for (bool, &str) {
 	
-	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> PathBuf {
+	fn build (&self, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> BuilderResult<PathBuf> {
 		if self.0 {
 			generate_route (_source_relative, Some (Path::new (self.1)), None)
 		} else {
@@ -1032,26 +1034,26 @@ impl RoutePathBuilder for (bool, &str) {
 
 
 
-fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _route_infix : Option<&Path>) -> PathBuf {
+fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _route_infix : Option<&Path>) -> BuilderResult<PathBuf> {
 	
-	let _route_prefix = _route_prefix.or_panic (0x1ba00780);
+	let _route_prefix = _route_prefix.or_wrap (0x1ba00780) ?;
 	
 	if ! _route_prefix.starts_with ("/") || (_route_prefix.ends_with ("/") && _route_prefix != Path::new ("/")) {
-		panic_with_code (0x6fc9256c);
+		return Err (error_with_code (0x6fc9256c));
 	}
 	if ! _source_relative.starts_with ("/") || _source_relative.ends_with ("/") {
-		panic_with_code (0xace09af4);
+		return Err (error_with_code (0xace09af4));
 	}
 	if let Some (_route_infix) = _route_infix {
 		if _route_infix.starts_with ("/") || _route_infix.ends_with ("/") {
-			panic_with_code (0xd224b592);
+			return Err (error_with_code (0xd224b592));
 		}
 	}
 	
-	let _source_relative = _source_relative.strip_prefix ("/") .or_panic (0xbd4b80bd);
+	let _source_relative = _source_relative.strip_prefix ("/") .or_wrap (0xbd4b80bd) ?;
 	
 	let _route = if let Some (_route_infix) = _route_infix {
-		let _route_infix = _route_infix.strip_prefix ("/") .or_panic (0x1a7e3353);
+		let _route_infix = _route_infix.strip_prefix ("/") .or_wrap (0x1a7e3353) ?;
 		_route_prefix.join (_route_infix) .join (_source_relative)
 	} else {
 		_route_prefix.join (_source_relative)
@@ -1061,10 +1063,10 @@ fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _rou
 }
 
 
-fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailing_slash : bool) -> PathBuf {
+fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailing_slash : bool) -> BuilderResult<PathBuf> {
 	
 	if ! _path_0.starts_with ("/") {
-		panic_with_code (0x1e7f7bc0);
+		return Err (error_with_code (0x1e7f7bc0));
 	}
 	
 	let mut _path = PathBuf::new ();
@@ -1081,27 +1083,28 @@ fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailin
 		}
 	}
 	
-	_path
+	Ok (_path)
 }
 
 
-fn normalize_path (_path_0 : &Path) -> PathBuf {
+fn normalize_path (_path_0 : &Path) -> BuilderResult<PathBuf> {
 	
 	let mut _path = PathBuf::new ();
 	for _component in _path_0.components () {
 		_path.push (_component);
 	}
-	_path
+	
+	Ok (_path)
 }
 
 
 
 
-fn detect_content_type_from_extension (_source : &Path) -> &'static str {
+fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'static str> {
 	
-	let _extension = _source.extension () .or_panic (0x29957dc8) .to_str () .or_panic (0x908aeea6);
+	let _extension = _source.extension () .or_wrap (0x29957dc8) ? .to_str () .or_wrap (0x908aeea6) ?;
 	
-	match _extension {
+	let _content_type = match _extension {
 		"text" | "txt" => "Text",
 		"md" => "Text",
 		"html" | "htm" => "Html",
@@ -1118,8 +1121,10 @@ fn detect_content_type_from_extension (_source : &Path) -> &'static str {
 		"woff" => "FontWoff",
 		"woff2" => "FontWoff2",
 		_ =>
-			panic_with_format (0x2bd15bab, format_args! ("{}", _source.display ())),
-	}
+			return Err (error_with_format (0x2bd15bab, format_args! ("{}", _source.display ()))),
+	};
+	
+	Ok (_content_type)
 }
 
 
