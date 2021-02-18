@@ -43,6 +43,7 @@ use ::hyper_simple_server::internals::*;
 
 
 
+
 pub type BuilderResult<V = ()> = Result<V, BuilderError>;
 pub type BuilderError = io::Error;
 
@@ -202,7 +203,7 @@ impl Builder {
 	
 	
 	
-	fn route_asset_raw (&mut self, _relative : &Path, _source : &Path, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) {
+	fn route_asset_raw (&mut self, _relative : &Path, _source : &Path, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) -> () {
 		
 		let _route = _route_builder.build (_relative, &_source, _route_base, None) .or_panic (0xae78232b);
 		
@@ -219,8 +220,8 @@ impl Builder {
 		
 		let _mode = "auto";
 		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _mode, _source, _description) .or_panic (0x5fa962ac);
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .or_panic (0x46de4cc9);
+		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _mode, _source, _description) .infallible (0x5fa962ac);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x46de4cc9);
 	}
 	
 	
@@ -233,7 +234,7 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) .or_panic (0xc1ef5a99);
 		
-		let _template = _relative.strip_prefix ("/") .or_panic (0x7285dc26);
+		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
 		
 		self.dependencies_include (&_source);
 		
@@ -244,8 +245,8 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .or_panic (0x35966385);
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .or_panic (0x41a5ee4c);
+		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .infallible (0x35966385);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x41a5ee4c);
 	}
 	
 	
@@ -546,7 +547,7 @@ impl Builder {
 	
 	
 	
-	pub fn route_asset (&mut self, _source_0 : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) {
+	pub fn route_asset (&mut self, _source_0 : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_assets_sources, _source_0) .or_panic (0x8a973b98);
@@ -574,7 +575,7 @@ impl Builder {
 	}
 	
 	
-	fn route_asset_0 (&mut self, _relative : &Path, _source : &Path, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) {
+	fn route_asset_0 (&mut self, _relative : &Path, _source : &Path, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> () {
 		
 		let _content_type = _content_type.unwrap_or_else (|| detect_content_type_from_extension (&_source) .or_panic (0xe9ddacef));
 		
@@ -584,7 +585,7 @@ impl Builder {
 	
 	
 	
-	pub fn watch_asset (&mut self, _source : &str) {
+	pub fn watch_asset (&mut self, _source : &str) -> () {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_assets_sources, _source) .or_panic (0x81a2a321);
@@ -609,17 +610,17 @@ impl Builder {
 		
 		self.dependencies_extend () .or_panic (0x01513344);
 		
-		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .or_panic (0x4bf5618f);
+		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .infallible (0x4bf5618f);
 		for _route_name in self.route_names.into_iter () {
-			writeln! (self.generated, "\t{},", _route_name) .or_panic (0x894377dd);
+			writeln! (self.generated, "\t{},", _route_name) .infallible (0x894377dd);
 		}
-		writeln! (self.generated, "]);") .or_panic (0x28d1ed4d);
+		writeln! (self.generated, "]);") .infallible (0x28d1ed4d);
 		
-		writeln! (self.generated, "::hyper_static_server::dependencies! (Dependencies, [") .or_panic (0x1a6c02cd);
+		writeln! (self.generated, "::hyper_static_server::dependencies! (Dependencies, [") .infallible (0x1a6c02cd);
 		for _dependency in self.dependencies.iter () {
-			writeln! (self.generated, "\t{:?},", _dependency) .or_panic (0x9df69eb7);
+			writeln! (self.generated, "\t{:?},", _dependency) .infallible (0x9df69eb7);
 		}
-		writeln! (self.generated, "]);") .or_panic (0x57d05438);
+		writeln! (self.generated, "]);") .infallible (0x57d05438);
 		
 		create_file_from_str (&self.configuration.generated, &self.generated) .or_panic (0x9796aa67);
 		
