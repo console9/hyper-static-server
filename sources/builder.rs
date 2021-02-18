@@ -43,6 +43,11 @@ use ::hyper_simple_server::internals::*;
 
 
 
+pub type BuilderResult<V = ()> = Result<V, BuilderError>;
+pub type BuilderError = io::Error;
+
+
+
 
 #[ derive (Clone, Debug) ]
 pub struct BuilderConfiguration {
@@ -636,7 +641,7 @@ impl Builder {
 impl Builder {
 	
 	
-	fn resolve_file (&self, _root : Option<&Path>, _source : &str) -> Result<(PathBuf, PathBuf), io::Error> {
+	fn resolve_file (&self, _root : Option<&Path>, _source : &str) -> BuilderResult<(PathBuf, PathBuf)> {
 		
 		let (_path, _relative_root) = self.resolve_source (_root, _source, true) ?;
 		
@@ -648,7 +653,7 @@ impl Builder {
 	}
 	
 	
-	fn resolve_files (&self, _root : Option<&Path>, _sources : &str, _glob : Option<&str>) -> Result<(Vec<(PathBuf, PathBuf)>, Vec<PathBuf>), io::Error> {
+	fn resolve_files (&self, _root : Option<&Path>, _sources : &str, _glob : Option<&str>) -> BuilderResult<(Vec<(PathBuf, PathBuf)>, Vec<PathBuf>)> {
 		
 		let (_root, _relative_root) = self.resolve_source (_root, _sources, false) ?;
 		
@@ -695,7 +700,7 @@ impl Builder {
 	}
 	
 	
-	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> Result<(PathBuf, PathBuf), io::Error> {
+	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> BuilderResult<(PathBuf, PathBuf)> {
 		
 		let _path = if _source.starts_with ("_/") {
 			let _root = _root.or_panic (0x6e3319c9);
@@ -725,7 +730,7 @@ impl Builder {
 	}
 	
 	
-	fn resolve_relative_and_path (&self, _path : &Path, _relative_root : &Path) -> Result<(PathBuf, PathBuf), io::Error> {
+	fn resolve_relative_and_path (&self, _path : &Path, _relative_root : &Path) -> BuilderResult<(PathBuf, PathBuf)> {
 		
 		let _relative = _path.strip_prefix (_relative_root) .or_panic (0x546e7cd9) .to_str () .or_panic (0xa48f283c);
 		let _relative = ["/", _relative].concat () .into ();
@@ -797,7 +802,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "sass-rs") ]
-	fn compile_sass (&mut self, _source : &Path) -> Result<String, io::Error> {
+	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
 		let _extension = _source.extension () .or_panic (0x836ff108) .to_str () .or_panic (0x4068e13f);
 		let _indented_syntax = match _extension {
@@ -825,7 +830,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "sass-alt") ]
-	fn compile_sass (&mut self, _source : &Path) -> Result<String, io::Error> {
+	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
 		let _parent = _source.parent () .or_panic (0xf6ce0d79);
 		
@@ -909,7 +914,7 @@ impl Builder {
 impl Builder {
 	
 	
-	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _title_detect : bool) -> Result<(Option<String>, String), io::Error> {
+	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _title_detect : bool) -> BuilderResult<(Option<String>, String)> {
 		
 		let _input = fs::read_to_string (_source) ?;
 		
@@ -986,7 +991,7 @@ impl Builder {
 
 
 
-fn create_file_from_str (_path : &Path, _data : &str) -> Result<(), io::Error> {
+fn create_file_from_str (_path : &Path, _data : &str) -> BuilderResult {
 	
 	fs::create_dir_all (_path.parent () .or_panic (0x370af23d)) ?;
 	
