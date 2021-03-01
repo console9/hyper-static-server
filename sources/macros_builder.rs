@@ -231,6 +231,16 @@ macro_rules! builder_macros {
 		
 		
 		#[ allow (unused_macros) ]
+		macro_rules! markdown_askama {
+			( $_source_markdown : literal, $_source_template : literal => $_route : literal ) => {
+				$crate::builder_call! ($_builder, route_markdown_askama, ($_source_markdown, $_source_template, $_route), (0x97238678));
+			};
+		}
+		
+		
+		
+		
+		#[ allow (unused_macros) ]
 		macro_rules! markdown {
 			( $_source : literal => $_route : literal ) => {
 				$crate::builder_call! ($_builder, route_markdown, ($_source, ::std::option::Option::None, ::std::option::Option::None, route_path_builder! (perhaps (exact), $_route)), (0x97238678));

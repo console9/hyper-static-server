@@ -244,12 +244,50 @@ impl Builder {
 		let _id = self.generate_id ();
 		
 		let _content_type = "Html";
-		let _description = format! ("askama ({}, source = `{}`)", _content_type, _source_0);
+		let _description = format! ("askama ({}, template = `{}`)", _content_type, _source_0);
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .infallible (0x35966385);
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x41a5ee4c);
+		
+		Ok (())
+	}
+	
+	
+	
+	
+	#[ cfg (feature = "pulldown-cmark") ]
+	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _route : &str) -> BuilderResult {
+		
+		let _route = normalize_route (_route.as_ref (), true, false) ?;
+		
+		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
+		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
+		
+		let _template = _relative_template.strip_prefix ("/") .infallible (0xda5e5ad4);
+		
+		self.dependencies_include (&_source_template) ?;
+		
+		let (_relative_markdown, _source_markdown) = self.resolve_file (None, _source_markdown_0) ?;
+		
+		self.dependencies_include (&_source_markdown) ?;
+		
+		let (_markdown_title, _markdown_body) = self.compile_markdown (&_source_markdown, false, true) ?;
+		let _markdown_title = _markdown_title.unwrap_or (String::new ());
+		
+		let _source_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
+		create_file_from_str (&_source_markdown, &_markdown_body) ?;
+		
+		let _id = self.generate_id ();
+		
+		let _content_type = "Html";
+		let _description = format! ("markdown_askama ({}, markdown = `{}`, template = `{}`)", _content_type, _source_markdown_0, _source_template_0);
+		
+		self.route_names.push (format! ("Route_{}", _id));
+		
+		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _content_type, _template, _markdown_title, _source_markdown, _description) .infallible (0xd64341cb);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0xafb30ea0);
 		
 		Ok (())
 	}

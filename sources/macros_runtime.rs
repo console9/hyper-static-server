@@ -65,6 +65,72 @@ macro_rules! askama {
 
 
 #[ macro_export ]
+macro_rules! askama_with_title_and_body {
+	
+	
+	( $_resource_name : ident, $_template_name : ident, $_content_type : ident, $_template_path : literal, $_title : literal, $_body_path : literal, $_description : literal ) => {
+		
+		#[ derive (::askama::Template) ]
+		#[ template (path = $_template_path) ]
+		#[ allow (non_camel_case_types) ]
+		pub(crate) struct $_template_name {
+			pub title : &'static str,
+			pub body : &'static str,
+		}
+		
+		#[ allow (non_camel_case_types) ]
+		pub(crate) struct $_resource_name {
+			template : $_template_name,
+		}
+		
+		#[ allow (dead_code) ]
+		impl $_resource_name {
+			
+			pub fn new () -> Self {
+				Self {
+						template : $_template_name {
+								title : $_title,
+								body : ::std::include_str! ($_body_path),
+							},
+					}
+			}
+			
+			pub fn render (&self) -> $crate::hss::ServerResult<::std::string::String> {
+				::askama::Template::render (&self.template)
+						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x28df3421, _error)))
+			}
+			
+			pub fn content_type (&self) -> $crate::hss::ContentType {
+				$crate::hss::ContentType::$_content_type
+			}
+			
+			pub fn description (&self) -> &'static str {
+				$_description
+			}
+			
+			pub fn into_handler (self) -> impl $crate::hss::Handler {
+				$crate::hss::HandlerSimpleSyncWrapper::new (self)
+			}
+		}
+		
+		impl $crate::hss::HandlerSimpleSync for $_resource_name {
+			
+			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::ServerResult {
+				use $crate::hss::ResponseExt as _;
+				let _body = self.render () ?;
+				_response.set_status_200 ();
+				_response.set_content_type (self.content_type ());
+				_response.set_body (_body);
+				::std::result::Result::Ok (())
+			}
+		}
+	};
+}
+
+
+
+
+#[ macro_export ]
 macro_rules! resource {
 	
 	

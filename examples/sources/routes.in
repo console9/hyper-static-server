@@ -20,4 +20,6 @@
 	markdowns! ("./markdown", glob : "*.md" => "/md-html");
 	assets! ("./markdown", glob : "*.md" => "/md-text");
 	
+	markdown_askama! ("./markdown/hello.md", "_/markdown.html" => "/hello-1");
+	
 }
