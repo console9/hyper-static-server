@@ -1,6 +1,7 @@
 {
 	
 	askama! ("_/home.html" => "/");
+	askamas! ("_", glob : "*/page-*.html" => "/askama");
 	
 	asset_sass! ("_/css/main.scss");
 	assets_watch! ("_/css");
@@ -16,10 +17,14 @@
 	asset! ("./files/robots.txt" => "/robots.txt");
 	asset! ("./files/data.txt" => "/data.txt");
 	
-	markdowns! ("./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html" => "/");
-	markdowns! ("./markdown", glob : "*.md" => "/md-html");
-	assets! ("./markdown", glob : "*.md" => "/md-text");
+	asset! ("./markdown/hello.md" => "/hello-text");
+	markdown! ("./markdown/hello.md" => "/hello-simple");
+	markdown! ("./markdown/hello.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html" => "/hello-with-header-footer");
+	markdown_askama! ("./markdown/hello.md", template : "_/markdown.html" => "/hello-with-askama");
 	
-	markdown_askama! ("./markdown/hello.md", "_/markdown.html" => "/hello-1");
+	assets! ("./markdown", glob : "*.md" => "/md-text");
+	markdowns! ("./markdown", glob : "*.md" => "/md-simple");
+	markdowns! ("./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html" => "/md-with-header-footer");
+	markdowns_askama! ("./markdown", glob : "*.md", template : "_/markdown.html" => "/md-with-askama");
 	
 }

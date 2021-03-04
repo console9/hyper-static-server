@@ -21,11 +21,11 @@
 		
 		<div class="container">
 			
-			{% block header %}{% include "_header.html" %}{% endblock %}
+			{% block header %}{% include "_header.html-0" %}{% endblock %}
 			
 			{% block main %}<h1>TBD</h1>{% endblock %}
 			
-			{% block footer %}{% include "_footer.html" %}{% endblock %}
+			{% block footer %}{% include "_footer.html-0" %}{% endblock %}
 			
 		</div>
 		
