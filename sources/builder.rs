@@ -230,9 +230,7 @@ impl Builder {
 	
 	
 	
-	pub fn route_askama (&mut self, _source_0 : &str, _route : &str) -> BuilderResult {
-		
-		let _route = normalize_route (_route.as_ref (), true, false) ?;
+	pub fn route_askama (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) ?;
@@ -240,6 +238,9 @@ impl Builder {
 		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
 		
 		self.dependencies_include (&_source) ?;
+		
+		let _route_base = Some (Path::new ("/"));
+		let _route = _route_builder.build (&_relative, &_source, _route_base, None) ?;
 		
 		let _id = self.generate_id ();
 		
@@ -258,9 +259,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "pulldown-cmark") ]
-	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _route : &str) -> BuilderResult {
-		
-		let _route = normalize_route (_route.as_ref (), true, false) ?;
+	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -276,8 +275,11 @@ impl Builder {
 		let (_markdown_title, _markdown_body) = self.compile_markdown (&_source_markdown, false, true) ?;
 		let _markdown_title = _markdown_title.unwrap_or (String::new ());
 		
-		let _source_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
-		create_file_from_str (&_source_markdown, &_markdown_body) ?;
+		let _output_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
+		create_file_from_str (&_output_markdown, &_markdown_body) ?;
+		
+		let _route_base = Some (Path::new ("/"));
+		let _route = _route_builder.build (&_relative_markdown, &_source_markdown, _route_base, None) ?;
 		
 		let _id = self.generate_id ();
 		
@@ -286,7 +288,7 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _content_type, _template, _markdown_title, _source_markdown, _description) .infallible (0xd64341cb);
+		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0xafb30ea0);
 		
 		Ok (())

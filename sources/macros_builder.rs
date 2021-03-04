@@ -223,7 +223,7 @@ macro_rules! builder_macros {
 		#[ allow (unused_macros) ]
 		macro_rules! askama {
 			( $_source : literal => $_route : literal ) => {
-				$crate::builder_call! ($_builder, route_askama, ($_source, $_route), (0xe3a36527));
+				$crate::builder_call! ($_builder, route_askama, ($_source, route_path_builder! (perhaps (exact), $_route)), (0xe3a36527));
 			};
 		}
 		
@@ -233,7 +233,7 @@ macro_rules! builder_macros {
 		#[ allow (unused_macros) ]
 		macro_rules! markdown_askama {
 			( $_source_markdown : literal, $_source_template : literal => $_route : literal ) => {
-				$crate::builder_call! ($_builder, route_markdown_askama, ($_source_markdown, $_source_template, $_route), (0x97238678));
+				$crate::builder_call! ($_builder, route_markdown_askama, ($_source_markdown, $_source_template, route_path_builder! (perhaps (exact), $_route)), (0x97238678));
 			};
 		}
 		
