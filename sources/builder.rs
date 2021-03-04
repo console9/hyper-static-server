@@ -260,9 +260,11 @@ impl Builder {
 	
 	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
+		let _relative_1 = _relative.with_extension ("");
+		
 		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
 		
-		let _route = _route_builder.build (&_relative, &_source, _route_base, None) ?;
+		let _route = _route_builder.build (&_relative_1, &_source, _route_base, None) ?;
 		
 		let _id = self.generate_id ();
 		
@@ -278,6 +280,29 @@ impl Builder {
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .infallible (0x35966385);
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x41a5ee4c);
+		
+		Ok (())
+	}
+	
+	
+	pub fn watch_askama (&mut self, _source : &str) -> BuilderResult {
+		
+		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
+		let (_relative, _source) = self.resolve_file (_templates_sources, _source) ?;
+		
+		self.dependencies_include (&_source) ?;
+		
+		Ok (())
+	}
+	
+	pub fn watch_askamas (&mut self, _sources : &str, _glob : Option<&str>) -> BuilderResult {
+		
+		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
+		let (_files, _folders) = self.resolve_files (_templates_sources, _sources, _glob) ?;
+		
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
+		
+		self.dependencies_include_all (_files.iter () .map (|_pair| _pair.1.as_path ())) ?;
 		
 		Ok (())
 	}

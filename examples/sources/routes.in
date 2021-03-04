@@ -2,6 +2,7 @@
 	
 	askama! ("_/home.html" => "/");
 	askamas! ("_", glob : "*/page-*.html" => "/askama");
+	askamas_watch! ("_", glob : "*.html-0");
 	
 	asset_sass! ("_/css/main.scss");
 	assets_watch! ("_/css");

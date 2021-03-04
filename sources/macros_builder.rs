@@ -238,12 +238,30 @@ macro_rules! builder_macros {
 		}
 		
 		
+		#[ allow (unused_macros) ]
+		macro_rules! askama_watch {
+			( $_source : literal ) => {
+				$crate::builder_call! ($_builder, watch_askama, ($_source), (0xd7c76ec9));
+			};
+		}
+		
+		#[ allow (unused_macros) ]
+		macro_rules! askamas_watch {
+			( $_sources : literal ) => {
+				$crate::builder_call! ($_builder, watch_askamas, ($_sources, ::std::option::Option::None), (0x4fe8df42));
+			};
+			( $_sources : literal, glob : $_glob : literal ) => {
+				$crate::builder_call! ($_builder, watch_askamas, ($_sources, ::std::option::Option::Some ($_glob)), (0x59d44dee));
+			};
+		}
+		
+		
 		
 		
 		#[ allow (unused_macros) ]
 		macro_rules! markdown_askama {
 			( $_source_markdown : literal, template : $_source_template : literal => $_route : literal ) => {
-				$crate::builder_call! ($_builder, route_markdown_askama, ($_source_markdown, $_source_template, route_path_builder! (perhaps (exact), $_route)), (0x97238678));
+				$crate::builder_call! ($_builder, route_markdown_askama, ($_source_markdown, $_source_template, route_path_builder! (perhaps (exact), $_route)), (0x0045ece1));
 			};
 		}
 		
