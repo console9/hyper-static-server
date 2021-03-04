@@ -387,12 +387,13 @@ impl Builder {
 			_contents_data
 		};
 		
-		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
-		create_file_from_str (&_source, &_compiled) ?;
+		let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
+		create_file_from_str (&_output, &_compiled) ?;
 		
-		self.route_asset_raw (&_relative_1, &_source, "Html", _route_base, _route_builder, "markdown", _source_0, _source_relative) ?;
+		// FIXME:  Here the second argument should be `_source`.
+		self.route_asset_raw (&_relative_1, &_output, "Html", _route_base, _route_builder, "markdown", _source_0, _source_relative) ?;
 		
-		self.dependencies_exclude (&_source) ?;
+		self.dependencies_exclude (&_output) ?;
 		
 		Ok (())
 	}
@@ -424,15 +425,16 @@ impl Builder {
 		
 		let _compiled = self.compile_sass (&_source) ?;
 		
-		let _source = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
-		create_file_from_str (&_source, &_compiled) ?;
+		let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
+		create_file_from_str (&_output, &_compiled) ?;
 		
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		self.route_asset_raw (&_relative_1, &_source, "Css", _route_base, _route_builder, "resource_sass", _source_0, None) ?;
+		// FIXME:  Here the second argument should be `_source`.
+		self.route_asset_raw (&_relative_1, &_output, "Css", _route_base, _route_builder, "resource_sass", _source_0, None) ?;
 		
-		self.dependencies_exclude (&_source) ?;
+		self.dependencies_exclude (&_output) ?;
 		
 		Ok (())
 	}
