@@ -235,19 +235,46 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) ?;
 		
-		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
+		let _route_base = Some (Path::new ("/"));
 		
-		self.dependencies_include (&_source) ?;
+		self.route_askama_0 (&_relative, &_source, _route_base, _route_builder, _source_0, None)
+	}
+	
+	pub fn route_askamas (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> BuilderResult {
+		
+		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
+		let (_files, _folders) = self.resolve_files (_templates_sources, _sources_0, _glob) ?;
+		
+		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = Some (Path::new ("/"));
+		
+		for (_relative, _source) in _files.into_iter () {
+			
+			self.route_askama_0 (&_relative, &_source, _route_base, _route_builder, _sources_0, Some (_relative.as_path ())) ?;
+		}
+		
+		Ok (())
+	}
+	
+	
+	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+		
+		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
+		
 		let _route = _route_builder.build (&_relative, &_source, _route_base, None) ?;
 		
 		let _id = self.generate_id ();
 		
 		let _content_type = "Html";
-		let _description = format! ("askama ({}, template = `{}`)", _content_type, _source_0);
+		let _description = if let Some (_relative) = _source_relative {
+			format! ("askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
+		} else {
+			format! ("askama ({}, file = `{}`)", _content_type, _source_0)
+		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
+		self.dependencies_include (&_source) ?;
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .infallible (0x35966385);
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x41a5ee4c);
@@ -270,21 +297,59 @@ impl Builder {
 		
 		let (_relative_markdown, _source_markdown) = self.resolve_file (None, _source_markdown_0) ?;
 		
-		self.dependencies_include (&_source_markdown) ?;
+		let _route_base = Some (Path::new ("/"));
 		
-		let (_markdown_title, _markdown_body) = self.compile_markdown (&_source_markdown, false, true) ?;
+		self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _route_base, _route_builder, _source_markdown_0, None)
+	}
+	
+	#[ cfg (feature = "pulldown-cmark") ]
+	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> BuilderResult {
+		
+		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
+		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
+		
+		let _template = _relative_template.strip_prefix ("/") .infallible (0xe0168bd3);
+		
+		self.dependencies_include (&_source_template) ?;
+		
+		let (_files_markdown, _folders_markdown) = self.resolve_files (None, _sources_markdown_0, _glob) ?;
+		
+		self.dependencies_include_all (_folders_markdown.iter () .map (PathBuf::as_path)) ?;
+		
+		let _route_base = Some (Path::new ("/"));
+		
+		for (_relative_markdown, _source_markdown) in _files_markdown.into_iter () {
+			
+			self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _route_base, _route_builder, _sources_markdown_0, Some (_relative_markdown.as_path ())) ?;
+		}
+		
+		Ok (())
+	}
+	
+	
+	#[ cfg (feature = "pulldown-cmark") ]
+	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+		
+		let _relative_markdown_1 = _relative_markdown.with_extension ("");
+		
+		self.dependencies_include (_source_markdown) ?;
+		
+		let (_markdown_title, _markdown_body) = self.compile_markdown (_source_markdown, false, true) ?;
 		let _markdown_title = _markdown_title.unwrap_or (String::new ());
 		
 		let _output_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
 		create_file_from_str (&_output_markdown, &_markdown_body) ?;
 		
-		let _route_base = Some (Path::new ("/"));
-		let _route = _route_builder.build (&_relative_markdown, &_source_markdown, _route_base, None) ?;
+		let _route = _route_builder.build (&_relative_markdown_1, _source_markdown, _route_base, None) ?;
 		
 		let _id = self.generate_id ();
 		
 		let _content_type = "Html";
-		let _description = format! ("markdown_askama ({}, markdown = `{}`, template = `{}`)", _content_type, _source_markdown_0, _source_template_0);
+		let _description = if let Some (_relative) = _source_relative {
+			format! ("markdown_askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
+		} else {
+			format! ("markdown_askama ({}, file = `{}`)", _content_type, _source_0)
+		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
@@ -774,11 +839,15 @@ impl Builder {
 	
 	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> BuilderResult<(PathBuf, PathBuf)> {
 		
-		let _path = if _source.starts_with ("_/") {
+		let _path = if _source.starts_with ("_/") || (_source == "_") {
 			let _root = _root.or_wrap (0x6e3319c9) ?;
-			_root.join (&_source[2..])
+			if _source != "_" {
+				_root.join (&_source[2..])
+			} else {
+				_root.to_owned ()
+			}
 			
-		} else if _source.starts_with ("./") || _source.starts_with ("..") {
+		} else if _source.starts_with ("./") || _source.starts_with ("..") || (_source == ".") || (_source == "..") {
 			let _root = self.configuration.sources.as_ref () .or_wrap (0x0791a9b4) ?;
 			_root.join (&_source)
 			

@@ -227,13 +227,33 @@ macro_rules! builder_macros {
 			};
 		}
 		
+		#[ allow (unused_macros) ]
+		macro_rules! askamas {
+			( $_sources : literal => $_route : literal ) => {
+				$crate::builder_call! ($_builder, route_askamas, ($_sources, ::std::option::Option::None, route_path_builder! (perhaps (prefix), $_route)), (0x2a28230c));
+			};
+			( $_sources : literal, glob : $_glob : literal => $_route : literal ) => {
+				$crate::builder_call! ($_builder, route_askamas, ($_sources, ::std::option::Option::Some ($_glob), route_path_builder! (perhaps (prefix), $_route)), (0xdb8e73df));
+			};
+		}
+		
 		
 		
 		
 		#[ allow (unused_macros) ]
 		macro_rules! markdown_askama {
-			( $_source_markdown : literal, $_source_template : literal => $_route : literal ) => {
+			( $_source_markdown : literal, template : $_source_template : literal => $_route : literal ) => {
 				$crate::builder_call! ($_builder, route_markdown_askama, ($_source_markdown, $_source_template, route_path_builder! (perhaps (exact), $_route)), (0x97238678));
+			};
+		}
+		
+		#[ allow (unused_macros) ]
+		macro_rules! markdowns_askama {
+			( $_sources_markdown : literal, template : $_source_template : literal => $_route : literal ) => {
+				$crate::builder_call! ($_builder, route_markdowns_askama, ($_sources_markdown, ::std::option::Option::None, $_source_template, route_path_builder! (perhaps (prefix), $_route)), (0x84a5049c));
+			};
+			( $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal => $_route : literal ) => {
+				$crate::builder_call! ($_builder, route_markdowns_askama, ($_sources_markdown, ::std::option::Option::Some ($_glob), $_source_template, route_path_builder! (perhaps (prefix), $_route)), (0x273fbd0e));
 			};
 		}
 		
