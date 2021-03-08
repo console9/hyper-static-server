@@ -393,7 +393,9 @@ dependencies = [
 
 [[package]]
 name = "hyper-simple-server"
-version = "0.2.0"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "5b1b2223cda54b0238411c5a6005f72c46507eba9286259beceff74acb2abd97"
 dependencies = [
  "argparse",
  "bytes",
@@ -412,7 +414,7 @@ dependencies = [
 
 [[package]]
 name = "hyper-static-server"
-version = "0.3.0"
+version = "0.3.1"
 dependencies = [
  "blake2",
  "globset",
