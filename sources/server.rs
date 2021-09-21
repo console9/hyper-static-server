@@ -62,8 +62,8 @@ impl StaticHandler {
 				return hss::Response::new_200_with_text (self.random_token.clone ()) .into (),
 			"/__/reload.js" =>
 				return hss::Response::new_200_with_body (
-						Some (hss::ContentType::Js),
 						& include_bytes! ("./reload.js") [..],
+						Some (hss::ContentType::Js),
 					) .into (),
 			"/__/routes.html" =>
 				return self.serve_routes_index_html (_request),

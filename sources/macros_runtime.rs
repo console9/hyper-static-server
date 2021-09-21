@@ -259,7 +259,7 @@ macro_rules! route {
 				}
 				$crate::hss::Route {
 						path : _path,
-						handler : $crate::hss::HandlerDynArc::new (_resource.into_handler ()),
+						handler : $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ()),
 						debug : ::std::option::Option::Some (::std::boxed::Box::new (_description)),
 					}
 			}
