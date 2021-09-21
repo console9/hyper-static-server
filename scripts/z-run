@@ -8,6 +8,7 @@
 ::// watch / ...
 ::// testing / ...
 ::// sources / ...
+::// release / ...
 ::// *
 
 
@@ -16,6 +17,7 @@
 &&== env _RUST_CRATE hyper_static_server
 &&== env-path _RUST_SOURCES ./sources
 &&== env-path _RUST_TARGET ./.target/${UNAME_NODE}--${UNAME_FINGERPRINT}
+
 &&== env-path _EXAMPLES ./examples
 
 
@@ -23,6 +25,8 @@
 
 && ../hyper-simple-server/scripts/project-common.z-run
 && ../hyper-simple-server/scripts/project-sources.z-run
+&& ../hyper-simple-server/scripts/project-generators.z-run
+&& ../hyper-simple-server/scripts/project-example.z-run
 
 && ../hyper-simple-server/scripts/cargo-dependencies.z-run
 && ../hyper-simple-server/scripts/cargo-publish.z-run
@@ -33,24 +37,4 @@
 && ../hyper-simple-server/scripts/testing-curl.z-run
 && ../hyper-simple-server/scripts/testing-wrk.z-run
 && ../hyper-simple-server/scripts/testing-nat.z-run
-
-
-
-
---<<== project / generator
-	#! <template>
-	
-	{{ $_watch_actions := array }}
-	{{ $_watch_actions = array_append $_watch_actions "debug / build / lib" "debug / check / lib" "debug / lint / lib" }}
-	{{ $_watch_actions = array_append $_watch_actions "debug / build / example" "debug / check / example" "debug / lint / example" }}
-	{{ $_watch_actions = array_append $_watch_actions "debug / run / example" }}
-	{{ $_watch_actions = array_append $_watch_actions "docs / crate / internals / build" "docs / crate / exports / build" "docs / crate / dependencies / build" }}
-	
-	{{ range $_, $_action := $_watch_actions }}
-	<< watch / {{ $_action }}
-		#! <bash+>
-		Z_zexec ':: tools / watch' ':: '{{ $_action | shell_quote }} "${@}"
-	!!
-	{{ end }}
-!!
 
