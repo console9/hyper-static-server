@@ -19,6 +19,11 @@
 &&== env-path _RUST_TARGET ./.target/${UNAME_NODE}--${UNAME_FINGERPRINT}
 
 &&== env-path _EXAMPLES ./examples
+&&== env-fallback _EXAMPLE_BIN server
+
+
+:: environment / example / use / server :: export -- _EXAMPLE_BIN=server
+:: environment / example / use / exporter :: export -- _EXAMPLE_BIN=exporter
 
 
 
