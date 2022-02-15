@@ -7,14 +7,20 @@ edition = "2021"
 build = "./sources/build.rs"
 
 [[bin]]
-name = "example"
-path = "./sources/main.rs"
+name = "server"
+path = "./sources/server.rs"
+required-features = ["hyper-static-server/server"]
+
+[[bin]]
+name = "exporter"
+path = "./sources/exporter.rs"
+required-features = ["hyper-static-server/exporter"]
 
 [features]
 default = []
 
 [dependencies]
-hyper-static-server = { path = "../sources", default-features = false, features = ["runtime"] }
+hyper-static-server = { path = "../sources", default-features = false, features = ["server", "exporter"] }
 askama = { package = "askama_patched", version = "*", default-features = true }
 
 [build-dependencies]

@@ -46,13 +46,21 @@ path = "./lib.rs"
 [features]
 
 default = [
-	"runtime",
+	"server",
+	"exporter",
 	"builder",
 ]
 
-runtime = [
+server = [
 	"hyper-simple-server/hss-full",
 	"rand",
+]
+
+exporter = [
+	"hyper-simple-server/hss-handler",
+	"hyper-simple-server/hss-routes",
+	"hyper-simple-server/hss-errors",
+	"hyper-simple-server/hss-runtime",
 ]
 
 builder = [
