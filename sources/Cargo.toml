@@ -33,7 +33,7 @@ runtime = [
 ]
 
 builder = [
-	"hyper-simple-server/hss-internals",
+	"hyper-simple-server/hss-errors",
 	"walkdir",
 	"globset",
 	"blake2",
@@ -63,7 +63,7 @@ hyper-simple-server = { path = "../../hyper-simple-server/sources", default-feat
 
 globset = { version = "0.4.6", default-features = false, optional = true }
 pulldown-cmark = { version = "0.8.0", default-features = false, optional = true }
-rand = { version = "0.8.3", default-features = false, optional = true }
+rand = { version = "0.8.3", default-features = false, features = ["std", "std_rng"], optional = true }
 sass-rs = { version = "0.2.2", default-features = false, optional = true }
 sass-alt = { version = "0.2.7", default-features = false, optional = true }
 walkdir = { version = "2.3.1", default-features = false, optional = true }

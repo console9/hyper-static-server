@@ -149,9 +149,7 @@ impl hss::HandlerDyn for StaticHandler {
 
 
 fn random_token () -> String {
-	use ::rand::Rng as _;
-	let mut _rand = ::rand::thread_rng ();
-	let _token = _rand.gen::<u128> ();
+	let _token = ::rand::random::<u128> ();
 	format! ("{:0x}", _token)
 }
 

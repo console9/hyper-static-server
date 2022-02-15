@@ -39,7 +39,12 @@ use ::sass_alt as sass;
 #[ cfg (feature = "pulldown-cmark") ]
 use ::pulldown_cmark as cmark;
 
-use ::hyper_simple_server::internals::*;
+use ::hyper_simple_server::{
+		error_with_code,
+		error_with_format,
+		ResultExtWrap as _,
+		ResultExtPanic as _,
+	};
 
 
 
