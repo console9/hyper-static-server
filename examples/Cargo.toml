@@ -2,9 +2,8 @@
 [package]
 name = "hyper-static-server-example"
 version = "0.0.0"
-authors = ["Ciprian Dorin Craciun <ciprian@volution.ro>"]
-edition = "2018"
 license = "MIT"
+edition = "2021"
 build = "./sources/build.rs"
 
 [[bin]]
