@@ -316,7 +316,7 @@ macro_rules! builder_call {
 	
 	( $_builder : ident, $_method : ident, ( $( $_argument : expr ),* ), ( $_code : literal ) ) => {
 		{
-			use $crate::hss::internals::ResultExtPanic as _;
+			use $crate::hss::ResultExtPanic as _;
 			$_builder .$_method ( $( $_argument, )* ) .or_panic ($_code);
 		}
 	};

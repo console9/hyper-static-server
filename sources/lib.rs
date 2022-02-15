@@ -17,13 +17,6 @@ pub(crate) mod macros_runtime;
 pub use main::main_with_static;
 
 
-#[ cfg (feature = "runtime") ]
-pub use ::hyper_simple_server as hss;
-
-#[ cfg (feature = "runtime") ]
-pub use ::hyper_simple_server::*;
-
-
 
 
 #[ cfg (feature = "builder") ]
@@ -34,4 +27,13 @@ pub(crate) mod macros_builder;
 
 #[ cfg (feature = "builder") ]
 pub use builder::*;
+
+
+
+
+#[ cfg (any (feature = "runtime", feature = "builder") ) ]
+pub use ::hyper_simple_server as hss;
+
+#[ cfg (feature = "runtime") ]
+pub use ::hyper_simple_server::*;
 

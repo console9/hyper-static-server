@@ -283,7 +283,7 @@ macro_rules! routes {
 			
 			pub fn new () -> $crate::hss::Routes {
 				use ::std::iter::IntoIterator as _;
-				use $crate::hss::internals::ResultExtPanic as _;
+				use $crate::hss::ResultExtPanic as _;
 				let mut _routes = $crate::hss::RoutesBuilder::new ();
 				for _route in Self::routes () .into_iter () {
 					_routes = _routes.with_route_object (_route);
