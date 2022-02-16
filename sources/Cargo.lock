@@ -126,6 +126,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
 
 [[package]]
+name = "cpio"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ebd1e700d20da5cc95f5bde94323a72a4081cc1e6764bdc31262cc0f173662a8"
+
+[[package]]
 name = "cpuprofiler"
 version = "0.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -412,6 +418,7 @@ name = "hyper-static-server"
 version = "0.4.0"
 dependencies = [
  "blake2",
+ "cpio",
  "globset",
  "hyper-simple-server",
  "pulldown-cmark",
