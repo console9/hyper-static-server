@@ -2,19 +2,14 @@
 
 
 
-
-#[ cfg (feature = "server") ]
-pub(crate) mod main;
-
 #[ cfg (feature = "server") ]
 pub(crate) mod server;
 
 #[ cfg (feature = "server") ]
-pub(crate) mod macros_runtime;
-
+pub use crate::main::main_serve_with_static;
 
 #[ cfg (feature = "server") ]
-pub use main::main_with_static;
+pub use crate::server::*;
 
 
 
@@ -23,7 +18,10 @@ pub use main::main_with_static;
 pub(crate) mod exporter;
 
 #[ cfg (feature = "exporter") ]
-pub use exporter::*;
+pub use crate::main::main_export_with_static;
+
+#[ cfg (feature = "exporter") ]
+pub use crate::exporter::*;
 
 
 
@@ -40,9 +38,17 @@ pub use builder::*;
 
 
 
+pub(crate) mod main;
+
+#[ cfg (any (feature = "server", feature = "exporter") ) ]
+pub(crate) mod macros_runtime;
+
+
+
+
 #[ cfg (any (feature = "server", feature = "exporter", feature = "builder") ) ]
 pub use ::hyper_simple_server as hss;
 
-#[ cfg (feature = "server") ]
+#[ cfg (any (feature = "server", feature = "exporter") ) ]
 pub use ::hyper_simple_server::*;
 

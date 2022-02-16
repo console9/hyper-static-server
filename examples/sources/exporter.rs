@@ -12,6 +12,6 @@ fn main () -> hss::ServerResult {
 	
 	let _routes = Routes::new ();
 	
-	return hss::export_routes (_routes);
+	return hss::main_export_with_static (_routes);
 }
 

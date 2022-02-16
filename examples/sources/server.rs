@@ -15,6 +15,6 @@ fn main () -> hss::ServerResult {
 	
 	let _routes = Routes::new ();
 	
-	return hss::main_with_static (_routes, ::std::option::Option::None);
+	return hss::main_serve_with_static (_routes, ::std::option::Option::None);
 }
 
