@@ -59,8 +59,12 @@ server = [
 exporter = [
 	"hyper-simple-server/hss-handler",
 	"hyper-simple-server/hss-routes",
-	"hyper-simple-server/hss-errors",
+	"hyper-simple-server/hss-extensions",
 	"hyper-simple-server/hss-runtime",
+	"hyper-simple-server/hss-exports",
+	"hyper-simple-server/hss-errors",
+	"hyper-simple-server/hss-config",
+	"hyper-simple-server/hss-cli",
 	"cpio",
 ]
 
