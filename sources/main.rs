@@ -39,8 +39,8 @@ pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<h
 			return _main_serve (_routes, _configuration, _arguments.without_first ()),
 		Some ("exporter") | Some ("export") =>
 			return _main_export (_routes, _arguments.without_first ()),
-		Some (_first) if ! _first.starts_with ("-") =>
-			hss::fail_with_format! (0x98f52b4c, "invalid mode `{}`!", _first),
+		Some (_mode) if ! _mode.starts_with ("-") =>
+			hss::fail_with_format! (0x98f52b4c, "invalid mode `{}`!", _mode),
 		Some (_) =>
 			return _main_serve (_routes, _configuration, _arguments),
 	}
@@ -64,17 +64,27 @@ pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration 
 #[ cfg (feature = "exporter") ]
 pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : Option<hss::CliArguments>) -> hss::ServerResult {
 	
-	let _arguments = hss::CliArguments::unwrap_or_args (_arguments);
+	let mut _arguments = hss::CliArguments::unwrap_or_args (_arguments);
+	let _mode = _arguments.remove_first_str ();
+	if ! _arguments.is_empty () {
+		hss::fail_with_message! (0x2383b422, "unexpected extra arguments!");
+	}
 	
 	let _routes = _routes.into ();
 	
-	match "cpio" {
-		"debug" =>
+	match _mode.as_deref () {
+		
+		None | Some ("debug") =>
 			return crate::exporter::export_routes_debug (_routes),
-		"cpio" =>
+		
+		Some ("cpio") =>
 			return crate::exporter::export_routes_cpio (_routes, ::std::io::stdout ()),
-		_ =>
-			hss::panic_with_code (0x9ebba755),
+		
+		Some (_mode) if ! _mode.starts_with ("-") =>
+			hss::fail_with_format! (0xf108089b, "invalid exporter mode `{}`!", _mode),
+		
+		Some (_) =>
+			hss::fail_with_message! (0xf108089b, "unexpected extra arguments!"),
 	}
 }
 
