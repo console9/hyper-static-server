@@ -102,8 +102,7 @@ builder-markdown = [
 
 [dependencies]
 
-# hyper-simple-server = { version = "0.2.1", default-features = false, optional = true }
-hyper-simple-server = { path = "../../hyper-simple-server/sources", default-features = false, optional = true }
+hyper-simple-server = { version = "0.3.0", default-features = false, optional = true }
 
 globset = { version = "0.4.6", default-features = false, optional = true }
 pulldown-cmark = { version = "0.8.0", default-features = false, optional = true }
@@ -187,6 +186,19 @@ opt-level = 3
 debug = 1
 debug-assertions = false
 overflow-checks = true
+
+
+
+
+################################################################################
+################################################################################
+
+
+
+
+[patch.crates-io]
+
+hyper-simple-server = { path = "../../hyper-simple-server/sources" }
 
 
 
