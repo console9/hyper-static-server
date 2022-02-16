@@ -38,17 +38,24 @@ pub use builder::*;
 
 
 
+#[ cfg ( any (feature = "server", feature = "exporter") ) ]
 pub(crate) mod main;
 
-#[ cfg (any (feature = "server", feature = "exporter") ) ]
+#[ cfg ( any (feature = "server", feature = "exporter") ) ]
+pub use crate::main::{
+		main,
+		main_wrapper,
+	};
+
+#[ cfg ( any (feature = "server", feature = "exporter") ) ]
 pub(crate) mod macros_runtime;
 
 
 
 
-#[ cfg (any (feature = "server", feature = "exporter", feature = "builder") ) ]
+#[ cfg ( any (feature = "server", feature = "exporter", feature = "builder") ) ]
 pub use ::hyper_simple_server as hss;
 
-#[ cfg (any (feature = "server", feature = "exporter") ) ]
+#[ cfg ( any (feature = "server", feature = "exporter") ) ]
 pub use ::hyper_simple_server::*;
 

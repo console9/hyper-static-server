@@ -512,7 +512,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg (any (feature = "sass-rs", feature = "sass-alt")) ]
+	#[ cfg ( any (feature = "sass-rs", feature = "sass-alt") ) ]
 	pub fn route_sass (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized)) -> BuilderResult {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
