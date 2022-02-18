@@ -1,8 +1,8 @@
 {
 	
 	askama! ("_/home.html" => "/");
-	askamas! ("_", glob : "*/page-*.html" => "/askama");
-	askamas_watch! ("_", glob : "*.html-0");
+	askamas! ({"_", glob : "*/page-*.html"} => "/askama");
+	askamas_watch! ({"_", glob : "*.html-0"});
 	
 	asset_sass! ("_/css/main.scss");
 	assets_watch! ("_/css");
@@ -20,12 +20,12 @@
 	
 	asset! ("./markdown/hello.md" => "/hello-text");
 	markdown! ("./markdown/hello.md" => "/hello-simple");
-	markdown! ("./markdown/hello.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html" => "/hello-with-header-footer");
-	markdown_askama! ("./markdown/hello.md", template : "_/markdown.html" => "/hello-with-askama");
+	markdown! ({"./markdown/hello.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html"} => "/hello-with-header-footer");
+	markdown_askama! ({"./markdown/hello.md", template : "_/markdown.html"} => "/hello-with-askama");
 	
-	assets! ("./markdown", glob : "*.md" => "/md-text");
-	markdowns! ("./markdown", glob : "*.md" => "/md-simple");
-	markdowns! ("./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html" => "/md-with-header-footer");
-	markdowns_askama! ("./markdown", glob : "*.md", template : "_/markdown.html" => "/md-with-askama");
+	assets! ({"./markdown", glob : "*.md"} => "/md-text");
+	markdowns! ({"./markdown", glob : "*.md"} => "/md-simple");
+	markdowns! ({"./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html"} => "/md-with-header-footer");
+	markdowns_askama! ({"./markdown", glob : "*.md", template : "_/markdown.html"} => "/md-with-askama");
 	
 }
