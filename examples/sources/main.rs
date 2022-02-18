@@ -2,16 +2,13 @@
 #![ no_implicit_prelude ]
 
 
-use ::hyper_static_server as hss;
+::hyper_static_server::builder_generated! ();
 
 
-hss::builder_generated! ();
-
-
-fn main () -> hss::ServerResult {
+fn main () -> ::hyper_static_server::ServerResult {
 	
 	let _routes = Routes::new ();
 	
-	return hss::main (_routes);
+	return ::hyper_static_server::main (_routes);
 }
 
