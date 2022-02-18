@@ -257,11 +257,13 @@ macro_rules! route {
 						_formatter.write_str (self.0)
 					}
 				}
-				$crate::hss::Route {
+				let mut _route = $crate::hss::Route {
 						path : _path,
 						handler : $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ()),
-						debug : ::std::option::Option::Some (::std::boxed::Box::new (_description)),
-					}
+						extensions : $crate::hss::Extensions::new (),
+					};
+				_route.extensions.insert ($crate::hss::RouteDebug::new (_description));
+				_route
 			}
 		}
 	};
@@ -307,7 +309,7 @@ macro_rules! routes {
 			pub fn eprintln () -> () {
 				use ::std::iter::IntoIterator as _;
 				for _route in Self::routes () .into_iter () {
-					if let ::std::option::Option::Some (_debug) = _route.debug.as_ref () {
+					if let ::std::option::Option::Some (_debug) = _route.extensions.get::<$crate::hss::RouteDebug> () {
 						::std::eprintln! ("[dd] [825798f8]  **  {} -> {:?}", _route.path, _debug);
 					} else {
 						::std::eprintln! ("[dd] [df531ca1]  **  {}", _route.path);

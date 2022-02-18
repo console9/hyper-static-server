@@ -40,7 +40,7 @@ pub fn export_routes_debug (_routes : impl Into<hss::Routes>) -> hss::ServerResu
 	
 	let mut _consumer = |_route : &hss::Route, _content_type : hss::ContentType, _content_buffer : Vec<u8>| {
 			
-			if let Some (_debug) = _route.debug.as_ref () {
+			if let Some (_debug) = _route.extensions.get::<hss::RouteDebug> () {
 				eprintln! ("[dd] [cad36aee]  **  {} -> {:?}", _route.path, _debug);
 			} else {
 				eprintln! ("[dd] [742523c0]  **  {}", _route.path);
