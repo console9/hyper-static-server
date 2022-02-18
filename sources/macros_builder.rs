@@ -245,7 +245,7 @@ macro_rules! builder_call_asset_css {
 		$crate::builder_call! ($_builder,
 				route_css, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x16cfdc28));
 	};
 }
@@ -263,7 +263,7 @@ macro_rules! builder_call_asset_sass {
 		$crate::builder_call! ($_builder,
 				route_sass, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0xf8cdbb33));
 	};
 }
@@ -281,7 +281,7 @@ macro_rules! builder_call_asset_js {
 		$crate::builder_call! ($_builder,
 				route_js, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x039b17d3));
 	};
 }
@@ -302,7 +302,7 @@ macro_rules! builder_call_asset_image {
 		$crate::builder_call! ($_builder,
 				route_image, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0xa4be0f67));
 	};
 }
@@ -322,7 +322,7 @@ macro_rules! builder_call_assets_images {
 				route_images, (
 					$_sources,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xa2ee2c3c));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }) => {
@@ -338,7 +338,7 @@ macro_rules! builder_call_assets_images {
 				route_images, (
 					$_sources,
 					::std::option::Option::Some ($_glob),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xf4033023));
 	};
 }
@@ -357,7 +357,7 @@ macro_rules! builder_call_asset_icon {
 		$crate::builder_call! ($_builder,
 				route_icon, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x6e4fe9ac));
 	};
 }
@@ -377,7 +377,7 @@ macro_rules! builder_call_assets_icons {
 				route_icons, (
 					$_sources,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x301b41df));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }) => {
@@ -393,7 +393,7 @@ macro_rules! builder_call_assets_icons {
 				route_icons, (
 					$_sources,
 					::std::option::Option::Some ($_glob),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x5e6b3ee8));
 	};
 }
@@ -412,7 +412,7 @@ macro_rules! builder_call_asset_favicon {
 		$crate::builder_call! ($_builder,
 				route_favicon, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x3c20acca));
 	};
 }
@@ -432,7 +432,7 @@ macro_rules! builder_call_assets_favicons {
 				route_favicons, (
 					$_sources,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x112340a3));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }) => {
@@ -448,7 +448,7 @@ macro_rules! builder_call_assets_favicons {
 				route_favicons, (
 					$_sources,
 					::std::option::Option::Some ($_glob),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x1681a399));
 	};
 }
@@ -467,7 +467,7 @@ macro_rules! builder_call_asset_font {
 		$crate::builder_call! ($_builder,
 				route_font, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x5e41011e));
 	};
 }
@@ -487,7 +487,7 @@ macro_rules! builder_call_assets_fonts {
 				route_fonts, (
 					$_sources,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x9ad64b09));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }) => {
@@ -503,7 +503,7 @@ macro_rules! builder_call_assets_fonts {
 				route_fonts, (
 					$_sources,
 					::std::option::Option::Some ($_glob),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x06f49685));
 	};
 }
@@ -516,7 +516,7 @@ macro_rules! builder_call_asset {
 				route_asset, (
 					$_source,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x5cdb13b5));
 	};
 	( $_builder : ident, { $_source : literal, content_type : $_content_type : ident }, $_route : literal ) => {
@@ -524,7 +524,7 @@ macro_rules! builder_call_asset {
 				route_asset, (
 					$_source,
 					::std::option::Option::Some (::std::stringify! ($_content_type)),
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0xd03ccf86));
 	};
 }
@@ -537,7 +537,7 @@ macro_rules! builder_call_assets {
 					$_sources,
 					::std::option::Option::None,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xb51be306));
 	};
 	( $_builder : ident, { $_sources : literal, content_type : $_content_type : ident }, $_route : literal ) => {
@@ -546,7 +546,7 @@ macro_rules! builder_call_assets {
 					$_sources,
 					::std::option::Option::None,
 					::std::option::Option::Some (::std::stringify! ($_content_type)),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xc6966c8b));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
@@ -555,7 +555,7 @@ macro_rules! builder_call_assets {
 					$_sources,
 					::std::option::Option::Some ($_glob),
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x4acc2c15));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal, content_type : $_content_type : ident }, $_route : literal ) => {
@@ -564,7 +564,7 @@ macro_rules! builder_call_assets {
 					$_sources,
 					::std::option::Option::Some ($_glob),
 					::std::option::Option::Some (::std::stringify! ($_content_type)),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x9c99e92d));
 	};
 }
@@ -607,7 +607,7 @@ macro_rules! builder_call_askama {
 		$crate::builder_call! ($_builder,
 				route_askama, (
 					$_source,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0xe3a36527));
 	};
 }
@@ -619,7 +619,7 @@ macro_rules! builder_call_askamas {
 				route_askamas, (
 					$_sources,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x2a28230c));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
@@ -627,7 +627,7 @@ macro_rules! builder_call_askamas {
 				route_askamas, (
 					$_sources,
 					::std::option::Option::Some ($_glob),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xdb8e73df));
 	};
 }
@@ -671,7 +671,7 @@ macro_rules! builder_call_markdown_askama {
 				route_markdown_askama, (
 					$_source_markdown,
 					$_source_template,
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x0045ece1));
 	};
 }
@@ -684,7 +684,7 @@ macro_rules! builder_call_markdowns_askama {
 					$_sources_markdown,
 					::std::option::Option::None,
 					$_source_template,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x84a5049c));
 	};
 	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal }, $_route : literal ) => {
@@ -693,7 +693,7 @@ macro_rules! builder_call_markdowns_askama {
 					$_sources_markdown,
 					::std::option::Option::Some ($_glob),
 					$_source_template,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x273fbd0e));
 	};
 }
@@ -708,7 +708,8 @@ macro_rules! builder_call_markdown {
 				route_markdown, (
 					$_source,
 					::std::option::Option::None,
-					::std::option::Option::None, $crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					::std::option::Option::None,
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x97238678));
 	};
 	( $_builder : ident, { $_source : literal, header : $_header : literal, footer : $_footer : literal }, $_route : literal ) => {
@@ -717,7 +718,7 @@ macro_rules! builder_call_markdown {
 					$_source,
 					::std::option::Option::Some ($_header),
 					::std::option::Option::Some ($_footer),
-					$crate::builder_call_route_path! ($_builder, perhaps (exact), $_route),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
 				), (0x0be4beba));
 	};
 }
@@ -731,7 +732,7 @@ macro_rules! builder_call_markdowns {
 					::std::option::Option::None,
 					::std::option::Option::None,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xf73441ed));
 	};
 	( $_builder : ident, { $_sources : literal, header : $_header : literal, footer : $_footer : literal }, $_route : literal ) => {
@@ -741,7 +742,7 @@ macro_rules! builder_call_markdowns {
 					::std::option::Option::None,
 					::std::option::Option::Some ($_header),
 					::std::option::Option::Some ($_footer),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0x3664d302));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
@@ -751,7 +752,7 @@ macro_rules! builder_call_markdowns {
 					::std::option::Option::Some ($_glob),
 					::std::option::Option::None,
 					::std::option::Option::None,
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xa5bd4849));
 	};
 	( $_builder : ident, { $_sources : literal, glob : $_glob : literal, header : $_header : literal, footer : $_footer : literal }, $_route : literal ) => {
@@ -761,7 +762,7 @@ macro_rules! builder_call_markdowns {
 					::std::option::Option::Some ($_glob),
 					::std::option::Option::Some ($_header),
 					::std::option::Option::Some ($_footer),
-					$crate::builder_call_route_path! ($_builder, perhaps (prefix), $_route),
+					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 				), (0xf712c3cf));
 	};
 }
@@ -793,9 +794,6 @@ macro_rules! builder_call_route_path {
 	};
 	( $_builder : expr, prefix, $_route : literal ) => {
 		&(true, $_route as &'static str)
-	};
-	( $_builder : expr, perhaps ($_type : ident), $_route : literal ) => {
-		$crate::builder_call_route_path! ($_builder, $_type, $_route)
 	};
 }
 
