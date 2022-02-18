@@ -84,7 +84,7 @@ pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : O
 			hss::fail_with_format! (0xf108089b, "invalid exporter mode `{}`!", _mode),
 		
 		Some (_) =>
-			hss::fail_with_message! (0xf108089b, "unexpected extra arguments!"),
+			hss::fail_with_message! (0x186bfec4, "unexpected extra arguments!"),
 	}
 }
 
