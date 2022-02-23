@@ -5,6 +5,8 @@ use crate::hss;
 use crate::hss::RequestExt as _;
 use crate::hss::ResponseExtBuild as _;
 
+use crate::RouteDebug;
+
 
 
 
@@ -99,7 +101,7 @@ impl StaticHandler {
 			_buffer.push_str ("\">");
 			_buffer.push_str (& _sanitize (&_route.path, false));
 			_buffer.push_str ("</a>");
-			if let Some (_debug) = _route.extensions.get::<hss::RouteDebug> () {
+			if let Some (_debug) = _route.extensions.get::<RouteDebug> () {
 				_buffer.push_str (" -> <span>");
 				_buffer.push_str (& _sanitize (& format! ("{:?}", _debug), false));
 				_buffer.push_str ("</span>");
@@ -118,7 +120,7 @@ impl StaticHandler {
 		for _route in self.routes.routes () {
 			_buffer.push_str ("* ");
 			_buffer.push_str (&_route.path);
-			if let Some (_debug) = _route.extensions.get::<hss::RouteDebug> () {
+			if let Some (_debug) = _route.extensions.get::<RouteDebug> () {
 				_buffer.push_str (" -> ");
 				_buffer.push_str (& format! ("{:?}", _debug));
 			}
