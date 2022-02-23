@@ -12,8 +12,14 @@ path = "./sources/main.rs"
 
 [features]
 default = ["server", "exporter"]
-server = ["hyper-static-server/server"]
-exporter = ["hyper-static-server/exporter"]
+server = [
+	"hyper-static-server/server",
+	"hyper-static-server/runtime-sitemaps",
+]
+exporter = [
+	"hyper-static-server/exporter",
+	"hyper-static-server/runtime-sitemaps",
+]
 
 [dependencies]
 hyper-static-server = { version = "0.4.0", default-features = false, features = [] }

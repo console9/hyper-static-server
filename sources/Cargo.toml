@@ -49,6 +49,9 @@ default = [
 	"server",
 	"exporter",
 	"builder",
+	"runtime-sitemaps",
+	"builder-sass",
+	"builder-markdown",
 ]
 
 server = [
@@ -67,6 +70,8 @@ exporter = [
 	"hyper-simple-server/hss-cli",
 	"cpio",
 ]
+
+runtime-sitemaps = []
 
 builder = [
 	"hyper-simple-server/hss-errors",
