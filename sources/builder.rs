@@ -29,6 +29,7 @@ use ::std::{
 use ::globset;
 use ::walkdir;
 use ::blake2;
+use ::proc_macro2;
 
 #[ cfg (feature = "sass-rs") ]
 use ::sass_rs as sass;
@@ -214,6 +215,7 @@ impl Builder {
 	fn route_asset_raw (&mut self, _relative : &Path, _source : &Path, _content_type : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _route = _route_builder.build (_relative, &_source, _route_base, None) ?;
+		let _extensions = _extensions_builder.build () ?;
 		
 		let _id = self.generate_id ();
 		
@@ -229,7 +231,7 @@ impl Builder {
 		let _mode = "auto";
 		
 		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _mode, _source, _description) .infallible (0x5fa962ac);
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x46de4cc9);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x46de4cc9);
 		
 		Ok (())
 	}
@@ -272,6 +274,7 @@ impl Builder {
 		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
 		
 		let _route = _route_builder.build (&_relative_1, &_source, _route_base, None) ?;
+		let _extensions = _extensions_builder.build () ?;
 		
 		let _id = self.generate_id ();
 		
@@ -286,7 +289,7 @@ impl Builder {
 		self.dependencies_include (&_source) ?;
 		
 		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .infallible (0x35966385);
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0x41a5ee4c);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
 		
 		Ok (())
 	}
@@ -373,6 +376,7 @@ impl Builder {
 		create_file_from_str (&_output_markdown, &_markdown_body) ?;
 		
 		let _route = _route_builder.build (&_relative_markdown_1, _source_markdown, _route_base, None) ?;
+		let _extensions = _extensions_builder.build () ?;
 		
 		let _id = self.generate_id ();
 		
@@ -386,7 +390,7 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		
 		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?});", _id, _id, _route) .infallible (0xafb30ea0);
+		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
 		
 		Ok (())
 	}
@@ -1218,14 +1222,14 @@ impl RoutePathBuilder for (bool, &str) {
 
 pub trait RouteExtensionsBuilder {
 	
-	fn build (&self) -> BuilderResult<String>;
+	fn build (&self) -> BuilderResult<proc_macro2::TokenTree>;
 }
 
 
 impl RouteExtensionsBuilder for () {
 	
-	fn build (&self) -> BuilderResult<String> {
-		Ok (String::new ())
+	fn build (&self) -> BuilderResult<proc_macro2::TokenTree> {
+		Ok (proc_macro2::Group::new (proc_macro2::Delimiter::Parenthesis, proc_macro2::TokenStream::new ()) .into ())
 	}
 }
 

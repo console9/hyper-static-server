@@ -239,7 +239,7 @@ macro_rules! resource {
 macro_rules! route {
 	
 	
-	( $_route_name : ident, $_resource_name : ty, $_route_path : literal ) => {
+	( $_route_name : ident, $_resource_name : ty, $_route_path : literal, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_route_name ();
@@ -257,15 +257,28 @@ macro_rules! route {
 						_formatter.write_str (self.0)
 					}
 				}
+				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ());
+				let _extensions = $crate::route_extensions! ($_route_extensions);
 				let mut _route = $crate::hss::Route {
 						path : _path,
-						handler : $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ()),
-						extensions : $crate::hss::Extensions::new (),
+						handler : _handler,
+						extensions : _extensions,
 					};
 				_route.extensions.insert ($crate::hss::RouteDebug::new (_description));
 				_route
 			}
 		}
+	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! route_extensions {
+	
+	( () ) => {
+		$crate::hss::Extensions::new ()
 	};
 }
 
