@@ -242,7 +242,7 @@ macro_rules! builder_call_asset_css {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x76ec81d1));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_css, (
 					$_source,
@@ -262,7 +262,7 @@ macro_rules! builder_call_asset_sass {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x714c403a));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_sass, (
 					$_source,
@@ -282,7 +282,7 @@ macro_rules! builder_call_asset_js {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xd7b6a398));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_js, (
 					$_source,
@@ -305,7 +305,7 @@ macro_rules! builder_call_asset_image {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x3c6853f7));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_image, (
 					$_source,
@@ -326,7 +326,7 @@ macro_rules! builder_call_assets_images {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xc2f0c669));
 	};
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_images, (
 					$_sources,
@@ -344,7 +344,7 @@ macro_rules! builder_call_assets_images {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x274e0974));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_images, (
 					$_sources,
@@ -366,7 +366,7 @@ macro_rules! builder_call_asset_icon {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xcb47ada1));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_icon, (
 					$_source,
@@ -387,7 +387,7 @@ macro_rules! builder_call_assets_icons {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x5ed5f8c5));
 	};
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_icons, (
 					$_sources,
@@ -405,7 +405,7 @@ macro_rules! builder_call_assets_icons {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x6838ad5b));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_icons, (
 					$_sources,
@@ -427,7 +427,7 @@ macro_rules! builder_call_asset_favicon {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x9ba89b0a));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_favicon, (
 					$_source,
@@ -448,7 +448,7 @@ macro_rules! builder_call_assets_favicons {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xd8657b51));
 	};
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_favicons, (
 					$_sources,
@@ -466,7 +466,7 @@ macro_rules! builder_call_assets_favicons {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xa1b7b0ce));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_favicons, (
 					$_sources,
@@ -488,7 +488,7 @@ macro_rules! builder_call_asset_font {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0x8470b423));
 	};
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_font, (
 					$_source,
@@ -509,7 +509,7 @@ macro_rules! builder_call_assets_fonts {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xda42d3e9));
 	};
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_fonts, (
 					$_sources,
@@ -527,7 +527,7 @@ macro_rules! builder_call_assets_fonts {
 					$crate::builder_call_route_extensions! ($_builder, default),
 				), (0xb700bad6));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_fonts, (
 					$_sources,
@@ -541,7 +541,7 @@ macro_rules! builder_call_assets_fonts {
 
 #[ macro_export ]
 macro_rules! builder_call_asset {
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_asset, (
 					$_source,
@@ -550,7 +550,7 @@ macro_rules! builder_call_asset {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x5cdb13b5));
 	};
-	( $_builder : ident, { $_source : literal, content_type : $_content_type : ident }, $_route : literal ) => {
+	( $_builder : ident, { $_source : literal, content_type : $_content_type : ident }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_asset, (
 					$_source,
@@ -563,7 +563,7 @@ macro_rules! builder_call_asset {
 
 #[ macro_export ]
 macro_rules! builder_call_assets {
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_assets, (
 					$_sources,
@@ -573,7 +573,7 @@ macro_rules! builder_call_assets {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xb51be306));
 	};
-	( $_builder : ident, { $_sources : literal, content_type : $_content_type : ident }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, content_type : $_content_type : ident }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_assets, (
 					$_sources,
@@ -583,7 +583,7 @@ macro_rules! builder_call_assets {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xc6966c8b));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_assets, (
 					$_sources,
@@ -593,7 +593,7 @@ macro_rules! builder_call_assets {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x4acc2c15));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal, content_type : $_content_type : ident }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal, content_type : $_content_type : ident }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_assets, (
 					$_sources,
@@ -639,7 +639,7 @@ macro_rules! builder_call_assets_watch {
 
 #[ macro_export ]
 macro_rules! builder_call_askama {
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askama, (
 					$_source,
@@ -651,7 +651,7 @@ macro_rules! builder_call_askama {
 
 #[ macro_export ]
 macro_rules! builder_call_askamas {
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
@@ -660,7 +660,7 @@ macro_rules! builder_call_askamas {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x2a28230c));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
@@ -705,7 +705,7 @@ macro_rules! builder_call_askamas_watch {
 
 #[ macro_export ]
 macro_rules! builder_call_markdown_askama {
-	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown_askama, (
 					$_source_markdown,
@@ -718,7 +718,7 @@ macro_rules! builder_call_markdown_askama {
 
 #[ macro_export ]
 macro_rules! builder_call_markdowns_askama {
-	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
@@ -728,7 +728,7 @@ macro_rules! builder_call_markdowns_askama {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x84a5049c));
 	};
-	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
@@ -745,7 +745,7 @@ macro_rules! builder_call_markdowns_askama {
 
 #[ macro_export ]
 macro_rules! builder_call_markdown {
-	( $_builder : ident, $_source : literal, $_route : literal ) => {
+	( $_builder : ident, $_source : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown, (
 					$_source,
@@ -755,7 +755,7 @@ macro_rules! builder_call_markdown {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x97238678));
 	};
-	( $_builder : ident, { $_source : literal, header : $_header : literal, footer : $_footer : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_source : literal, header : $_header : literal, footer : $_footer : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown, (
 					$_source,
@@ -769,7 +769,7 @@ macro_rules! builder_call_markdown {
 
 #[ macro_export ]
 macro_rules! builder_call_markdowns {
-	( $_builder : ident, $_sources : literal, $_route : literal ) => {
+	( $_builder : ident, $_sources : literal, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns, (
 					$_sources,
@@ -780,7 +780,7 @@ macro_rules! builder_call_markdowns {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xf73441ed));
 	};
-	( $_builder : ident, { $_sources : literal, header : $_header : literal, footer : $_footer : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, header : $_header : literal, footer : $_footer : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns, (
 					$_sources,
@@ -791,7 +791,7 @@ macro_rules! builder_call_markdowns {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x3664d302));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns, (
 					$_sources,
@@ -802,7 +802,7 @@ macro_rules! builder_call_markdowns {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xa5bd4849));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal, header : $_header : literal, footer : $_footer : literal }, $_route : literal ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal, header : $_header : literal, footer : $_footer : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns, (
 					$_sources,
@@ -843,6 +843,12 @@ macro_rules! builder_call_route_path {
 	( $_builder : expr, prefix, $_route : literal ) => {
 		&(true, $_route as &'static str)
 	};
+	( $_builder : expr, exact, { $_route : literal $(, extensions : $_ : tt )? } ) => {
+		&(false, $_route as &'static str)
+	};
+	( $_builder : expr, prefix, { $_route : literal $(, extensions : $_ : tt )? } ) => {
+		&(true, $_route as &'static str)
+	};
 }
 
 
@@ -855,6 +861,12 @@ macro_rules! builder_call_route_extensions {
 	};
 	( $_builder : expr, $_route : literal ) => {
 		&()
+	};
+	( $_builder : expr, { $_route : literal } ) => {
+		&()
+	};
+	( $_builder : expr, { $_route : tt, extensions : $_extensions : tt } ) => {
+		::std::stringify! ($_extensions)
 	};
 }
 
