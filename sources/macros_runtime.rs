@@ -258,13 +258,15 @@ macro_rules! route {
 					}
 				}
 				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ());
-				let _extensions = $crate::route_extensions! ($_route_extensions);
+				let mut _extensions = $crate::route_extensions! ($_route_extensions);
+				if _extensions.get::<$crate::hss::RouteDebug> () .is_none () {
+					_extensions.insert ($crate::hss::RouteDebug::new (_description));
+				}
 				let mut _route = $crate::hss::Route {
 						path : _path,
 						handler : _handler,
 						extensions : _extensions,
 					};
-				_route.extensions.insert ($crate::hss::RouteDebug::new (_description));
 				_route
 			}
 		}
@@ -277,8 +279,28 @@ macro_rules! route {
 #[ macro_export ]
 macro_rules! route_extensions {
 	
-	( () ) => {
-		$crate::hss::Extensions::new ()
+	( $_extensions : tt ) => {
+		{
+			let mut _extensions = $crate::hss::Extensions::new ();
+			$crate::route_extensions_insert! (_extensions, $_extensions);
+			_extensions
+		}
+	};
+}
+
+
+#[ macro_export ]
+macro_rules! route_extensions_insert {
+	
+	( $_extensions : ident, () ) => {
+	};
+	
+	( $_extensions : ident, {} ) => {
+	};
+	
+	( $_extensions : ident, { debug : $_debug : expr $(, $( $_rest : tt )* )? } ) => {
+		$_extensions.insert ($crate::hss::RouteDebug::new ($_debug));
+		$crate::route_extensions_insert! ($_extensions, { $( $( $_rest )* )? });
 	};
 }
 

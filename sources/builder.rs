@@ -20,6 +20,7 @@ use ::std::{
 		iter::Iterator,
 		path::{Path, PathBuf},
 		
+		str::FromStr as _,
 		fmt::{Write as _},
 		io::{Write as _},
 		
@@ -1230,6 +1231,24 @@ impl RouteExtensionsBuilder for () {
 	
 	fn build (&self) -> BuilderResult<proc_macro2::TokenTree> {
 		Ok (proc_macro2::Group::new (proc_macro2::Delimiter::Parenthesis, proc_macro2::TokenStream::new ()) .into ())
+	}
+}
+
+
+impl RouteExtensionsBuilder for str {
+	
+	fn build (&self) -> BuilderResult<proc_macro2::TokenTree> {
+		let _stream = proc_macro2::TokenStream::from_str (self) .or_wrap (0x72524db6) ?;
+		let mut _stream = _stream.into_iter ();
+		let _token = if let Some (_token) = _stream.next () {
+			_token
+		} else {
+			return Err (error_with_code (0xe9c8879a))
+		};
+		if _stream.next () .is_some () {
+			return Err (error_with_code (0xd96714a4))
+		}
+		Ok (_token)
 	}
 }
 
