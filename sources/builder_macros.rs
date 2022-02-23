@@ -226,6 +226,16 @@ macro_rules! builder_macros {
 		}
 		
 		
+		
+		
+		#[ allow (unused_macros) ]
+		macro_rules! sitemap {
+			( $_format : tt => $_route : tt ) => {
+				$crate::builder_call_sitemap! ($_builder, $_format, $_route);
+			};
+		}
+		
+		
 	};
 }
 
@@ -812,6 +822,21 @@ macro_rules! builder_call_markdowns {
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xf712c3cf));
+	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! builder_call_sitemap {
+	( $_builder : ident, $_format : ident, $_route : tt ) => {
+		$crate::builder_call! ($_builder,
+				route_sitemap, (
+					::std::stringify! ($_format),
+					$crate::builder_call_route_path! ($_builder, exact, $_route),
+					$crate::builder_call_route_extensions! ($_builder, $_route),
+				), (0x48080c8b));
 	};
 }
 

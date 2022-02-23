@@ -276,6 +276,49 @@ macro_rules! route {
 
 
 
+#[ cfg (feature = "runtime-sitemaps") ]
+#[ macro_export ]
+macro_rules! route_sitemap {
+	
+	
+	( $_route_name : ident, $_route_path : literal, $_format : ident, $_route_extensions : tt ) => {
+		
+		#[ allow (non_camel_case_types) ]
+		pub(crate) struct $_route_name ();
+		
+		impl $_route_name {
+			
+			pub fn new () -> $crate::hss::Route {
+				use ::std::convert::From as _;
+				use $crate::hss::HandlerSimpleSync as _;
+				let _resource = $crate::RoutesSitemapResource::new ($crate::SitemapFormat::$_format);
+				let _path = ::std::string::String::from ($_route_path);
+				let _description = Description ();
+				struct Description ();
+				impl ::std::fmt::Debug for Description {
+					fn fmt (&self, _formatter : &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
+						_formatter.write_fmt (::std::format_args! ("sitemap ({})", ::std::stringify! ($_format)))
+					}
+				}
+				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.wrap ()) .into_arc ());
+				let mut _extensions = $crate::route_extensions! ($_route_extensions);
+				if _extensions.get::<$crate::RouteDebug> () .is_none () {
+					_extensions.insert ($crate::RouteDebug::new (_description));
+				}
+				let mut _route = $crate::hss::Route {
+						path : _path,
+						handler : _handler,
+						extensions : _extensions,
+					};
+				_route
+			}
+		}
+	};
+}
+
+
+
+
 #[ macro_export ]
 macro_rules! route_extensions {
 	
@@ -298,9 +341,27 @@ macro_rules! route_extensions_insert {
 	( $_extensions : ident, {} ) => {
 	};
 	
-	( $_extensions : ident, { debug : $_debug : expr $(, $( $_rest : tt )* )? } ) => {
-		$_extensions.insert ($crate::hss::RouteDebug::new ($_debug));
+	( $_extensions : ident, { $_key : ident $(, $( $_rest : tt )* )? } ) => {
+		$crate::route_extensions_insert_one! ($_extensions, $_key);
 		$crate::route_extensions_insert! ($_extensions, { $( $( $_rest )* )? });
+	};
+	
+	( $_extensions : ident, { $_key : ident : $_value : tt $(, $( $_rest : tt )* )? } ) => {
+		$crate::route_extensions_insert_one! ($_extensions, $_key : $_value);
+		$crate::route_extensions_insert! ($_extensions, { $( $( $_rest )* )? });
+	};
+}
+
+
+#[ macro_export ]
+macro_rules! route_extensions_insert_one {
+	
+	( $_extensions : ident, debug : $_debug : expr ) => {
+		$_extensions.insert ($crate::RouteDebug::new ($_debug));
+	};
+	
+	( $_extensions : ident, sitemap ) => {
+		$_extensions.insert ($crate::RouteSitemapEntry::new ());
 	};
 }
 

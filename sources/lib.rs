@@ -57,6 +57,15 @@ pub(crate) mod runtime_macros;
 pub use runtime::*;
 
 
+#[ cfg (feature = "runtime-sitemaps") ]
+#[ cfg ( any (feature = "server", feature = "exporter") ) ]
+pub(crate) mod runtime_sitemaps;
+
+#[ cfg (feature = "runtime-sitemaps") ]
+#[ cfg ( any (feature = "server", feature = "exporter") ) ]
+pub use runtime_sitemaps::*;
+
+
 
 
 #[ cfg ( any (feature = "server", feature = "exporter", feature = "builder") ) ]

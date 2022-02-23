@@ -752,6 +752,29 @@ impl Builder {
 	
 	
 	
+	pub fn route_sitemap (&mut self, _format : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+		
+		let _route = _route_builder.build (Path::new (""), Path::new (""), None, None) ?;
+		let _extensions = _extensions_builder.build () ?;
+		
+		let _id = self.generate_id ();
+		
+		let _format = match _format {
+			"xml" => "Xml",
+			"text" => "Text",
+			_ => return Err (error_with_format (0xe35adc84, format_args! ("{}", _format))),
+		};
+		
+		self.route_names.push (format! ("Route_{}", _id));
+		
+		writeln! (self.generated, "::hyper_static_server::route_sitemap! (Route_{}, {:?}, {}, {});", _id, _route, _format, _extensions) .infallible (0x5f529a53);
+		
+		Ok (())
+	}
+	
+	
+	
+	
 	pub fn watch_asset (&mut self, _source : &str) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
