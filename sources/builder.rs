@@ -32,13 +32,13 @@ use ::walkdir;
 use ::blake2;
 use ::proc_macro2;
 
-#[ cfg (feature = "sass-rs") ]
+#[ cfg (feature = "builder-sass-rs") ]
 use ::sass_rs as sass;
 
-#[ cfg (feature = "sass-alt") ]
+#[ cfg (feature = "builder-sass-alt") ]
 use ::sass_alt as sass;
 
-#[ cfg (feature = "pulldown-cmark") ]
+#[ cfg (feature = "builder-markdown") ]
 use ::pulldown_cmark as cmark;
 
 #[ allow (unused_imports) ]
@@ -321,7 +321,7 @@ impl Builder {
 	
 	
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
@@ -338,7 +338,7 @@ impl Builder {
 		self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _route_base, _route_builder, _extensions_builder, _source_markdown_0, None)
 	}
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
@@ -363,7 +363,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
@@ -399,7 +399,7 @@ impl Builder {
 	
 	
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdown (&mut self, _source_0 : &str, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source) ?;
@@ -411,7 +411,7 @@ impl Builder {
 		self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _extensions_builder, _source_0, None)
 	}
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdowns (&mut self, _sources_0 : &str, _glob : Option<&str>, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source) ?;
@@ -435,7 +435,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> BuilderResult<(Option<String>, Option<String>)> {
 		
 		let _header_source = _header_source.map (|_source| BuilderResult::Ok (self.resolve_file (None, _source) ? .1)) .transpose () ?;
@@ -460,7 +460,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg (feature = "pulldown-cmark") ]
+	#[ cfg (feature = "builder-markdown") ]
 	fn route_markdown_0 (&mut self, _relative : &Path, _source : &Path, _header_data : Option<&String>, _footer_data : Option<&String>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_1 = _relative.with_extension ("");
@@ -517,7 +517,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg ( any (feature = "sass-rs", feature = "sass-alt") ) ]
+	#[ cfg ( any (feature = "builder-sass-rs", feature = "builder-sass-alt") ) ]
 	pub fn route_sass (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -1008,7 +1008,7 @@ impl Builder {
 impl Builder {
 	
 	
-	#[ cfg (feature = "sass-rs") ]
+	#[ cfg (feature = "builder-sass-rs") ]
 	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
 		let _extension = _source.extension () .or_wrap (0x836ff108) ? .to_str () .or_wrap (0x4068e13f) ?;
@@ -1036,7 +1036,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg (feature = "sass-alt") ]
+	#[ cfg (feature = "builder-sass-alt") ]
 	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
 		let _parent = _source.parent () .or_wrap (0xf6ce0d79) ?;
@@ -1117,7 +1117,7 @@ impl Builder {
 
 
 
-#[ cfg (feature = "pulldown-cmark") ]
+#[ cfg (feature = "builder-markdown") ]
 impl Builder {
 	
 	

@@ -48,15 +48,18 @@ path = "./lib.rs"
 default = [
 	"server",
 	"exporter",
-	"builder",
+	"runtime",
 	"runtime-sitemaps",
 	"runtime-sitemaps-xml",
+	"runtime-hss-exports",
+	"builder",
 	"builder-sass",
 	"builder-markdown",
 ]
 
 server = [
 	"hyper-simple-server/hss-full",
+	"runtime",
 	"rand",
 ]
 
@@ -66,18 +69,31 @@ exporter = [
 	"hyper-simple-server/hss-extensions",
 	"hyper-simple-server/hss-runtime",
 	"hyper-simple-server/hss-exports",
-	"hyper-simple-server/hss-errors",
 	"hyper-simple-server/hss-config",
 	"hyper-simple-server/hss-cli",
+	"runtime",
 	"cpio",
 ]
 
+runtime = [
+	"hyper-simple-server/hss-errors",
+]
+
 runtime-sitemaps = [
+	"runtime",
+	"hyper-simple-server/hss-handler",
+	"hyper-simple-server/hss-routes",
+	"hyper-simple-server/hss-extensions",
+	"hyper-simple-server/hss-exports",
 ]
 
 runtime-sitemaps-xml = [
 	"runtime-sitemaps",
 	"sitewriter",
+]
+
+runtime-hss-exports = [
+	"runtime",
 ]
 
 builder = [
@@ -89,20 +105,28 @@ builder = [
 ]
 
 builder-sass = [
+	"builder",
 	"sass-rs",
 ]
 
 builder-sass-rs = [
+	"builder",
 	"sass-rs",
 ]
 
 builder-sass-alt = [
+	"builder",
 	"sass-alt",
 ]
 
 builder-markdown = [
+	"builder",
 	"pulldown-cmark",
 ]
+
+
+features-fuzzing = []
+features-none = []
 
 
 

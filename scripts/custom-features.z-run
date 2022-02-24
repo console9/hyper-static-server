@@ -9,6 +9,7 @@
 	runtime
 	runtime-sitemaps
 	runtime-sitemaps-xml
+	runtime-hss-exports
 	builder
 	builder-sass
 	builder-sass-rs
