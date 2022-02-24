@@ -66,19 +66,33 @@ pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : O
 	
 	let mut _arguments = hss::CliArguments::unwrap_or_args (_arguments);
 	let _mode = _arguments.remove_first_str ();
-	if ! _arguments.is_empty () {
-		hss::fail_with_message! (0x2383b422, "unexpected extra arguments!");
-	}
 	
 	let _routes = _routes.into ();
 	
 	match _mode.as_deref () {
 		
-		None | Some ("debug") =>
-			return crate::exporter::export_routes_debug (_routes),
+		None | Some ("debug") => {
+			if ! _arguments.is_empty () {
+				hss::fail_with_message! (0x2383b422, "unexpected extra arguments!");
+			}
+			return crate::exporter::export_routes_debug (_routes, ::std::io::stdout ());
+		}
 		
-		Some ("cpio") =>
-			return crate::exporter::export_routes_cpio (_routes, ::std::io::stdout ()),
+		Some ("cpio") => {
+			if ! _arguments.is_empty () {
+				hss::fail_with_message! (0xba48b225, "unexpected extra arguments!");
+			}
+			return crate::exporter::export_routes_cpio (_routes, ::std::io::stdout ());
+		}
+		
+		Some ("dump") => {
+			let (_route,) = if let Ok (_tuple) = _arguments.into_tuple_1_str () {
+				_tuple
+			} else {
+				hss::fail_with_message! (0x509712ab, "unexpected extra arguments!");
+			};
+			return crate::exporter::export_routes_dump (_routes, &_route, ::std::io::stdout ());
+		}
 		
 		Some (_mode) if ! _mode.starts_with ("-") =>
 			hss::fail_with_format! (0xf108089b, "invalid exporter mode `{}`!", _mode),
