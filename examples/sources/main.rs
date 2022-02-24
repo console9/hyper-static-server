@@ -5,7 +5,7 @@
 ::hyper_static_server::builder_generated! ();
 
 
-fn main () -> ::hyper_static_server::ServerResult {
+fn main () -> ::hyper_static_server::hss::ServerResult {
 	
 	let _routes = Routes::new ();
 	
