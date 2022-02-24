@@ -756,14 +756,9 @@ impl Builder {
 		
 		let _route = _route_builder.build (Path::new (""), Path::new (""), None, None) ?;
 		let _extensions = _extensions_builder.build () ?;
+		let _format = token_tree_parse (_format) ?;
 		
 		let _id = self.generate_id ();
-		
-		let _format = match _format {
-			"xml" => "Xml",
-			"text" => "Text",
-			_ => return Err (error_with_format (0xe35adc84, format_args! ("{}", _format))),
-		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
@@ -1261,17 +1256,7 @@ impl RouteExtensionsBuilder for () {
 impl RouteExtensionsBuilder for str {
 	
 	fn build (&self) -> BuilderResult<proc_macro2::TokenTree> {
-		let _stream = proc_macro2::TokenStream::from_str (self) .or_wrap (0x72524db6) ?;
-		let mut _stream = _stream.into_iter ();
-		let _token = if let Some (_token) = _stream.next () {
-			_token
-		} else {
-			return Err (error_with_code (0xe9c8879a))
-		};
-		if _stream.next () .is_some () {
-			return Err (error_with_code (0xd96714a4))
-		}
-		Ok (_token)
+		token_tree_parse (self)
 	}
 }
 
@@ -1369,6 +1354,23 @@ fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'stati
 	};
 	
 	Ok (_content_type)
+}
+
+
+
+
+fn token_tree_parse (_string : &str) -> BuilderResult<proc_macro2::TokenTree> {
+	let _stream = proc_macro2::TokenStream::from_str (_string) .or_wrap (0x72524db6) ?;
+	let mut _stream = _stream.into_iter ();
+	let _token = if let Some (_token) = _stream.next () {
+		_token
+	} else {
+		return Err (error_with_code (0xe9c8879a))
+	};
+	if _stream.next () .is_some () {
+		return Err (error_with_code (0xd96714a4))
+	}
+	Ok (_token)
 }
 
 

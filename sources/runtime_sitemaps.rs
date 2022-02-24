@@ -4,14 +4,31 @@ use crate::hss;
 
 
 #[ allow (unused_imports) ]
-use crate::hss::{
+use ::std::{
 		
-		ResponseExt as _,
-		ResultExtWrap as _,
+		str::FromStr as _,
 		
 	};
 
 
+#[ allow (unused_imports) ]
+use crate::hss::{
+		
+		ResponseExt as _,
+		
+		ResultExtWrap as _,
+		ResultExtPanic as _,
+		
+	};
+
+
+
+
+pub enum SitemapFormat {
+	#[ cfg (feature = "runtime-sitemaps-xml") ]
+	Xml,
+	Text,
+}
 
 
 pub enum SitemapFrequency {
@@ -25,10 +42,84 @@ pub enum SitemapFrequency {
 }
 
 
-pub enum SitemapFormat {
-	#[ cfg (feature = "runtime-sitemaps-xml") ]
-	Xml,
-	Text,
+pub struct SitemapPriority (f32);
+
+
+
+
+impl SitemapFormat {
+	
+	pub fn from_str (_string : &str) -> hss::ServerResult<Self> {
+		match _string {
+			#[ cfg (feature = "runtime-sitemaps-xml") ]
+			"xml" => Ok (Self::Xml),
+			"text" => Ok (Self::Text),
+			_ => hss::fail_with_code! (0xdf9d3bb7),
+		}
+	}
+	
+	pub fn from_str_must (_string : &str) -> Self {
+		Self::from_str (_string) .or_panic (0x685370b7)
+	}
+}
+
+
+
+
+impl SitemapFrequency {
+	
+	pub fn from_str (_string : &str) -> hss::ServerResult<Option<Self>> {
+		match _string {
+			"default" => Ok (None),
+			"always" => Ok (Some (Self::Always)),
+			"hourly" => Ok (Some (Self::Hourly)),
+			"daily" => Ok (Some (Self::Daily)),
+			"weekly" => Ok (Some (Self::Weekly)),
+			"monthly" => Ok (Some (Self::Monthly)),
+			"yearly" => Ok (Some (Self::Yearly)),
+			"never" => Ok (Some (Self::Never)),
+			_ => hss::fail_with_code! (0xb2001a05),
+		}
+	}
+	
+	pub fn from_str_must (_string : &str) -> Option<Self> {
+		Self::from_str (_string) .or_panic (0x256f6fc2)
+	}
+}
+
+
+impl SitemapPriority {
+	
+	pub fn to_f32 (&self) -> f32 {
+		self.0
+	}
+	
+	pub fn from_str (_string : &str) -> hss::ServerResult<Option<Self>> {
+		match _string {
+			"default" =>
+				Ok (None),
+			_ =>
+				Self::from_f32 (f32::from_str (_string) .or_wrap (0x1dd1e4e7) ?)
+		}
+	}
+	
+	pub fn from_f32 (_value : f32) -> hss::ServerResult<Option<Self>> {
+		if _value < 0.0 {
+			hss::fail_with_code! (0x55b5a84b);
+		}
+		if _value > 1.0 {
+			hss::fail_with_code! (0xa233806b);
+		}
+		Ok (Some (Self (_value)))
+	}
+	
+	pub fn from_str_must (_string : &str) -> Option<Self> {
+		Self::from_str (_string) .or_panic (0xfe4be058)
+	}
+	
+	pub fn from_f32_must (_value : f32) -> Option<Self> {
+		Self::from_f32 (_value) .or_panic (0x004c83da)
+	}
 }
 
 
@@ -37,7 +128,7 @@ pub enum SitemapFormat {
 pub struct RouteSitemapEntry {
 	pub included : Option<bool>,
 	pub frequency : Option<SitemapFrequency>,
-	pub priority : Option<f32>,
+	pub priority : Option<SitemapPriority>,
 }
 
 
@@ -138,11 +229,7 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 						_builder.changefreq (_frequency);
 					}
 					if let Some (_priority) = _route_entry.priority.as_ref () {
-						let _priority = *_priority;
-						if (_priority < 0.0) || (_priority > 1.0) {
-							hss::fail_with_code! (0x1842f8e9);
-						}
-						_builder.priority (_priority);
+						_builder.priority (_priority.to_f32 ());
 					}
 					let _entry = _builder.build () .or_wrap (0x155cdb8f) ?;
 					_entries.push (_entry);

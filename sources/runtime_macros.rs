@@ -292,7 +292,8 @@ macro_rules! route_sitemap {
 				use ::std::convert::From as _;
 				use $crate::hss::HandlerSimpleSync as _;
 				let _prefix = ::std::string::String::from ($_prefix);
-				let _resource = $crate::RoutesSitemapResource::new (_prefix, $crate::SitemapFormat::$_format);
+				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
+				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format);
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = Description ();
 				struct Description ();
@@ -348,7 +349,7 @@ macro_rules! route_extensions_insert {
 	};
 	
 	( $_extensions : ident, { $_key : ident : $_value : tt $(, $( $_rest : tt )* )? } ) => {
-		$crate::route_extensions_insert_one! ($_extensions, $_key : $_value);
+		$crate::route_extensions_insert_one! ($_extensions, $_key, $_value);
 		$crate::route_extensions_insert! ($_extensions, { $( $( $_rest )* )? });
 	};
 }
@@ -357,12 +358,35 @@ macro_rules! route_extensions_insert {
 #[ macro_export ]
 macro_rules! route_extensions_insert_one {
 	
-	( $_extensions : ident, debug : $_debug : expr ) => {
+	( $_extensions : ident, debug, $_debug : expr ) => {
 		$_extensions.insert ($crate::RouteDebug::new ($_debug));
 	};
 	
 	( $_extensions : ident, sitemap ) => {
 		$_extensions.insert ($crate::RouteSitemapEntry::new ());
+	};
+	( $_extensions : ident, sitemap, { frequency : $_frequency : ident } ) => {
+		{
+			let mut _entry = $crate::RouteSitemapEntry::new ();
+			_entry.frequency = $crate::SitemapFrequency::from_str_must (::std::stringify! ($_frequency));
+			$_extensions.insert (_entry);
+		}
+	};
+	( $_extensions : ident, sitemap, { frequency : $_frequency : ident, priority : $_priority : ident } ) => {
+		{
+			let mut _entry = $crate::RouteSitemapEntry::new ();
+			_entry.frequency = $crate::SitemapFrequency::from_str_must (::std::stringify! ($_frequency));
+			_entry.priority = $crate::SitemapPriority::from_str_must (::std::stringify! ($_priority));
+			$_extensions.insert (_entry);
+		}
+	};
+	( $_extensions : ident, sitemap, { frequency : $_frequency : ident, priority : $_priority : literal } ) => {
+		{
+			let mut _entry = $crate::RouteSitemapEntry::new ();
+			_entry.frequency = $crate::SitemapFrequency::from_str_must (::std::stringify! ($_frequency));
+			_entry.priority = $crate::SitemapPriority::from_str_must (::std::stringify! ($_priority));
+			$_extensions.insert (_entry);
+		}
 	};
 }
 
