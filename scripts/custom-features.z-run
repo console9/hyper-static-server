@@ -7,12 +7,18 @@
 	server
 	exporter
 	runtime
+	runtime-macros
+	runtime-askama
 	runtime-sitemaps
 	runtime-sitemaps-xml
 	runtime-hss-exports
 	builder
-	builder-sass
-	builder-sass-rs
+	builder-macros
+	builder-assets
+	builder-assets-sass
+	builder-assets-sass-rs
 	builder-markdown
+	builder-askama
+	builder-sitemaps
 !!
 

@@ -49,12 +49,18 @@ default = [
 	"server",
 	"exporter",
 	"runtime",
+	"runtime-macros",
+	"runtime-askama",
 	"runtime-sitemaps",
 	"runtime-sitemaps-xml",
-	"runtime-hss-exports",
+#!	"runtime-hss-exports",
 	"builder",
-	"builder-sass",
+	"builder-macros",
+	"builder-assets",
+	"builder-assets-sass",
 	"builder-markdown",
+	"builder-askama",
+	"builder-sitemaps",
 ]
 
 server = [
@@ -77,6 +83,14 @@ exporter = [
 
 runtime = [
 	"hyper-simple-server/hss-errors",
+]
+
+runtime-macros = [
+	"runtime",
+]
+
+runtime-askama = [
+	"runtime",
 ]
 
 runtime-sitemaps = [
@@ -105,23 +119,44 @@ builder = [
 	"proc-macro2",
 ]
 
-builder-sass = [
-	"builder-sass-rs",
+builder-macros = [
+	"builder",
 ]
 
-builder-sass-rs = [
+builder-assets = [
 	"builder",
+]
+
+builder-assets-sass = [
+	"builder-assets-sass-rs",
+]
+
+builder-assets-sass-rs = [
+	"builder",
+	"builder-assets-sass-any",
 	"sass-rs",
 ]
 
-builder-sass-alt = [
+builder-assets-sass-alt = [
 	"builder",
+	"builder-assets-sass-any",
 	"sass-alt",
+]
+
+builder-assets-sass-any = [
 ]
 
 builder-markdown = [
 	"builder",
 	"pulldown-cmark",
+]
+
+builder-askama = [
+	"builder",
+]
+
+builder-sitemaps = [
+	"builder",
 ]
 
 

@@ -201,7 +201,7 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 					_url_buffer.push_str (self.prefix.trim_end_matches ("/"));
 					_url_buffer.push_str ("/");
 					_url_buffer.push_str (_route.path.trim_start_matches ("/"));
-					let _url = _url_buffer.parse () .or_wrap (0x270667a5) ?;
+					let _url = ::url::Url::from_str (&_url_buffer) .or_wrap (0x270667a5) ?;
 					_sitemap_routes.push ((_url, _entry));
 				}
 			}

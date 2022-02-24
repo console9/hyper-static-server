@@ -33,7 +33,7 @@ pub use crate::exporter::*;
 #[ cfg (feature = "builder") ]
 pub(crate) mod builder;
 
-#[ cfg (feature = "builder") ]
+#[ cfg (feature = "builder-macros") ]
 pub(crate) mod builder_macros;
 
 #[ cfg (feature = "builder") ]
@@ -57,7 +57,7 @@ pub use crate::main::{
 #[ cfg (feature = "runtime") ]
 pub(crate) mod runtime;
 
-#[ cfg (feature = "runtime") ]
+#[ cfg (feature = "runtime-macros") ]
 pub(crate) mod runtime_macros;
 
 #[ cfg (feature = "runtime") ]

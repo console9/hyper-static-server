@@ -32,10 +32,10 @@ use ::walkdir;
 use ::blake2;
 use ::proc_macro2;
 
-#[ cfg (feature = "builder-sass-rs") ]
+#[ cfg (feature = "builder-assets-sass-rs") ]
 use ::sass_rs as sass;
 
-#[ cfg (feature = "builder-sass-alt") ]
+#[ cfg (feature = "builder-assets-sass-alt") ]
 use ::sass_alt as sass;
 
 #[ cfg (feature = "builder-markdown") ]
@@ -63,17 +63,26 @@ pub type BuilderError = io::Error;
 pub struct BuilderConfiguration {
 	
 	pub sources : Option<PathBuf>,
+	#[ cfg (feature = "builder-assets") ]
 	pub assets_sources : Option<PathBuf>,
+	#[ cfg (feature = "builder-askama") ]
 	pub templates_sources : Option<PathBuf>,
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub assets_route_base : Option<PathBuf>,
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub css_route_base : Option<PathBuf>,
+	#[ cfg (feature = "builder-assets") ]
 	pub js_route_base : Option<PathBuf>,
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub images_route_base : Option<PathBuf>,
+	#[ cfg (feature = "builder-assets") ]
 	pub icons_route_base : Option<PathBuf>,
+	#[ cfg (feature = "builder-assets") ]
 	pub favicons_route_base : Option<PathBuf>,
+	#[ cfg (feature = "builder-assets") ]
 	pub fonts_route_base : Option<PathBuf>,
 	
 	pub outputs : PathBuf,
@@ -88,38 +97,58 @@ impl Default for BuilderConfiguration {
 		let _sources = Self::resolve_sources () .or_panic (0xc6e7914d);
 		let _outputs = Self::resolve_outputs () .or_panic (0x344e2c9e);
 		
+		#[ cfg (feature = "builder-assets") ]
 		let _assets_sources = _sources.join ("./assets");
+		#[ cfg (feature = "builder-assets") ]
 		let _assets_sources = if _assets_sources.exists () { Some (_assets_sources) } else { None };
 		
+		#[ cfg (feature = "builder-askama") ]
 		let _templates_sources = _sources.join ("./templates");
+		#[ cfg (feature = "builder-askama") ]
 		let _templates_sources = if _templates_sources.exists () { Some (_templates_sources) } else { None };
 		
 		let _generated = _outputs.join ("./hss-builder-generated-default.in");
 		
+		#[ cfg (feature = "builder-assets") ]
 		let _assets_route_base = Some (PathBuf::from ("/assets"));
 		
+		#[ cfg (feature = "builder-assets") ]
 		let _css_route_base = Some (PathBuf::from ("/assets/css"));
+		#[ cfg (feature = "builder-assets") ]
 		let _js_route_base = Some (PathBuf::from ("/assets/js"));
 		
+		#[ cfg (feature = "builder-assets") ]
 		let _images_route_base = Some (PathBuf::from ("/assets/images"));
+		#[ cfg (feature = "builder-assets") ]
 		let _icons_route_base = Some (PathBuf::from ("/assets/icons"));
+		#[ cfg (feature = "builder-assets") ]
 		let _favicons_route_base = Some (PathBuf::from ("/assets/favicons"));
+		#[ cfg (feature = "builder-assets") ]
 		let _fonts_route_base = Some (PathBuf::from ("/assets/fonts"));
 		
 		Self {
 				
 				sources : Some (_sources),
+				#[ cfg (feature = "builder-assets") ]
 				assets_sources : _assets_sources,
+				#[ cfg (feature = "builder-askama") ]
 				templates_sources : _templates_sources,
 				
+				#[ cfg (feature = "builder-assets") ]
 				assets_route_base : _assets_route_base,
 				
+				#[ cfg (feature = "builder-assets") ]
 				css_route_base : _css_route_base,
+				#[ cfg (feature = "builder-assets") ]
 				js_route_base : _js_route_base,
 				
+				#[ cfg (feature = "builder-assets") ]
 				images_route_base : _images_route_base,
+				#[ cfg (feature = "builder-assets") ]
 				icons_route_base : _icons_route_base,
+				#[ cfg (feature = "builder-assets") ]
 				favicons_route_base : _favicons_route_base,
+				#[ cfg (feature = "builder-assets") ]
 				fonts_route_base : _fonts_route_base,
 				
 				outputs : _outputs,
@@ -138,18 +167,29 @@ impl BuilderConfiguration {
 		let _generated = _outputs.join ("./hss-builder-generated-default.in");
 		
 		let _builder = Self {
+				
 				sources : Some (_sources),
+				
+				#[ cfg (feature = "builder-assets") ]
 				assets_sources : None,
+				#[ cfg (feature = "builder-askama") ]
 				templates_sources : None,
 				
+				#[ cfg (feature = "builder-assets") ]
 				assets_route_base : None,
 				
+				#[ cfg (feature = "builder-assets") ]
 				css_route_base : None,
+				#[ cfg (feature = "builder-assets") ]
 				js_route_base : None,
 				
+				#[ cfg (feature = "builder-assets") ]
 				images_route_base : None,
+				#[ cfg (feature = "builder-assets") ]
 				icons_route_base : None,
+				#[ cfg (feature = "builder-assets") ]
 				favicons_route_base : None,
+				#[ cfg (feature = "builder-assets") ]
 				fonts_route_base : None,
 				
 				outputs : _outputs,
@@ -240,6 +280,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-askama") ]
 	pub fn route_askama (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
@@ -250,6 +291,7 @@ impl Builder {
 		self.route_askama_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, _source_0, None)
 	}
 	
+	#[ cfg (feature = "builder-askama") ]
 	pub fn route_askamas (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
@@ -268,6 +310,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-askama") ]
 	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_1 = _relative.with_extension ("");
@@ -296,6 +339,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-askama") ]
 	pub fn watch_askama (&mut self, _source : &str) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
@@ -306,6 +350,7 @@ impl Builder {
 		Ok (())
 	}
 	
+	#[ cfg (feature = "builder-askama") ]
 	pub fn watch_askamas (&mut self, _sources : &str, _glob : Option<&str>) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
@@ -321,6 +366,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
@@ -338,6 +384,7 @@ impl Builder {
 		self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _route_base, _route_builder, _extensions_builder, _source_markdown_0, None)
 	}
 	
+	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
@@ -363,6 +410,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
 	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
@@ -505,6 +553,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_css (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -517,7 +566,8 @@ impl Builder {
 	}
 	
 	
-	#[ cfg ( any (feature = "builder-sass-rs", feature = "builder-sass-alt") ) ]
+	#[ cfg (feature = "builder-assets") ]
+	#[ cfg (feature = "builder-assets-sass-any") ]
 	pub fn route_sass (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -546,6 +596,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_js (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _js_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -560,6 +611,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_image (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -571,6 +623,7 @@ impl Builder {
 		self.route_image_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, "resource_image", _source_0, None)
 	}
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_images (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -590,6 +643,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_icon (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -601,6 +655,7 @@ impl Builder {
 		self.route_image_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, "resource_icon", _source_0, None)
 	}
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_icons (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -620,6 +675,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_favicon (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -631,6 +687,7 @@ impl Builder {
 		self.route_image_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, "resource_favicon", _source_0, None)
 	}
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_favicons (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -650,6 +707,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	fn route_image_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _macro : &str, _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _content_type = detect_content_type_from_extension (&_source) ?;
@@ -666,6 +724,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_font (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -677,6 +736,7 @@ impl Builder {
 		self.route_font_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, _source_0, None)
 	}
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_fonts (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -696,6 +756,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	fn route_font_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _content_type = detect_content_type_from_extension (&_source) ?;
@@ -712,6 +773,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_asset (&mut self, _source_0 : &str, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -723,6 +785,7 @@ impl Builder {
 		self.route_asset_0 (&_relative, &_source, _content_type, _route_base, _route_builder, _extensions_builder, _source_0, None)
 	}
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn route_assets (&mut self, _sources_0 : &str, _glob : Option<&str>, _content_type : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -742,6 +805,7 @@ impl Builder {
 	}
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	fn route_asset_0 (&mut self, _relative : &Path, _source : &Path, _content_type : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _content_type = _content_type.map_or_else (|| detect_content_type_from_extension (&_source), |_content_type| Ok (_content_type)) ?;
@@ -752,6 +816,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-sitemaps") ]
 	pub fn route_sitemap (&mut self, _prefix : &str, _format : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _route = _route_builder.build (Path::new (""), Path::new (""), None, None) ?;
@@ -770,6 +835,7 @@ impl Builder {
 	
 	
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn watch_asset (&mut self, _source : &str) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -780,6 +846,7 @@ impl Builder {
 		Ok (())
 	}
 	
+	#[ cfg (feature = "builder-assets") ]
 	pub fn watch_assets (&mut self, _sources : &str, _glob : Option<&str>) -> BuilderResult {
 		
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -1005,10 +1072,11 @@ impl Builder {
 
 
 
+#[ cfg (feature = "builder-assets-sass-any") ]
 impl Builder {
 	
 	
-	#[ cfg (feature = "builder-sass-rs") ]
+	#[ cfg (feature = "builder-assets-sass-rs") ]
 	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
 		let _extension = _source.extension () .or_wrap (0x836ff108) ? .to_str () .or_wrap (0x4068e13f) ?;
@@ -1036,7 +1104,7 @@ impl Builder {
 	}
 	
 	
-	#[ cfg (feature = "builder-sass-alt") ]
+	#[ cfg (feature = "builder-assets-sass-alt") ]
 	fn compile_sass (&mut self, _source : &Path) -> BuilderResult<String> {
 		
 		let _parent = _source.parent () .or_wrap (0xf6ce0d79) ?;

@@ -4,6 +4,7 @@
 
 
 
+#[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
 macro_rules! askama {
 	
@@ -64,6 +65,7 @@ macro_rules! askama {
 
 
 
+#[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
 macro_rules! askama_with_title_and_body {
 	
