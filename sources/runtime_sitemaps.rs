@@ -193,29 +193,29 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 		};
 		
 		let mut _sitemap_routes = Vec::new ();
+		let mut _url_buffer = String::with_capacity (128);
 		for _route in _routes.routes () {
 			if let Some (_entry) = _route.extensions.get::<RouteSitemapEntry> () {
 				if _entry.included.unwrap_or (true) {
-					_sitemap_routes.push ((_route, _entry));
+					_url_buffer.clear ();
+					_url_buffer.push_str (self.prefix.trim_end_matches ("/"));
+					_url_buffer.push_str ("/");
+					_url_buffer.push_str (_route.path.trim_start_matches ("/"));
+					let _url = _url_buffer.parse () .or_wrap (0x270667a5) ?;
+					_sitemap_routes.push ((_url, _entry));
 				}
 			}
 		}
-		
+		drop (_url_buffer);
 		
 		let (_body, _content_type) = match self.format {
 			
 			#[ cfg (feature = "runtime-sitemaps-xml") ]
 			SitemapFormat::Xml => {
 				let mut _entries = Vec::with_capacity (_sitemap_routes.len ());
-				let mut _url_buffer = String::with_capacity (128);
-				for (_route, _route_entry) in _sitemap_routes {
-					_url_buffer.clear ();
-					_url_buffer.push_str (self.prefix.trim_end_matches ("/"));
-					_url_buffer.push_str ("/");
-					_url_buffer.push_str (_route.path.trim_start_matches ("/"));
-					let _url = _url_buffer.parse () .or_wrap (0x270667a5) ?;
+				for (_route_url, _route_entry) in _sitemap_routes {
 					let mut _builder = ::sitewriter::UrlEntryBuilder::default ();
-					_builder.loc (_url);
+					_builder.loc (_route_url);
 					if let Some (_frequency) = _route_entry.frequency.as_ref () {
 						let _frequency = match _frequency {
 							SitemapFrequency::Always => ::sitewriter::ChangeFreq::Always,
@@ -240,8 +240,8 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 			
 			SitemapFormat::Text => {
 				let mut _buffer = String::with_capacity (16 * 1024);
-				for (_route, _entry) in _sitemap_routes {
-					_buffer.push_str (&_route.path);
+				for (_route_url, _route_entry) in _sitemap_routes {
+					_buffer.push_str (_route_url.as_str ());
 					_buffer.push_str ("\n");
 				}
 				(_buffer, hss::ContentType::Text)
