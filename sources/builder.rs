@@ -752,7 +752,7 @@ impl Builder {
 	
 	
 	
-	pub fn route_sitemap (&mut self, _format : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_sitemap (&mut self, _prefix : &str, _format : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _route = _route_builder.build (Path::new (""), Path::new (""), None, None) ?;
 		let _extensions = _extensions_builder.build () ?;
@@ -767,7 +767,7 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::route_sitemap! (Route_{}, {:?}, {}, {});", _id, _route, _format, _extensions) .infallible (0x5f529a53);
+		writeln! (self.generated, "::hyper_static_server::route_sitemap! (Route_{}, {:?}, {:?}, {}, {});", _id, _route, _prefix, _format, _extensions) .infallible (0x5f529a53);
 		
 		Ok (())
 	}

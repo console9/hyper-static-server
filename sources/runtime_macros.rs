@@ -281,7 +281,7 @@ macro_rules! route {
 macro_rules! route_sitemap {
 	
 	
-	( $_route_name : ident, $_route_path : literal, $_format : ident, $_route_extensions : tt ) => {
+	( $_route_name : ident, $_route_path : literal, $_prefix : literal, $_format : ident, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_route_name ();
@@ -291,7 +291,8 @@ macro_rules! route_sitemap {
 			pub fn new () -> $crate::hss::Route {
 				use ::std::convert::From as _;
 				use $crate::hss::HandlerSimpleSync as _;
-				let _resource = $crate::RoutesSitemapResource::new ($crate::SitemapFormat::$_format);
+				let _prefix = ::std::string::String::from ($_prefix);
+				let _resource = $crate::RoutesSitemapResource::new (_prefix, $crate::SitemapFormat::$_format);
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = Description ();
 				struct Description ();

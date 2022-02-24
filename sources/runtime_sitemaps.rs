@@ -3,9 +3,11 @@
 use crate::hss;
 
 
+#[ allow (unused_imports) ]
 use crate::hss::{
 		
 		ResponseExt as _,
+		ResultExtWrap as _,
 		
 	};
 
@@ -24,6 +26,7 @@ pub enum SitemapFrequency {
 
 
 pub enum SitemapFormat {
+	#[ cfg (feature = "runtime-sitemaps-xml") ]
 	Xml,
 	Text,
 }
@@ -53,29 +56,32 @@ impl RouteSitemapEntry {
 
 
 pub struct RoutesSitemapResource {
-	routes : Option<hss::Routes>,
+	prefix : String,
 	format : SitemapFormat,
+	routes : Option<hss::Routes>,
 }
 
 
 impl RoutesSitemapResource {
 	
-	pub fn new (_format : SitemapFormat) -> Self {
-		Self::new_with_routes (None, _format)
+	pub fn new (_prefix : String, _format : SitemapFormat) -> Self {
+		Self::new_with_routes (_prefix, _format, None)
 	}
 	
-	pub fn new_xml () -> Self {
-		Self::new (SitemapFormat::Xml)
+	#[ cfg (feature = "runtime-sitemaps-xml") ]
+	pub fn new_xml (_prefix : String) -> Self {
+		Self::new (_prefix, SitemapFormat::Xml)
 	}
 	
-	pub fn new_text () -> Self {
-		Self::new (SitemapFormat::Text)
+	pub fn new_text (_prefix : String) -> Self {
+		Self::new (_prefix, SitemapFormat::Text)
 	}
 	
-	pub fn new_with_routes (_routes : Option<hss::Routes>, _format : SitemapFormat) -> Self {
+	pub fn new_with_routes (_prefix : String, _format : SitemapFormat, _routes : Option<hss::Routes>) -> Self {
 		Self {
-				routes : _routes,
+				prefix : _prefix,
 				format : _format,
+				routes : _routes,
 			}
 	}
 }
@@ -107,9 +113,41 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 		
 		let (_body, _content_type) = match self.format {
 			
+			#[ cfg (feature = "runtime-sitemaps-xml") ]
 			SitemapFormat::Xml => {
-				// FIXME!
-				let mut _buffer = String::with_capacity (16 * 1024);
+				let mut _entries = Vec::with_capacity (_sitemap_routes.len ());
+				let mut _url_buffer = String::with_capacity (128);
+				for (_route, _route_entry) in _sitemap_routes {
+					_url_buffer.clear ();
+					_url_buffer.push_str (self.prefix.trim_end_matches ("/"));
+					_url_buffer.push_str ("/");
+					_url_buffer.push_str (_route.path.trim_start_matches ("/"));
+					let _url = _url_buffer.parse () .or_wrap (0x270667a5) ?;
+					let mut _builder = ::sitewriter::UrlEntryBuilder::default ();
+					_builder.loc (_url);
+					if let Some (_frequency) = _route_entry.frequency.as_ref () {
+						let _frequency = match _frequency {
+							SitemapFrequency::Always => ::sitewriter::ChangeFreq::Always,
+							SitemapFrequency::Hourly => ::sitewriter::ChangeFreq::Hourly,
+							SitemapFrequency::Daily => ::sitewriter::ChangeFreq::Daily,
+							SitemapFrequency::Weekly => ::sitewriter::ChangeFreq::Weekly,
+							SitemapFrequency::Monthly => ::sitewriter::ChangeFreq::Monthly,
+							SitemapFrequency::Yearly => ::sitewriter::ChangeFreq::Yearly,
+							SitemapFrequency::Never => ::sitewriter::ChangeFreq::Never,
+						};
+						_builder.changefreq (_frequency);
+					}
+					if let Some (_priority) = _route_entry.priority.as_ref () {
+						let _priority = *_priority;
+						if (_priority < 0.0) || (_priority > 1.0) {
+							hss::fail_with_code! (0x1842f8e9);
+						}
+						_builder.priority (_priority);
+					}
+					let _entry = _builder.build () .or_wrap (0x155cdb8f) ?;
+					_entries.push (_entry);
+				}
+				let _buffer = ::sitewriter::generate_str (&_entries);
 				(_buffer, hss::ContentType::Xml)
 			}
 			

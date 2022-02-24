@@ -230,8 +230,8 @@ macro_rules! builder_macros {
 		
 		#[ allow (unused_macros) ]
 		macro_rules! sitemap {
-			( $_format : tt => $_route : tt ) => {
-				$crate::builder_call_sitemap! ($_builder, $_format, $_route);
+			( { prefix : $_prefix : tt, format : $_format : tt } => $_route : tt ) => {
+				$crate::builder_call_sitemap! ($_builder, $_prefix, $_format, $_route);
 			};
 		}
 		
@@ -830,9 +830,10 @@ macro_rules! builder_call_markdowns {
 
 #[ macro_export ]
 macro_rules! builder_call_sitemap {
-	( $_builder : ident, $_format : ident, $_route : tt ) => {
+	( $_builder : ident, $_prefix : literal, $_format : ident, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_sitemap, (
+					$_prefix,
 					::std::stringify! ($_format),
 					$crate::builder_call_route_path! ($_builder, exact, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
