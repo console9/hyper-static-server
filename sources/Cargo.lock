@@ -458,6 +458,7 @@ dependencies = [
  "sass-alt",
  "sass-rs",
  "sitewriter",
+ "url",
  "walkdir",
 ]
 
