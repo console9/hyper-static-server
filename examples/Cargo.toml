@@ -15,10 +15,12 @@ default = ["server", "exporter"]
 server = [
 	"hyper-static-server/server",
 	"hyper-static-server/runtime-sitemaps",
+	"hyper-static-server/runtime-sitemaps-xml",
 ]
 exporter = [
 	"hyper-static-server/exporter",
 	"hyper-static-server/runtime-sitemaps",
+	"hyper-static-server/runtime-sitemaps-xml",
 ]
 
 [dependencies]

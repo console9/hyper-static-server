@@ -50,6 +50,7 @@ default = [
 	"exporter",
 	"builder",
 	"runtime-sitemaps",
+	"runtime-sitemaps-xml",
 	"builder-sass",
 	"builder-markdown",
 ]
@@ -71,7 +72,13 @@ exporter = [
 	"cpio",
 ]
 
-runtime-sitemaps = []
+runtime-sitemaps = [
+]
+
+runtime-sitemaps-xml = [
+	"runtime-sitemaps",
+	"sitewriter",
+]
 
 builder = [
 	"hyper-simple-server/hss-errors",
@@ -117,6 +124,7 @@ sass-rs = { version = "0.2.2", default-features = false, optional = true }
 sass-alt = { version = "0.2.7", default-features = false, optional = true }
 walkdir = { version = "2.3.1", default-features = false, optional = true }
 proc-macro2 = { version = "1.0.36", default-features = false, features = ["proc-macro"], optional = true }
+sitewriter = { version = "0.5.1", default-features = false, optional = true }
 blake2 = { version = "0.9.1", default-features = false, features = ["std"], optional = true }
 cpio = { version = "0.2.1", default-features = false, optional = true }
 
