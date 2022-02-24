@@ -1,9 +1,1 @@
 #!/dev/null
-
-
-
-:: rust / features / set / default :: export -- _RUST_FEATURES=default
-:: rust / features / set / server :: export -- _RUST_FEATURES=server
-:: rust / features / set / exporter :: export -- _RUST_FEATURES=exporter
-:: rust / features / set / builder :: export -- _RUST_FEATURES=builder
-

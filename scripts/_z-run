@@ -28,6 +28,7 @@
 
 && ../hyper-simple-server/scripts/project-common.z-run
 && ../hyper-simple-server/scripts/project-sources.z-run
+&& ../hyper-simple-server/scripts/project-features.z-run
 && ../hyper-simple-server/scripts/project-generators.z-run
 && ../hyper-simple-server/scripts/project-example.z-run
 
@@ -45,4 +46,5 @@
 
 
 && _/custom-environment.z-run
+&& _/custom-features.z-run
 
