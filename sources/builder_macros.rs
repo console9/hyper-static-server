@@ -874,10 +874,7 @@ macro_rules! builder_call_sitemap {
 macro_rules! builder_call {
 	
 	( $_builder : ident, $_method : ident, ( $( $_argument : expr , )* ), ( $_code : literal ) ) => {
-		{
-			use $crate::hss::ResultExtPanic as _;
-			$_builder .$_method ( $( $_argument, )* ) .or_panic ($_code);
-		}
+		$_builder .$_method ( $( $_argument, )* ) ?;
 	};
 }
 

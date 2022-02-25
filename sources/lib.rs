@@ -75,7 +75,7 @@ pub use crate::runtime_sitemaps::*;
 
 
 
-#[ cfg (feature = "runtime") ]
+#[ cfg (any (feature = "runtime", feature = "builder") ) ]
 pub use ::hyper_simple_server as hss;
 
 #[ cfg (feature = "runtime") ]
