@@ -32,6 +32,7 @@
 && ../hyper-simple-server/scripts/project-features.z-run
 && ../hyper-simple-server/scripts/project-generators.z-run
 && ../hyper-simple-server/scripts/project-example.z-run
+&& ../hyper-simple-server/scripts/project-all.z-run
 
 && ../hyper-simple-server/scripts/cargo-dependencies.z-run
 && ../hyper-simple-server/scripts/cargo-publish.z-run
