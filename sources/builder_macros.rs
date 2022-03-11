@@ -946,3 +946,20 @@ macro_rules! build_with_defaults {
 	};
 }
 
+
+
+
+#[ macro_export ]
+macro_rules! main_build_with_defaults {
+	
+	( $_resources : tt ) => {
+		
+		pub fn main () -> $crate::BuilderResult {
+			
+			$crate::build_with_defaults! ($_resources);
+			
+			$crate::BuilderResult::Ok (())
+		}
+	};
+}
+
