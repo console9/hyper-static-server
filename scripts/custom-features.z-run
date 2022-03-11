@@ -20,5 +20,6 @@
 	builder-markdown
 	builder-askama
 	builder-sitemaps
+	production
 !!
 

@@ -1,1 +1,6 @@
 #!/dev/null
+
+
+:: rust / features / set / quick / default :: export -- _RUST_FEATURES=default _EXAMPLE_FEATURES=default
+:: rust / features / set / quick / production :: export -- _RUST_FEATURES=default,production _EXAMPLE_FEATURES=default,production
+
