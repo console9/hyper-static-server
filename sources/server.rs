@@ -43,7 +43,7 @@ impl StaticHandler {
 			return self.serve_special (_request);
 		}
 		
-		#[ cfg (debug_assertions) ]
+		#[ cfg (not (feature = "production")) ]
 		eprintln! ("[ii] [9ada1c36]  serving `{}`...", _request.uri_path ());
 		
 		match self.routes.try_handle (_request) {
@@ -60,23 +60,33 @@ impl StaticHandler {
 		match _request.uri_path () {
 			"/__/heartbeat" =>
 				return hss::Response::new_200 () .into (),
+			
+			#[ cfg (not (feature = "production")) ]
 			"/__/reload.txt" =>
 				return hss::Response::new_200_with_text (self.random_token.clone ()) .into (),
+			
+			#[ cfg (not (feature = "production")) ]
 			"/__/reload.js" =>
 				return hss::Response::new_200_with_body (
 						& include_bytes! ("./reload.js") [..],
 						Some (hss::ContentType::Js),
 					) .into (),
+			
+			#[ cfg (not (feature = "production")) ]
 			"/__/routes.html" =>
 				return self.serve_routes_index_html (_request),
+			
+			#[ cfg (not (feature = "production")) ]
 			"/__/routes.txt" =>
 				return self.serve_routes_index_txt (_request),
+			
 			_ =>
 				return self.serve_404 (_request),
 		}
 	}
 	
 	
+	#[ cfg (not (feature = "production")) ]
 	pub fn serve_routes_index_html (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		let mut _buffer = String::with_capacity (128 * 1024);
@@ -113,6 +123,7 @@ impl StaticHandler {
 		return hss::Response::new_200_with_html (_buffer) .into ();
 	}
 	
+	#[ cfg (not (feature = "production")) ]
 	pub fn serve_routes_index_txt (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
 		let mut _buffer = String::with_capacity (128 * 1024);

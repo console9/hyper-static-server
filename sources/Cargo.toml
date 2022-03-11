@@ -63,6 +63,8 @@ default = [
 	"builder-sitemaps",
 ]
 
+production = []
+
 server = [
 	"hyper-simple-server/hss-full",
 	"runtime",

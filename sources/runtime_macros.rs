@@ -137,9 +137,9 @@ macro_rules! resource {
 	
 	
 	( $_resource_name : ident, $_content_type : tt, auto, $_resource_path : tt, $_description : literal ) => {
-		#[ cfg (debug_assertions) ]
+		#[ cfg (not (feature = "production")) ]
 		$crate::resource! ($_resource_name, $_content_type, dynamic, $_resource_path, $_description);
-		#[ cfg (not (debug_assertions)) ]
+		#[ cfg (feature = "production") ]
 		$crate::resource! ($_resource_name, $_content_type, embedded, $_resource_path, $_description);
 	};
 	
@@ -169,9 +169,9 @@ macro_rules! resource {
 			}
 			
 			pub const RESOURCE : $crate::hss::EmbeddedResource =
-					$crate::hss::EmbeddedResource::new (
-							::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
+					$crate::hss::EmbeddedResource::new_const (
 							::std::include_bytes! ($crate::resource_path! ($_resource_path)),
+							::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
 						);
 		}
 		

@@ -12,6 +12,9 @@ path = "./sources/main.rs"
 
 [features]
 default = ["server", "exporter"]
+production = [
+	"hyper-static-server/production",
+]
 server = [
 	"hyper-static-server/server",
 	"hyper-static-server/runtime-macros",
