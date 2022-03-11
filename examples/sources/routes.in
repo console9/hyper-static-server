@@ -16,7 +16,9 @@
 	asset_favicon! ("_/favicons/favicon.ico" => "/favicon.ico");
 	
 	asset! ("./files/robots.txt" => "/robots.txt");
+	
 	asset! ("./files/data.txt" => "/data.txt");
+	asset! ({ "./files/data.txt", content_type : text } => "/data-with-content-type.txt");
 	
 	asset! ("./markdown/hello.md" => "/hello-text");
 	markdown! ("./markdown/hello.md" => "/hello-simple");

@@ -9,7 +9,7 @@
 macro_rules! askama {
 	
 	
-	( $_resource_name : ident, $_template_name : ident, $_content_type : ident, $_template_path : literal, $_description : literal ) => {
+	( $_resource_name : ident, $_template_name : ident, $_content_type : tt, $_template_path : literal, $_description : literal ) => {
 		
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
@@ -36,7 +36,7 @@ macro_rules! askama {
 			}
 			
 			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::hss::ContentType::$_content_type
+				$crate::resource_content_type! ($_content_type)
 			}
 			
 			pub fn description (&self) -> &'static str {
@@ -70,7 +70,7 @@ macro_rules! askama {
 macro_rules! askama_with_title_and_body {
 	
 	
-	( $_resource_name : ident, $_template_name : ident, $_content_type : ident, $_template_path : literal, $_title : literal, $_body_path : literal, $_description : literal ) => {
+	( $_resource_name : ident, $_template_name : ident, $_content_type : tt, $_template_path : literal, $_title : literal, $_body_path : literal, $_description : literal ) => {
 		
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
@@ -103,7 +103,7 @@ macro_rules! askama_with_title_and_body {
 			}
 			
 			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::hss::ContentType::$_content_type
+				$crate::resource_content_type! ($_content_type)
 			}
 			
 			pub fn description (&self) -> &'static str {
@@ -136,7 +136,7 @@ macro_rules! askama_with_title_and_body {
 macro_rules! resource {
 	
 	
-	( $_resource_name : ident, $_content_type : ident, auto, $_resource_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, auto, $_resource_path : tt, $_description : literal ) => {
 		#[ cfg (debug_assertions) ]
 		$crate::resource! ($_resource_name, $_content_type, dynamic, $_resource_path, $_description);
 		#[ cfg (not (debug_assertions)) ]
@@ -144,7 +144,7 @@ macro_rules! resource {
 	};
 	
 	
-	( $_resource_name : ident, $_content_type : ident, embedded, $_resource_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, embedded, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_resource_name ();
@@ -157,7 +157,7 @@ macro_rules! resource {
 			}
 			
 			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::hss::ContentType::$_content_type
+				$crate::resource_content_type! ($_content_type)
 			}
 			
 			pub fn description (&self) -> &'static str {
@@ -170,7 +170,7 @@ macro_rules! resource {
 			
 			pub const RESOURCE : $crate::hss::EmbeddedResource =
 					$crate::hss::EmbeddedResource::new (
-							::std::option::Option::Some ($crate::hss::ContentType::$_content_type),
+							::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
 							::std::include_bytes! ($crate::resource_path! ($_resource_path)),
 						);
 		}
@@ -188,7 +188,7 @@ macro_rules! resource {
 	};
 	
 	
-	( $_resource_name : ident, $_content_type : ident, dynamic, $_resource_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, dynamic, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_resource_name {
@@ -202,14 +202,14 @@ macro_rules! resource {
 				Self {
 						resource : $crate::hss::FileResource::new (
 								$crate::resource_path! ($_resource_path),
-								::std::option::Option::Some ($crate::hss::ContentType::$_content_type),
+								::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
 								false,
 							)
 					}
 			}
 			
 			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::hss::ContentType::$_content_type
+				$crate::resource_content_type! ($_content_type)
 			}
 			
 			pub fn description (&self) -> &'static str {
@@ -232,6 +232,34 @@ macro_rules! resource {
 			}
 		}
 	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! resource_content_type {
+	
+	( text ) => { $crate::hss::ContentType::Text };
+	( html ) => { $crate::hss::ContentType::Html };
+	( css ) => { $crate::hss::ContentType::Css };
+	( js ) => { $crate::hss::ContentType::Js };
+	
+	( json ) => { $crate::hss::ContentType::Json };
+	( xml ) => { $crate::hss::ContentType::Xml };
+	
+	( png ) => { $crate::hss::ContentType::Png };
+	( jpeg ) => { $crate::hss::ContentType::Jpeg };
+	( svg ) => { $crate::hss::ContentType::Svg };
+	( icon ) => { $crate::hss::ContentType::Icon };
+	
+	( font_ttf ) => { $crate::hss::ContentType::FontTtf };
+	( font_otf ) => { $crate::hss::ContentType::FontOtf };
+	( font_woff ) => { $crate::hss::ContentType::FontWoff };
+	( font_woff2 ) => { $crate::hss::ContentType::FontWoff2 };
+	
+	( unknown ) => { $crate::hss::ContentType::Unknown };
+	
 }
 
 

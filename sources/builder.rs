@@ -325,7 +325,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		let _content_type = "Html";
+		let _content_type = "html";
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
 		} else {
@@ -432,7 +432,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		let _content_type = "Html";
+		let _content_type = "html";
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("markdown_askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
 		} else {
@@ -546,7 +546,7 @@ impl Builder {
 		create_file_from_str (&_output, &_compiled) ?;
 		
 		// FIXME:  Here the second argument should be `_source`.
-		self.route_asset_raw (&_relative_1, &_output, "Html", _route_base, _route_builder, _extensions_builder, "markdown", _source_0, _source_relative) ?;
+		self.route_asset_raw (&_relative_1, &_output, "html", _route_base, _route_builder, _extensions_builder, "markdown", _source_0, _source_relative) ?;
 		
 		self.dependencies_exclude (&_output) ?;
 		
@@ -565,7 +565,7 @@ impl Builder {
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		self.route_asset_raw (&_relative, &_source, "Css", _route_base, _route_builder, _extensions_builder, "resource_css", _source_0, None)
+		self.route_asset_raw (&_relative, &_source, "css", _route_base, _route_builder, _extensions_builder, "resource_css", _source_0, None)
 	}
 	
 	
@@ -589,7 +589,7 @@ impl Builder {
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
 		// FIXME:  Here the second argument should be `_source`.
-		self.route_asset_raw (&_relative_1, &_output, "Css", _route_base, _route_builder, _extensions_builder, "resource_sass", _source_0, None) ?;
+		self.route_asset_raw (&_relative_1, &_output, "css", _route_base, _route_builder, _extensions_builder, "resource_sass", _source_0, None) ?;
 		
 		self.dependencies_exclude (&_output) ?;
 		
@@ -608,7 +608,7 @@ impl Builder {
 		let _route_base = self.configuration.js_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		self.route_asset_raw (&_relative, &_source, "Js", _route_base, _route_builder, _extensions_builder, "resource_js", _source_0, None)
+		self.route_asset_raw (&_relative, &_source, "js", _route_base, _route_builder, _extensions_builder, "resource_js", _source_0, None)
 	}
 	
 	
@@ -715,7 +715,7 @@ impl Builder {
 		
 		let _content_type = detect_content_type_from_extension (&_source) ?;
 		match _content_type {
-			"Png" | "Jpeg" | "Icon" | "Svg" =>
+			"png" | "jpeg" | "icon" | "svg" =>
 				(),
 			_ =>
 				return Err (error_with_format (0x0fd2d804, format_args! ("{}", _source.display ()))),
@@ -764,7 +764,7 @@ impl Builder {
 		
 		let _content_type = detect_content_type_from_extension (&_source) ?;
 		match _content_type {
-			"FontTtf" | "FontOtf" | "FontWoff" | "FontWoff2" =>
+			"font_ttf" | "font_otf" | "font_woff" | "font_woff2" =>
 				(),
 			_ =>
 				return Err (error_with_format (0x1a4ccbf4, format_args! ("{}", _source.display ()))),
@@ -1405,21 +1405,21 @@ fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'stati
 	let _extension = _source.extension () .or_wrap (0x29957dc8) ? .to_str () .or_wrap (0x908aeea6) ?;
 	
 	let _content_type = match _extension {
-		"text" | "txt" => "Text",
-		"md" => "Text",
-		"html" | "htm" => "Html",
-		"css" => "Css",
-		"js" => "Js",
-		"json" => "Json",
-		"xml" => "Xml",
-		"png" => "Png",
-		"jpeg" | "jpg" => "Jpeg",
-		"ico" => "Icon",
-		"svg" => "Svg",
-		"ttf" => "FontTtf",
-		"otf" => "FontOtf",
-		"woff" => "FontWoff",
-		"woff2" => "FontWoff2",
+		"text" | "txt" => "text",
+		"md" => "text",
+		"html" | "htm" => "html",
+		"css" => "css",
+		"js" => "js",
+		"json" => "json",
+		"xml" => "xml",
+		"png" => "png",
+		"jpeg" | "jpg" => "jpeg",
+		"ico" => "icon",
+		"svg" => "svg",
+		"ttf" => "font_ttf",
+		"otf" => "font_otf",
+		"woff" => "font_woff",
+		"woff2" => "font_woff2",
 		_ =>
 			return Err (error_with_format (0x2bd15bab, format_args! ("{}", _source.display ()))),
 	};
