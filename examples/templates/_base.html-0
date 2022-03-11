@@ -12,7 +12,9 @@
 		
 		{% block head %}{% endblock %}
 		
+		{% if __is_development %}
 		<script src="/__/reload.js" defer></script>
+		{% endif %}
 		
 	</head>
 	

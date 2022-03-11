@@ -14,7 +14,10 @@ macro_rules! askama {
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_template_name ();
+		pub(crate) struct $_template_name {
+			pub __is_production : bool,
+			pub __is_development : bool,
+		}
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_resource_name {
@@ -26,7 +29,10 @@ macro_rules! askama {
 			
 			pub fn new () -> Self {
 				Self {
-						template : $_template_name {},
+						template : $_template_name {
+								__is_production : cfg! (feature = "production"),
+								__is_development : cfg! (not (feature = "production")),
+							},
 					}
 			}
 			
@@ -78,6 +84,8 @@ macro_rules! askama_with_title_and_body {
 		pub(crate) struct $_template_name {
 			pub title : &'static str,
 			pub body : &'static str,
+			pub __is_production : bool,
+			pub __is_development : bool,
 		}
 		
 		#[ allow (non_camel_case_types) ]
@@ -93,6 +101,8 @@ macro_rules! askama_with_title_and_body {
 						template : $_template_name {
 								title : $_title,
 								body : ::std::include_str! ($_body_path),
+								__is_production : cfg! (feature = "production"),
+								__is_development : cfg! (not (feature = "production")),
 							},
 					}
 			}
