@@ -284,18 +284,18 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "builder-askama") ]
-	pub fn route_askama (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_askama (&mut self, _source_0 : &str, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) ?;
 		
 		let _route_base = Some (Path::new ("/"));
 		
-		self.route_askama_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, _source_0, None)
+		self.route_askama_0 (&_relative, &_source, _context, _route_base, _route_builder, _extensions_builder, _source_0, None)
 	}
 	
 	#[ cfg (feature = "builder-askama") ]
-	pub fn route_askamas (&mut self, _sources_0 : &str, _glob : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_askamas (&mut self, _sources_0 : &str, _glob : Option<&str>, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_templates_sources, _sources_0, _glob) ?;
@@ -306,7 +306,7 @@ impl Builder {
 		
 		for (_relative, _source) in _files.into_iter () {
 			
-			self.route_askama_0 (&_relative, &_source, _route_base, _route_builder, _extensions_builder, _sources_0, Some (_relative.as_path ())) ?;
+			self.route_askama_0 (&_relative, &_source, _context, _route_base, _route_builder, _extensions_builder, _sources_0, Some (_relative.as_path ())) ?;
 		}
 		
 		Ok (())
@@ -314,7 +314,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "builder-askama") ]
-	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _context : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_1 = _relative.with_extension ("");
 		
@@ -335,7 +335,7 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies_include (&_source) ?;
 		
-		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {:?}, {:?});", _id, _id, _content_type, _template, _description) .infallible (0x35966385);
+		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _description) .infallible (0x35966385);
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
 		
 		Ok (())
@@ -371,7 +371,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -384,12 +384,12 @@ impl Builder {
 		
 		let _route_base = Some (Path::new ("/"));
 		
-		self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _route_base, _route_builder, _extensions_builder, _source_markdown_0, None)
+		self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _context, _route_base, _route_builder, _extensions_builder, _source_markdown_0, None)
 	}
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -406,7 +406,7 @@ impl Builder {
 		
 		for (_relative_markdown, _source_markdown) in _files_markdown.into_iter () {
 			
-			self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _route_base, _route_builder, _extensions_builder, _sources_markdown_0, Some (_relative_markdown.as_path ())) ?;
+			self.route_markdown_askama_0 (&_relative_markdown, &_source_markdown, &_template, _context, _route_base, _route_builder, _extensions_builder, _sources_markdown_0, Some (_relative_markdown.as_path ())) ?;
 		}
 		
 		Ok (())
@@ -415,7 +415,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _context : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
 		
@@ -441,7 +441,7 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
 		
 		Ok (())

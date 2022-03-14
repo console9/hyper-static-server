@@ -1,7 +1,9 @@
 {
 	
-	askama! ("_/home.html" => "/");
-	askamas! ({"_", glob : "*/page-*.html"} => "/askama");
+	askama! ("_/home.html" => "/askama");
+	askama! ({"_/home.html", context : ()} => "/askama-with-context");
+	askamas! ({"_", glob : "*/page-*.html"} => "/askamas");
+	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/askamas-with-context");
 	askamas_watch! ({"_", glob : "*.html-0"});
 	
 	asset_sass! ("_/css/main.scss");
@@ -18,17 +20,19 @@
 	asset! ("./files/robots.txt" => "/robots.txt");
 	
 	asset! ("./files/data.txt" => "/data.txt");
-	asset! ({ "./files/data.txt", content_type : text } => "/data-with-content-type.txt");
+	asset! ({"./files/data.txt", content_type : text} => "/data-with-content-type.txt");
 	
 	asset! ("./markdown/hello.md" => "/hello-text");
 	markdown! ("./markdown/hello.md" => "/hello-simple");
 	markdown! ({"./markdown/hello.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html"} => "/hello-with-header-footer");
 	markdown_askama! ({"./markdown/hello.md", template : "_/markdown.html"} => "/hello-with-askama");
+	markdown_askama! ({"./markdown/hello.md", template : "_/markdown.html", context : ()} => "/hello-with-askama-with-context");
 	
 	assets! ({"./markdown", glob : "*.md"} => "/md-text");
 	markdowns! ({"./markdown", glob : "*.md"} => "/md-simple");
 	markdowns! ({"./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html"} => "/md-with-header-footer");
 	markdowns_askama! ({"./markdown", glob : "*.md", template : "_/markdown.html"} => "/md-with-askama");
+	markdowns_askama! ({"./markdown", glob : "*.md", template : "_/markdown.html", context : ()} => "/md-with-askama-with-context");
 	
 	asset! ("./files/data.txt" => {"/route-with-extensions/a"});
 	asset! ("./files/data.txt" => {"/route-with-extensions/b-1", extensions : ()});
@@ -42,6 +46,6 @@
 	asset! ("./files/data.txt" => {"/route-with-extensions/d-6", extensions : {sitemap : {frequency : default, priority : default}}});
 	asset! ("./files/data.txt" => {"/route-with-extensions/d-7", extensions : {sitemap, debug : "custom-debug-with-sitemap"}});
 	
-	sitemap! ({ prefix : "https://example.com/", format : xml } => "/sitemap.xml");
-	sitemap! ({ prefix : "https://example.com/", format : text } => "/sitemap.txt");
+	sitemap! ({prefix : "https://example.com/", format : xml} => "/sitemap.xml");
+	sitemap! ({prefix : "https://example.com/", format : text} => "/sitemap.txt");
 }

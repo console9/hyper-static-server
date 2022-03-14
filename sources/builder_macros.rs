@@ -749,10 +749,11 @@ macro_rules! builder_call_assets_watch {
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
 macro_rules! builder_call_askama {
-	( $_builder : ident, { $_source : literal }, $_route : tt ) => {
+	( $_builder : ident, { $_source : literal $( , context : $_context : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askama, (
 					$_source,
+					{ let _context = "()"; $( let _context = ::std::stringify! ($_context); )? _context },
 					$crate::builder_call_route_path! ($_builder, exact, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xe3a36527));
@@ -768,20 +769,22 @@ macro_rules! builder_call_askama {
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
 macro_rules! builder_call_askamas {
-	( $_builder : ident, { $_sources : literal }, $_route : tt ) => {
+	( $_builder : ident, { $_sources : literal $( , context : $_context : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
 					::std::option::Option::None,
+					{ let _context = "()"; $( let _context = ::std::stringify! ($_context); )? _context },
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x2a28230c));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal }, $_route : tt ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal $( , context : $_context : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
 					::std::option::Option::Some ($_glob),
+					{ let _context = "()"; $( let _context = ::std::stringify! ($_context); )? _context },
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0xdb8e73df));
@@ -838,11 +841,12 @@ macro_rules! builder_call_askamas_watch {
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
 macro_rules! builder_call_markdown_askama {
-	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal }, $_route : tt ) => {
+	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown_askama, (
 					$_source_markdown,
 					$_source_template,
+					{ let _context = "()"; $( let _context = ::std::stringify! ($_context); )? _context },
 					$crate::builder_call_route_path! ($_builder, exact, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x0045ece1));
@@ -853,22 +857,24 @@ macro_rules! builder_call_markdown_askama {
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
 macro_rules! builder_call_markdowns_askama {
-	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
 					::std::option::Option::None,
 					$_source_template,
+					{ let _context = "()"; $( let _context = ::std::stringify! ($_context); )? _context },
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x84a5049c));
 	};
-	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
 					::std::option::Option::Some ($_glob),
 					$_source_template,
+					{ let _context = "()"; $( let _context = ::std::stringify! ($_context); )? _context },
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x273fbd0e));

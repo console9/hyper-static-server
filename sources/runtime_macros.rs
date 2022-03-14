@@ -9,12 +9,13 @@
 macro_rules! askama {
 	
 	
-	( $_resource_name : ident, $_template_name : ident, $_content_type : tt, $_template_path : literal, $_description : literal ) => {
+	( $_resource_name : ident, $_template_name : ident, $_context_name : ty, $_content_type : tt, $_template_path : literal, $_description : literal ) => {
 		
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_template_name {
+			pub context : $_context_name,
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
@@ -30,6 +31,7 @@ macro_rules! askama {
 			pub fn new () -> Self {
 				Self {
 						template : $_template_name {
+								context : (), // FIXME!
 								__is_production : cfg! (feature = "production"),
 								__is_development : cfg! (not (feature = "production")),
 							},
@@ -76,12 +78,13 @@ macro_rules! askama {
 macro_rules! askama_with_title_and_body {
 	
 	
-	( $_resource_name : ident, $_template_name : ident, $_content_type : tt, $_template_path : literal, $_title : literal, $_body_path : literal, $_description : literal ) => {
+	( $_resource_name : ident, $_template_name : ident, $_context_name : ty, $_content_type : tt, $_template_path : literal, $_title : literal, $_body_path : literal, $_description : literal ) => {
 		
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_template_name {
+			pub context : $_context_name,
 			pub title : &'static str,
 			pub body : &'static str,
 			pub __is_production : bool,
@@ -99,6 +102,7 @@ macro_rules! askama_with_title_and_body {
 			pub fn new () -> Self {
 				Self {
 						template : $_template_name {
+								context : (), // FIXME!
 								title : $_title,
 								body : ::std::include_str! ($_body_path),
 								__is_production : cfg! (feature = "production"),
