@@ -155,25 +155,26 @@ pub struct RoutesSitemapResource {
 
 impl RoutesSitemapResource {
 	
-	pub fn new (_prefix : String, _format : SitemapFormat, _extensions : Option<&hss::Extensions>) -> Self {
+	pub fn new (_prefix : String, _format : SitemapFormat, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
 		Self::new_with_routes (_prefix, _format, None, _extensions)
 	}
 	
 	#[ cfg (feature = "runtime-sitemaps-xml") ]
-	pub fn new_xml (_prefix : String, _extensions : Option<&hss::Extensions>) -> Self {
+	pub fn new_xml (_prefix : String, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
 		Self::new (_prefix, SitemapFormat::Xml, _extensions)
 	}
 	
-	pub fn new_text (_prefix : String, _extensions : Option<&hss::Extensions>) -> Self {
+	pub fn new_text (_prefix : String, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
 		Self::new (_prefix, SitemapFormat::Text, _extensions)
 	}
 	
-	pub fn new_with_routes (_prefix : String, _format : SitemapFormat, _routes : Option<hss::Routes>, _extensions : Option<&hss::Extensions>) -> Self {
-		Self {
+	pub fn new_with_routes (_prefix : String, _format : SitemapFormat, _routes : Option<hss::Routes>, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
+		let _self = Self {
 				prefix : _prefix,
 				format : _format,
 				routes : _routes,
-			}
+			};
+		Ok (_self)
 	}
 }
 

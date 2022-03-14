@@ -28,14 +28,15 @@ macro_rules! askama {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> Self {
-				Self {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _self = Self {
 						template : $_template_name {
 								context : (), // FIXME!
 								__is_production : cfg! (feature = "production"),
 								__is_development : cfg! (not (feature = "production")),
 							},
-					}
+					};
+				$crate::hss::ServerResult::Ok (_self)
 			}
 			
 			pub fn render (&self) -> $crate::hss::ServerResult<::std::string::String> {
@@ -64,7 +65,7 @@ macro_rules! askama {
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
-				::std::result::Result::Ok (())
+				$crate::hss::ServerResult::Ok (())
 			}
 		}
 	};
@@ -99,8 +100,8 @@ macro_rules! askama_with_title_and_body {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> Self {
-				Self {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _self = Self {
 						template : $_template_name {
 								context : (), // FIXME!
 								title : $_title,
@@ -108,7 +109,8 @@ macro_rules! askama_with_title_and_body {
 								__is_production : cfg! (feature = "production"),
 								__is_development : cfg! (not (feature = "production")),
 							},
-					}
+					};
+				$crate::hss::ServerResult::Ok (_self)
 			}
 			
 			pub fn render (&self) -> $crate::hss::ServerResult<::std::string::String> {
@@ -137,7 +139,7 @@ macro_rules! askama_with_title_and_body {
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
-				::std::result::Result::Ok (())
+				$crate::hss::ServerResult::Ok (())
 			}
 		}
 	};
@@ -166,8 +168,9 @@ macro_rules! resource {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> Self {
-				Self ()
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _self = Self ();
+				$crate::hss::ServerResult::Ok (_self)
 			}
 			
 			pub fn content_type (&self) -> $crate::hss::ContentType {
@@ -212,14 +215,15 @@ macro_rules! resource {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> Self {
-				Self {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _self = Self {
 						resource : $crate::hss::FileResource::new (
 								$crate::resource_path! ($_resource_path),
 								::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
 								false,
 							)
-					}
+					};
+				$crate::hss::ServerResult::Ok (_self)
 			}
 			
 			pub fn content_type (&self) -> $crate::hss::ContentType {
@@ -290,9 +294,9 @@ macro_rules! route {
 		
 		impl $_route_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::Route {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<$crate::hss::Route> {
 				use ::std::convert::From as _;
-				let _resource = <$_resource_name>::new (_extensions);
+				let _resource = <$_resource_name>::new (_extensions) ?;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = Description (_resource.description ());
 				struct Description (&'static str);
@@ -311,7 +315,7 @@ macro_rules! route {
 						handler : _handler,
 						extensions : _extensions,
 					};
-				_route
+				$crate::hss::ServerResult::Ok (_route)
 			}
 		}
 	};
@@ -332,12 +336,12 @@ macro_rules! route_sitemap {
 		
 		impl $_route_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::Route {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<$crate::hss::Route> {
 				use ::std::convert::From as _;
 				use $crate::hss::HandlerSimpleSync as _;
 				let _prefix = ::std::string::String::from ($_prefix);
 				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
-				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format, ::std::option::Option::Some (_extensions));
+				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format, ::std::option::Option::Some (_extensions)) ?;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = Description ();
 				struct Description ();
@@ -356,7 +360,7 @@ macro_rules! route_sitemap {
 						handler : _handler,
 						extensions : _extensions,
 					};
-				_route
+				$crate::hss::ServerResult::Ok (_route)
 			}
 		}
 	};
@@ -448,48 +452,52 @@ macro_rules! routes {
 		
 		impl $_name {
 			
-			pub fn new () -> $crate::hss::Routes {
+			pub fn new () -> $crate::hss::ServerResult<$crate::hss::Routes> {
 				Self::new_with_extensions (::std::option::Option::None)
 			}
 			
-			pub fn new_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::Routes {
+			pub fn new_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::ServerResult<$crate::hss::Routes> {
 				use ::std::iter::IntoIterator as _;
 				use $crate::hss::ResultExtPanic as _;
-				let mut _routes = $crate::hss::RoutesBuilder::new ();
-				for _route in Self::routes_with_extensions (_extensions) .into_iter () {
-					_routes = _routes.with_route_object (_route);
+				let _routes = Self::routes_with_extensions (_extensions) ?;
+				let mut _builder = $crate::hss::RoutesBuilder::new ();
+				for _route in _routes.into_iter () {
+					_builder = _builder.with_route_object (_route);
 				}
-				let _routes = _routes.build () .or_panic (0x630a415a);
-				_routes
+				let _routes = _builder.build () ?;
+				$crate::hss::ServerResult::Ok (_routes)
 			}
 		}
 		
 		impl $_name {
 			
-			pub fn routes () -> ::std::vec::Vec<$crate::hss::Route> {
+			pub fn routes () -> $crate::hss::ServerResult<::std::vec::Vec<$crate::hss::Route>> {
 				Self::routes_with_extensions (::std::option::Option::None)
 			}
 			
-			pub fn routes_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> ::std::vec::Vec<$crate::hss::Route> {
+			pub fn routes_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::ServerResult<::std::vec::Vec<$crate::hss::Route>> {
 				let _extensions_none = $crate::hss::Extensions::new ();
 				let _extensions = _extensions.unwrap_or (&_extensions_none);
-				::std::vec! (
-					$( <$_route>::new (_extensions), )*
-				)
+				let _routes = ::std::vec! (
+						$( <$_route>::new (_extensions) ?, )*
+					);
+				$crate::hss::ServerResult::Ok (_routes)
 			}
 		}
 		
 		impl $_name {
 			
-			pub fn eprintln () -> () {
+			pub fn eprintln () -> $crate::hss::ServerResult {
 				use ::std::iter::IntoIterator as _;
-				for _route in Self::routes () .into_iter () {
+				let _routes = Self::routes () ?;
+				for _route in _routes.into_iter () {
 					if let ::std::option::Option::Some (_debug) = _route.extensions.get::<$crate::RouteDebug> () {
 						::std::eprintln! ("[dd] [825798f8]  **  {} -> {:?}", _route.path, _debug);
 					} else {
 						::std::eprintln! ("[dd] [df531ca1]  **  {}", _route.path);
 					}
 				}
+				$crate::hss::ServerResult::Ok (())
 			}
 		}
 	};

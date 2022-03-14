@@ -7,7 +7,7 @@
 
 fn main () -> ::hyper_static_server::hss::ServerResult {
 	
-	let _routes = Routes::new ();
+	let _routes = Routes::new () ?;
 	
 	return ::hyper_static_server::main (_routes);
 }
