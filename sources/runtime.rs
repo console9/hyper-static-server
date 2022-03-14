@@ -11,12 +11,26 @@ use ::std::{
 
 
 
-pub struct RouteDebug {
+pub trait StaticResource {
+}
+
+
+pub trait StaticRoute {
+}
+
+
+pub trait StaticRoutes {
+}
+
+
+
+
+pub struct StaticRouteDebug {
 	pub debug : Box<dyn fmt::Debug + Send + Sync>,
 }
 
 
-impl RouteDebug {
+impl StaticRouteDebug {
 	
 	pub fn new (_debug : impl fmt::Debug + Send + Sync + 'static) -> Self {
 		Self {
@@ -26,7 +40,7 @@ impl RouteDebug {
 }
 
 
-impl fmt::Debug for RouteDebug {
+impl fmt::Debug for StaticRouteDebug {
 	
 	fn fmt (&self, _formatter : &mut fmt::Formatter) -> Result<(), fmt::Error> {
 		self.debug.deref () .fmt (_formatter)

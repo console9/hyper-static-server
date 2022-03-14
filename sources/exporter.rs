@@ -20,7 +20,7 @@ use ::cpio::newc as cpio;
 
 use crate::{
 		
-		RouteDebug,
+		StaticRouteDebug,
 		
 	};
 
@@ -48,7 +48,7 @@ pub fn export_routes_debug (_routes : impl Into<hss::Routes>, _output : impl io:
 	
 	let mut _consumer = |_route : &hss::Route, _content_type : hss::ContentType, _content_buffer : Vec<u8>| {
 			
-			if let Some (_debug) = _route.extensions.get::<RouteDebug> () {
+			if let Some (_debug) = _route.extensions.get::<StaticRouteDebug> () {
 				write! (_output, "**  {} -> {:?}\n", _route.path, _debug) .or_wrap (0x99260590) ?;
 			} else {
 				write! (_output, "**  {}\n", _route.path) .or_wrap (0xb7ff2169) ?;

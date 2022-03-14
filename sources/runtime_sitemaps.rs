@@ -22,6 +22,12 @@ use crate::hss::{
 	};
 
 
+use crate::{
+		
+		StaticResource,
+		
+	};
+
 
 
 pub enum SitemapFormat {
@@ -176,6 +182,10 @@ impl RoutesSitemapResource {
 			};
 		Ok (_self)
 	}
+}
+
+
+impl StaticResource for RoutesSitemapResource {
 }
 
 

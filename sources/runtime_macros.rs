@@ -57,6 +57,9 @@ macro_rules! askama {
 			}
 		}
 		
+		impl $crate::StaticResource for $_resource_name {
+		}
+		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
 			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::ServerResult {
@@ -131,6 +134,9 @@ macro_rules! askama_with_title_and_body {
 			}
 		}
 		
+		impl $crate::StaticResource for $_resource_name {
+		}
+		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
 			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::ServerResult {
@@ -192,6 +198,9 @@ macro_rules! resource {
 						);
 		}
 		
+		impl $crate::StaticResource for $_resource_name {
+		}
+		
 		impl $crate::hss::Handler for $_resource_name {
 			
 			type Future = <$crate::hss::EmbeddedResource as $crate::hss::Handler>::Future;
@@ -237,6 +246,9 @@ macro_rules! resource {
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				self
 			}
+		}
+		
+		impl $crate::StaticResource for $_resource_name {
 		}
 		
 		impl $crate::hss::Handler for $_resource_name {
@@ -290,13 +302,14 @@ macro_rules! route {
 	( $_route_name : ident, $_resource_name : ty, $_route_path : literal, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_route_name ();
+		pub(crate) struct $_route_name ($crate::hss::Route);
 		
 		impl $_route_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<$crate::hss::Route> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
 				use ::std::convert::From as _;
 				let _resource = <$_resource_name>::new (_extensions) ?;
+				let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = Description (_resource.description ());
 				struct Description (&'static str);
@@ -307,16 +320,24 @@ macro_rules! route {
 				}
 				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ());
 				let mut _extensions = $crate::route_extensions! ($_route_extensions);
-				if _extensions.get::<$crate::RouteDebug> () .is_none () {
-					_extensions.insert ($crate::RouteDebug::new (_description));
+				if _extensions.get::<$crate::StaticRouteDebug> () .is_none () {
+					_extensions.insert ($crate::StaticRouteDebug::new (_description));
 				}
 				let mut _route = $crate::hss::Route {
 						path : _path,
 						handler : _handler,
 						extensions : _extensions,
 					};
-				$crate::hss::ServerResult::Ok (_route)
+				let _self = Self (_route);
+				$crate::hss::ServerResult::Ok (_self)
 			}
+			
+			pub fn into_route (self) -> $crate::hss::Route {
+				self.0
+			}
+		}
+		
+		impl $crate::StaticRoute for $_route_name {
 		}
 	};
 }
@@ -332,16 +353,17 @@ macro_rules! route_sitemap {
 	( $_route_name : ident, $_route_path : literal, $_prefix : literal, $_format : ident, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_route_name ();
+		pub(crate) struct $_route_name ($crate::hss::Route);
 		
 		impl $_route_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<$crate::hss::Route> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
 				use ::std::convert::From as _;
 				use $crate::hss::HandlerSimpleSync as _;
 				let _prefix = ::std::string::String::from ($_prefix);
 				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
 				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format, ::std::option::Option::Some (_extensions)) ?;
+				let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = Description ();
 				struct Description ();
@@ -352,16 +374,24 @@ macro_rules! route_sitemap {
 				}
 				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.wrap ()) .into_arc ());
 				let mut _extensions = $crate::route_extensions! ($_route_extensions);
-				if _extensions.get::<$crate::RouteDebug> () .is_none () {
-					_extensions.insert ($crate::RouteDebug::new (_description));
+				if _extensions.get::<$crate::StaticRouteDebug> () .is_none () {
+					_extensions.insert ($crate::StaticRouteDebug::new (_description));
 				}
 				let mut _route = $crate::hss::Route {
 						path : _path,
 						handler : _handler,
 						extensions : _extensions,
 					};
-				$crate::hss::ServerResult::Ok (_route)
+				let _self = Self (_route);
+				$crate::hss::ServerResult::Ok (_self)
 			}
+			
+			pub fn into_route (self) -> $crate::hss::Route {
+				self.0
+			}
+		}
+		
+		impl $crate::StaticRoute for $_route_name {
 		}
 	};
 }
@@ -407,7 +437,7 @@ macro_rules! route_extensions_insert {
 macro_rules! route_extensions_insert_one {
 	
 	( $_extensions : ident, debug, $_debug : expr ) => {
-		$_extensions.insert ($crate::RouteDebug::new ($_debug));
+		$_extensions.insert ($crate::StaticRouteDebug::new ($_debug));
 	};
 	
 	( $_extensions : ident, sitemap ) => {
@@ -479,7 +509,14 @@ macro_rules! routes {
 				let _extensions_none = $crate::hss::Extensions::new ();
 				let _extensions = _extensions.unwrap_or (&_extensions_none);
 				let _routes = ::std::vec! (
-						$( <$_route>::new (_extensions) ?, )*
+						$(
+							{
+								let _route : $_route = <$_route>::new (_extensions) ?;
+								let _ : &dyn $crate::StaticRoute = &_route;
+								let _route = _route.into_route ();
+								_route
+							},
+						)*
 					);
 				$crate::hss::ServerResult::Ok (_routes)
 			}
@@ -491,7 +528,7 @@ macro_rules! routes {
 				use ::std::iter::IntoIterator as _;
 				let _routes = Self::routes () ?;
 				for _route in _routes.into_iter () {
-					if let ::std::option::Option::Some (_debug) = _route.extensions.get::<$crate::RouteDebug> () {
+					if let ::std::option::Option::Some (_debug) = _route.extensions.get::<$crate::StaticRouteDebug> () {
 						::std::eprintln! ("[dd] [825798f8]  **  {} -> {:?}", _route.path, _debug);
 					} else {
 						::std::eprintln! ("[dd] [df531ca1]  **  {}", _route.path);
