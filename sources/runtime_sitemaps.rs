@@ -22,7 +22,7 @@ use crate::hss::{
 	};
 
 
-use crate::{
+use crate::runtime::{
 		
 		StaticResource,
 		
@@ -182,10 +182,40 @@ impl RoutesSitemapResource {
 			};
 		Ok (_self)
 	}
+	
+	pub fn into_handler (self) -> impl hss::Handler {
+		hss::HandlerSimpleSyncWrapper::new (self)
+	}
 }
 
 
 impl StaticResource for RoutesSitemapResource {
+	
+	fn content_type (&self) -> hss::ContentType {
+		match self.format {
+			#[ cfg (feature = "runtime-sitemaps-xml") ]
+			SitemapFormat::Xml =>
+				hss::ContentType::Xml,
+			SitemapFormat::Text =>
+				hss::ContentType::Text,
+		}
+	}
+	
+	fn description (&self) -> &'static str {
+		match self.format {
+			#[ cfg (feature = "runtime-sitemaps-xml") ]
+			SitemapFormat::Xml =>
+				"sitemap (xml)",
+			SitemapFormat::Text =>
+				"sitemap (text)",
+		}
+	}
+	
+	fn into_handler_dyn (self) -> hss::HandlerDynArc {
+		let _handler = self.into_handler ();
+		let _handler = hss::HandlerDynArc::new (_handler);
+		_handler
+	}
 }
 
 

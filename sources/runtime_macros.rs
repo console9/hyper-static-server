@@ -44,26 +44,33 @@ macro_rules! askama {
 						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x60beda55, _error)))
 			}
 			
-			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::resource_content_type! ($_content_type)
-			}
-			
-			pub fn description (&self) -> &'static str {
-				$_description
-			}
-			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)
 			}
 		}
 		
 		impl $crate::StaticResource for $_resource_name {
+			
+			fn content_type (&self) -> $crate::hss::ContentType {
+				$crate::resource_content_type! ($_content_type)
+			}
+			
+			fn description (&self) -> &'static str {
+				$_description
+			}
+			
+			fn into_handler_dyn (self) -> $crate::hss::HandlerDynArc {
+				let _handler = self.into_handler ();
+				let _handler = $crate::hss::HandlerDynArc::new (_handler);
+				_handler
+			}
 		}
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
 			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::ServerResult {
 				use $crate::hss::ResponseExt as _;
+				use $crate::StaticResource as _;
 				let _body = self.render () ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
@@ -121,26 +128,33 @@ macro_rules! askama_with_title_and_body {
 						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x28df3421, _error)))
 			}
 			
-			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::resource_content_type! ($_content_type)
-			}
-			
-			pub fn description (&self) -> &'static str {
-				$_description
-			}
-			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)
 			}
 		}
 		
 		impl $crate::StaticResource for $_resource_name {
+			
+			fn content_type (&self) -> $crate::hss::ContentType {
+				$crate::resource_content_type! ($_content_type)
+			}
+			
+			fn description (&self) -> &'static str {
+				$_description
+			}
+			
+			fn into_handler_dyn (self) -> $crate::hss::HandlerDynArc {
+				let _handler = self.into_handler ();
+				let _handler = $crate::hss::HandlerDynArc::new (_handler);
+				_handler
+			}
 		}
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
 			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::ServerResult {
 				use $crate::hss::ResponseExt as _;
+				use $crate::StaticResource as _;
 				let _body = self.render () ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
@@ -179,19 +193,11 @@ macro_rules! resource {
 				$crate::hss::ServerResult::Ok (_self)
 			}
 			
-			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::resource_content_type! ($_content_type)
-			}
-			
-			pub fn description (&self) -> &'static str {
-				$_description
-			}
-			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				self
 			}
 			
-			pub const RESOURCE : $crate::hss::EmbeddedResource =
+			const RESOURCE : $crate::hss::EmbeddedResource =
 					$crate::hss::EmbeddedResource::new_const (
 							::std::include_bytes! ($crate::resource_path! ($_resource_path)),
 							::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
@@ -199,6 +205,20 @@ macro_rules! resource {
 		}
 		
 		impl $crate::StaticResource for $_resource_name {
+			
+			fn content_type (&self) -> $crate::hss::ContentType {
+				$crate::resource_content_type! ($_content_type)
+			}
+			
+			fn description (&self) -> &'static str {
+				$_description
+			}
+			
+			fn into_handler_dyn (self) -> $crate::hss::HandlerDynArc {
+				let _handler = self.into_handler ();
+				let _handler = $crate::hss::HandlerDynArc::new (_handler);
+				_handler
+			}
 		}
 		
 		impl $crate::hss::Handler for $_resource_name {
@@ -235,20 +255,26 @@ macro_rules! resource {
 				$crate::hss::ServerResult::Ok (_self)
 			}
 			
-			pub fn content_type (&self) -> $crate::hss::ContentType {
-				$crate::resource_content_type! ($_content_type)
-			}
-			
-			pub fn description (&self) -> &'static str {
-				$_description
-			}
-			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				self
 			}
 		}
 		
 		impl $crate::StaticResource for $_resource_name {
+			
+			fn content_type (&self) -> $crate::hss::ContentType {
+				$crate::resource_content_type! ($_content_type)
+			}
+			
+			fn description (&self) -> &'static str {
+				$_description
+			}
+			
+			fn into_handler_dyn (self) -> $crate::hss::HandlerDynArc {
+				let _handler = self.into_handler ();
+				let _handler = $crate::hss::HandlerDynArc::new (_handler);
+				_handler
+			}
 		}
 		
 		impl $crate::hss::Handler for $_resource_name {
@@ -268,34 +294,6 @@ macro_rules! resource {
 
 
 #[ macro_export ]
-macro_rules! resource_content_type {
-	
-	( text ) => { $crate::hss::ContentType::Text };
-	( html ) => { $crate::hss::ContentType::Html };
-	( css ) => { $crate::hss::ContentType::Css };
-	( js ) => { $crate::hss::ContentType::Js };
-	
-	( json ) => { $crate::hss::ContentType::Json };
-	( xml ) => { $crate::hss::ContentType::Xml };
-	
-	( png ) => { $crate::hss::ContentType::Png };
-	( jpeg ) => { $crate::hss::ContentType::Jpeg };
-	( svg ) => { $crate::hss::ContentType::Svg };
-	( icon ) => { $crate::hss::ContentType::Icon };
-	
-	( font_ttf ) => { $crate::hss::ContentType::FontTtf };
-	( font_otf ) => { $crate::hss::ContentType::FontOtf };
-	( font_woff ) => { $crate::hss::ContentType::FontWoff };
-	( font_woff2 ) => { $crate::hss::ContentType::FontWoff2 };
-	
-	( unknown ) => { $crate::hss::ContentType::Unknown };
-	
-}
-
-
-
-
-#[ macro_export ]
 macro_rules! route {
 	
 	
@@ -308,20 +306,15 @@ macro_rules! route {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
 				use ::std::convert::From as _;
+				use $crate::StaticResource as _;
 				let _resource = <$_resource_name>::new (_extensions) ?;
-				let _ : &dyn $crate::StaticResource = &_resource;
+			//	let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
-				let _description = Description (_resource.description ());
-				struct Description (&'static str);
-				impl ::std::fmt::Debug for Description {
-					fn fmt (&self, _formatter : &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-						_formatter.write_str (self.0)
-					}
-				}
-				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.into_handler ()) .into_arc ());
+				let _description = _resource.description ();
+				let _handler = $crate::hss::RouteHandler::HandlerDynArc (_resource.into_handler_dyn () .into_arc ());
 				let mut _extensions = $crate::route_extensions! ($_route_extensions);
 				if _extensions.get::<$crate::StaticRouteDebug> () .is_none () {
-					_extensions.insert ($crate::StaticRouteDebug::new (_description));
+					_extensions.insert ($crate::StaticRouteDebug::from_str_static (_description));
 				}
 				let mut _route = $crate::hss::Route {
 						path : _path,
@@ -331,13 +324,21 @@ macro_rules! route {
 				let _self = Self (_route);
 				$crate::hss::ServerResult::Ok (_self)
 			}
+		}
+		
+		impl $crate::StaticRoute for $_route_name {
 			
-			pub fn into_route (self) -> $crate::hss::Route {
+			fn into_route (self) -> $crate::hss::Route {
 				self.0
 			}
 		}
 		
-		impl $crate::StaticRoute for $_route_name {
+		impl ::std::convert::Into<$crate::hss::Route> for $_route_name {
+			
+			fn into (self) -> $crate::hss::Route {
+				use $crate::StaticRoute as _;
+				self.into_route ()
+			}
 		}
 	};
 }
@@ -359,23 +360,17 @@ macro_rules! route_sitemap {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
 				use ::std::convert::From as _;
-				use $crate::hss::HandlerSimpleSync as _;
+				use $crate::StaticResource as _;
 				let _prefix = ::std::string::String::from ($_prefix);
 				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
 				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format, ::std::option::Option::Some (_extensions)) ?;
-				let _ : &dyn $crate::StaticResource = &_resource;
+			//	let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
-				let _description = Description ();
-				struct Description ();
-				impl ::std::fmt::Debug for Description {
-					fn fmt (&self, _formatter : &mut ::std::fmt::Formatter<'_>) -> ::std::result::Result<(), ::std::fmt::Error> {
-						_formatter.write_fmt (::std::format_args! ("sitemap ({})", ::std::stringify! ($_format)))
-					}
-				}
-				let _handler = $crate::hss::RouteHandler::HandlerDynArc ($crate::hss::HandlerDynArc::new (_resource.wrap ()) .into_arc ());
+				let _description = _resource.description ();
+				let _handler = $crate::hss::RouteHandler::HandlerDynArc (_resource.into_handler_dyn () .into_arc ());
 				let mut _extensions = $crate::route_extensions! ($_route_extensions);
 				if _extensions.get::<$crate::StaticRouteDebug> () .is_none () {
-					_extensions.insert ($crate::StaticRouteDebug::new (_description));
+					_extensions.insert ($crate::StaticRouteDebug::from_str_static (_description));
 				}
 				let mut _route = $crate::hss::Route {
 						path : _path,
@@ -385,13 +380,21 @@ macro_rules! route_sitemap {
 				let _self = Self (_route);
 				$crate::hss::ServerResult::Ok (_self)
 			}
+		}
+		
+		impl $crate::StaticRoute for $_route_name {
 			
-			pub fn into_route (self) -> $crate::hss::Route {
+			fn into_route (self) -> $crate::hss::Route {
 				self.0
 			}
 		}
 		
-		impl $crate::StaticRoute for $_route_name {
+		impl ::std::convert::Into<$crate::hss::Route> for $_route_name {
+			
+			fn into (self) -> $crate::hss::Route {
+				use $crate::StaticRoute as _;
+				self.into_route ()
+			}
 		}
 	};
 }
@@ -478,24 +481,24 @@ macro_rules! routes {
 	( $_name : ident, [ $( $_route : ty, )* ] ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_name ();
+		pub(crate) struct $_name ($crate::hss::Routes);
 		
 		impl $_name {
 			
-			pub fn new () -> $crate::hss::ServerResult<$crate::hss::Routes> {
+			pub fn new () -> $crate::hss::ServerResult<Self> {
 				Self::new_with_extensions (::std::option::Option::None)
 			}
 			
-			pub fn new_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::ServerResult<$crate::hss::Routes> {
+			pub fn new_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::ServerResult<Self> {
 				use ::std::iter::IntoIterator as _;
-				use $crate::hss::ResultExtPanic as _;
 				let _routes = Self::routes_with_extensions (_extensions) ?;
 				let mut _builder = $crate::hss::RoutesBuilder::new ();
 				for _route in _routes.into_iter () {
 					_builder = _builder.with_route_object (_route);
 				}
 				let _routes = _builder.build () ?;
-				$crate::hss::ServerResult::Ok (_routes)
+				let _self = Self (_routes);
+				$crate::hss::ServerResult::Ok (_self)
 			}
 		}
 		
@@ -506,19 +509,35 @@ macro_rules! routes {
 			}
 			
 			pub fn routes_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::ServerResult<::std::vec::Vec<$crate::hss::Route>> {
+				use $crate::StaticRoute as _;
 				let _extensions_none = $crate::hss::Extensions::new ();
 				let _extensions = _extensions.unwrap_or (&_extensions_none);
 				let _routes = ::std::vec! (
 						$(
 							{
 								let _route : $_route = <$_route>::new (_extensions) ?;
-								let _ : &dyn $crate::StaticRoute = &_route;
+							//	let _ : &dyn $crate::StaticRoute = &_route;
 								let _route = _route.into_route ();
 								_route
 							},
 						)*
 					);
 				$crate::hss::ServerResult::Ok (_routes)
+			}
+		}
+		
+		impl $crate::StaticRoutes for $_name {
+			
+			fn into_routes (self) -> $crate::hss::Routes {
+				self.0
+			}
+		}
+		
+		impl ::std::convert::Into<$crate::hss::Routes> for $_name {
+			
+			fn into (self) -> $crate::hss::Routes {
+				use $crate::StaticRoutes as _;
+				self.into_routes ()
 			}
 		}
 		
@@ -571,6 +590,34 @@ macro_rules! dependencies {
 			}
 		}
 	};
+}
+
+
+
+
+#[ macro_export ]
+macro_rules! resource_content_type {
+	
+	( text ) => { $crate::hss::ContentType::Text };
+	( html ) => { $crate::hss::ContentType::Html };
+	( css ) => { $crate::hss::ContentType::Css };
+	( js ) => { $crate::hss::ContentType::Js };
+	
+	( json ) => { $crate::hss::ContentType::Json };
+	( xml ) => { $crate::hss::ContentType::Xml };
+	
+	( png ) => { $crate::hss::ContentType::Png };
+	( jpeg ) => { $crate::hss::ContentType::Jpeg };
+	( svg ) => { $crate::hss::ContentType::Svg };
+	( icon ) => { $crate::hss::ContentType::Icon };
+	
+	( font_ttf ) => { $crate::hss::ContentType::FontTtf };
+	( font_otf ) => { $crate::hss::ContentType::FontOtf };
+	( font_woff ) => { $crate::hss::ContentType::FontWoff };
+	( font_woff2 ) => { $crate::hss::ContentType::FontWoff2 };
+	
+	( unknown ) => { $crate::hss::ContentType::Unknown };
+	
 }
 
 
