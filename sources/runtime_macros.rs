@@ -29,9 +29,10 @@ macro_rules! askama {
 		impl $_resource_name {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _context = <$_context_name as $crate::StaticAskamaContext>::new_with_extensions (_extensions) ?;
 				let _self = Self {
 						template : $_template_name {
-								context : (), // FIXME!
+								context : _context,
 								__is_production : cfg! (feature = "production"),
 								__is_development : cfg! (not (feature = "production")),
 							},
@@ -111,9 +112,10 @@ macro_rules! askama_with_title_and_body {
 		impl $_resource_name {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _context = <$_context_name as $crate::StaticAskamaContext>::new_with_extensions (_extensions) ?;
 				let _self = Self {
 						template : $_template_name {
-								context : (), // FIXME!
+								context : _context,
 								title : $_title,
 								body : ::std::include_str! ($_body_path),
 								__is_production : cfg! (feature = "production"),

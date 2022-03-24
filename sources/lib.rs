@@ -65,6 +65,15 @@ pub use crate::runtime::*;
 
 
 #[ cfg (feature = "runtime") ]
+#[ cfg (feature = "runtime-askama") ]
+pub(crate) mod runtime_askama;
+
+#[ cfg (feature = "runtime") ]
+#[ cfg (feature = "runtime-askama") ]
+pub use crate::runtime_askama::*;
+
+
+#[ cfg (feature = "runtime") ]
 #[ cfg (feature = "runtime-sitemaps") ]
 pub(crate) mod runtime_sitemaps;
 
