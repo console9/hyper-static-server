@@ -421,11 +421,29 @@ impl Builder {
 		
 		self.dependencies_include (_source_markdown) ?;
 		
-		let (_markdown_title, _markdown_body) = self.compile_markdown (_source_markdown, false, true) ?;
+		let (_markdown_title, _markdown_body, _markdown_frontmatter) = self.compile_markdown (_source_markdown, false, true) ?;
 		let _markdown_title = _markdown_title.unwrap_or (String::new ());
 		
 		let _output_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
 		create_file_from_str (&_output_markdown, &_markdown_body) ?;
+		
+		let _output_frontmatter = if let Some ((_type, _data)) = _markdown_frontmatter {
+			let _extension = match _type.as_ref () {
+				"toml" =>
+					"toml",
+				"yaml" =>
+					"yaml",
+				"json" =>
+					"json",
+				_ =>
+					return Err (error_with_format (0x75f4427f, format_args! ("{}", _type))),
+			};
+			let _path = self.configuration.outputs.join (fingerprint_data (&_data)) .with_extension (_extension);
+			create_file_from_str (&_path, &_data) ?;
+			Some ((_extension, _path))
+		} else {
+			None
+		};
 		
 		let _route = _route_builder.build (&_relative_markdown_1, _source_markdown, _route_base, None) ?;
 		let _extensions = _extensions_builder.build () ?;
@@ -441,7 +459,11 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
+			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {} : (deserialize, {:?}, {:?}), {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _context_encoding, _context_path, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+		} else {
+			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+		}
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
 		
 		Ok (())
@@ -523,7 +545,7 @@ impl Builder {
 			let _header_data = _header_data.map (String::as_str) .unwrap_or ("");
 			let _footer_data = _footer_data.map (String::as_str) .unwrap_or ("");
 			
-			let (_title, _contents_data) = self.compile_markdown (&_source, false, true) ?;
+			let (_title, _contents_data, _frontmatter) = self.compile_markdown (&_source, false, true) ?;
 			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
 			let _title = {
 				let mut _buffer = String::with_capacity (_title.len () * 3 / 2);
@@ -538,7 +560,7 @@ impl Builder {
 			_buffer
 			
 		} else {
-			let (_title, _contents_data) = self.compile_markdown (&_source, true, true) ?;
+			let (_title, _contents_data, _frontmatter) = self.compile_markdown (&_source, true, true) ?;
 			_contents_data
 		};
 		
@@ -1192,9 +1214,70 @@ impl Builder {
 impl Builder {
 	
 	
-	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _title_detect : bool) -> BuilderResult<(Option<String>, String)> {
+	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _title_detect : bool) -> BuilderResult<(Option<String>, String, Option<(String, String)>)> {
 		
 		let _input = fs::read_to_string (_source) ?;
+		
+		let mut _input : Vec<&str> = _input.lines () .skip_while (|_line| _line.is_empty ()) .collect ();
+		while let Some (_line) = _input.last () {
+			if _line.is_empty () {
+				_input.pop ();
+			} else {
+				break;
+			}
+		}
+		
+		if _input.is_empty () {
+			return Err (error_with_code (0x1fc18809));
+		}
+		
+		let (_input, _frontmatter) = {
+			let _detected = if let Some (_line) = _input.first () {
+				let _line_trimmed = _line.trim ();
+				match _line_trimmed {
+					"+++" =>
+						Some (("toml", "+++")),
+					"---" =>
+						Some (("yaml", "---")),
+					"{{{" =>
+						Some (("json", "}}}")),
+					_ =>
+						None,
+				}
+			} else {
+				None
+			};
+			if let Some ((_type, _marker)) = _detected {
+				let mut _input = _input.into_iter ();
+				let mut _frontmatter = Vec::new ();
+				let mut _frontmatter_is_empty = true;
+				_input.next ();
+				while let Some (_line) = _input.next () {
+					let _line_trimmed = _line.trim ();
+					if _line_trimmed == _marker {
+						break;
+					} else {
+						_frontmatter.push (_line);
+						if ! _line_trimmed.is_empty () {
+							_frontmatter_is_empty = false;
+						}
+					}
+				}
+				let _input : Vec<&str> = _input.collect ();
+				let _frontmatter = if ! _frontmatter_is_empty {
+					let _type = String::from (_type);
+					let _frontmatter = _frontmatter.join ("\n");
+					Some ((_type, _frontmatter))
+				} else {
+					None
+				};
+				(_input, _frontmatter)
+			} else {
+				(_input, None)
+			}
+		};
+		
+		let _input = _input.join ("\n");
 		
 		let mut _options = cmark::Options::empty ();
 		_options.insert (cmark::Options::ENABLE_TABLES);
@@ -1234,7 +1317,7 @@ impl Builder {
 		cmark::html::push_html (&mut _contents, _parser);
 		
 		if ! _html_wrapper {
-			return Ok ((_title, _contents));
+			return Ok ((_title, _contents, _frontmatter));
 		}
 		
 		let mut _output = String::with_capacity (_contents.len () + 1024);
@@ -1262,7 +1345,7 @@ impl Builder {
 			_output.push_str ("</html>\n");
 		}
 		
-		Ok ((_title, _output))
+		Ok ((_title, _output, _frontmatter))
 	}
 }
 
