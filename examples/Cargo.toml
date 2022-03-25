@@ -19,6 +19,7 @@ server = [
 	"hyper-static-server/server",
 	"hyper-static-server/runtime-macros",
 	"hyper-static-server/runtime-askama",
+	"hyper-static-server/runtime-askama-serde",
 	"hyper-static-server/runtime-sitemaps",
 	"hyper-static-server/runtime-sitemaps-xml",
 ]
@@ -26,6 +27,7 @@ exporter = [
 	"hyper-static-server/exporter",
 	"hyper-static-server/runtime-macros",
 	"hyper-static-server/runtime-askama",
+	"hyper-static-server/runtime-askama-serde",
 	"hyper-static-server/runtime-sitemaps",
 	"hyper-static-server/runtime-sitemaps-xml",
 ]
@@ -33,6 +35,7 @@ exporter = [
 [dependencies]
 hyper-static-server = { version = "0.4.0", default-features = false, features = [] }
 askama = { package = "askama_patched", version = "*", default-features = true }
+serde = { version = "1.0.136", default-features = true }
 
 [build-dependencies]
 hyper-static-server = { version = "0.4.0", default-features = false, features = [

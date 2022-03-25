@@ -51,6 +51,7 @@ default = [
 	"runtime",
 	"runtime-macros",
 	"runtime-askama",
+	"runtime-askama-serde",
 	"runtime-sitemaps",
 	"runtime-sitemaps-xml",
 #!	"runtime-hss-exports",
@@ -93,6 +94,14 @@ runtime-macros = [
 
 runtime-askama = [
 	"runtime",
+]
+
+runtime-askama-serde = [
+	"runtime-askama",
+	"serde",
+	"toml",
+	"serde_yaml",
+	"serde_json",
 ]
 
 runtime-sitemaps = [
@@ -189,6 +198,10 @@ url = { version = "2.2.2", default-features = false, optional = true }
 sitewriter = { version = "0.5.1", default-features = false, optional = true }
 blake2 = { version = "0.9.1", default-features = false, features = ["std"], optional = true }
 cpio = { version = "0.2.1", default-features = false, optional = true }
+serde = { version = "1.0.136", default-features = false, features = ["std"], optional = true }
+serde_json = { version = "1.0.79", default-features = false, features = ["std"], optional = true }
+serde_yaml = { version = "0.8.23", default-features = false, features = [], optional = true }
+toml = { version = "0.5.8", default-features = false, features = [], optional = true }
 
 
 
