@@ -9,7 +9,14 @@
 macro_rules! askama {
 	
 	
-	( $_resource_name : ident, $_template_name : ident, $_context_name : ty, $_content_type : tt, $_template_path : literal, $_description : literal ) => {
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_name : ty $( : $_context_constructor : tt )?,
+			$_content_type : tt,
+			$_template_path : literal,
+			$_description : literal
+	) => {
 		
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
@@ -29,7 +36,7 @@ macro_rules! askama {
 		impl $_resource_name {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
-				let _context = <$_context_name as $crate::StaticAskamaContext>::new_with_extensions (_extensions) ?;
+				let _context = $crate::askama_context_new! ($_context_name $(, $_context_constructor )?, _extensions) ?;
 				let _self = Self {
 						template : $_template_name {
 								context : _context,
@@ -90,7 +97,16 @@ macro_rules! askama {
 macro_rules! askama_with_title_and_body {
 	
 	
-	( $_resource_name : ident, $_template_name : ident, $_context_name : ty, $_content_type : tt, $_template_path : literal, $_title : literal, $_body_path : literal, $_description : literal ) => {
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_name : ty $( : $_context_constructor : tt )?,
+			$_content_type : tt,
+			$_template_path : literal,
+			$_title : literal,
+			$_body_path : literal,
+			$_description : literal
+	) => {
 		
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
@@ -112,7 +128,7 @@ macro_rules! askama_with_title_and_body {
 		impl $_resource_name {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
-				let _context = <$_context_name as $crate::StaticAskamaContext>::new_with_extensions (_extensions) ?;
+				let _context = $crate::askama_context_new! ($_context_name $(, $_context_constructor )?, _extensions) ?;
 				let _self = Self {
 						template : $_template_name {
 								context : _context,
@@ -165,6 +181,30 @@ macro_rules! askama_with_title_and_body {
 			}
 		}
 	};
+}
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama_context_new {
+	
+	( $_context_name : ty, $_extensions : expr ) => {
+		{
+			let _extensions : &$crate::hss::Extensions = $_extensions;
+			<$_context_name as $crate::StaticAskamaContext>::new_with_extensions (_extensions)
+		}
+	};
+	
+	( $_context_name : ty, (deserialize, $_context_encoding : literal, $_context_path : literal ), $_extensions : expr ) => {
+		{
+			let _encoding : &str = $_context_encoding;
+			let _data : &[u8] = ::std::include_bytes! ($_context_path);
+			let _extensions : &$crate::hss::Extensions = $_extensions;
+			<$_context_name as $crate::StaticAskamaContext>::new_with_deserialization (_encoding, _data, _extensions)
+		}
+	}
 }
 
 
