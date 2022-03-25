@@ -9,6 +9,7 @@
 	runtime
 	runtime-macros
 	runtime-askama
+	runtime-askama-serde
 	runtime-sitemaps
 	runtime-sitemaps-xml
 	runtime-hss-exports
