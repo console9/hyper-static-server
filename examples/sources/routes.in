@@ -28,6 +28,14 @@
 	markdown_askama! ({"./markdown/hello.md", template : "_/markdown.html"} => "/hello-with-askama");
 	markdown_askama! ({"./markdown/hello.md", template : "_/markdown.html", context : ()} => "/hello-with-askama-with-context");
 	
+	markdown! ("./markdown/with-frontmatter-toml.md" => "/with-frontmatter-toml-simple");
+	markdown! ("./markdown/with-frontmatter-yaml.md" => "/with-frontmatter-yaml-simple");
+	markdown! ("./markdown/with-frontmatter-json.md" => "/with-frontmatter-json-simple");
+	
+	markdown_askama! ({"./markdown/with-frontmatter-toml.md", template : "_/markdown-with-frontmatter.html", context : MarkdownWithFrontmatterContext} => "/with-frontmatter-toml-askama");
+	markdown_askama! ({"./markdown/with-frontmatter-yaml.md", template : "_/markdown-with-frontmatter.html", context : MarkdownWithFrontmatterContext} => "/with-frontmatter-yaml-askama");
+	markdown_askama! ({"./markdown/with-frontmatter-json.md", template : "_/markdown-with-frontmatter.html", context : MarkdownWithFrontmatterContext} => "/with-frontmatter-json-askama");
+	
 	assets! ({"./markdown", glob : "*.md"} => "/md-text");
 	markdowns! ({"./markdown", glob : "*.md"} => "/md-simple");
 	markdowns! ({"./markdown", glob : "*.md", header : "./markdown/_header.html", footer : "./markdown/_footer.html"} => "/md-with-header-footer");
