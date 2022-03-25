@@ -34,6 +34,7 @@ exporter = [
 
 [dependencies]
 hyper-static-server = { version = "0.4.0", default-features = false, features = [] }
+# askama = { version = "0.10.5", default-features = true }
 askama = { package = "askama_patched", version = "*", default-features = true }
 serde = { version = "1.0.136", default-features = true }
 
