@@ -237,7 +237,7 @@ impl Builder {
 		Self {
 				configuration : _configuration,
 				generated : String::with_capacity (1024 * 1024),
-				counter : 0,
+				counter : 1,
 				route_names : Vec::new (),
 				dependencies : BTreeSet::new (),
 			}
@@ -284,7 +284,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "builder-askama") ]
-	pub fn route_askama (&mut self, _source_0 : &str, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_askama (&mut self, _source_0 : &str, _context : Option<(&str, Option<&str>)>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source_0) ?;
@@ -295,7 +295,7 @@ impl Builder {
 	}
 	
 	#[ cfg (feature = "builder-askama") ]
-	pub fn route_askamas (&mut self, _sources_0 : &str, _glob : Option<&str>, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_askamas (&mut self, _sources_0 : &str, _glob : Option<&str>, _context : Option<(&str, Option<&str>)>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_templates_sources, _sources_0, _glob) ?;
@@ -314,7 +314,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "builder-askama") ]
-	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _context : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+	fn route_askama_0 (&mut self, _relative : &Path, _source : &Path, _context : Option<(&str, Option<&str>)>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_1 = _relative.with_extension ("");
 		
@@ -335,7 +335,22 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		self.dependencies_include (&_source) ?;
 		
-		writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _description) .infallible (0x35966385);
+		let (_context_type, _context_path) = _context.unwrap_or (("()", None));
+		if let Some (_context_path) = _context_path {
+			let _sources = self.configuration.sources.as_ref () .map (PathBuf::as_path);
+			let (_, _context_path) = self.resolve_file (_sources, _context_path) ?;
+			let _context_encoding = match _context_path.extension () .or_wrap (0x70d90b37) ? .to_str () .or_wrap (0xa22f0541) ? {
+				"toml" => "toml",
+				"yaml" => "yaml",
+				"json" => "json",
+				_ =>
+					return Err (error_with_format (0xcbc42494, format_args! ("{}", _context_path.display ()))),
+			};
+			self.dependencies_include (&_context_path) ?;
+			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _description) .infallible (0x35966385);
+		} else {
+			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _description) .infallible (0x35966385);
+		}
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
 		
 		Ok (())
@@ -371,7 +386,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _context : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -389,7 +404,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _context : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _context : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -415,7 +430,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _context : &str, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _context : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
 		
@@ -460,9 +475,15 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
-			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _context_encoding, _context_path, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+			if let Some (_context_type) = _context {
+				writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+			} else {
+				let _context_type = _context.unwrap_or ("()");
+				writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+			}
 		} else {
-			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+			let _context_type = _context.unwrap_or ("()");
+			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
 		}
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
 		
