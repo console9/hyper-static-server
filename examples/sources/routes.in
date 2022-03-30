@@ -6,6 +6,10 @@
 	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/askamas-with-context");
 	askamas_watch! ({"_", glob : "*.html-0"});
 	
+	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.toml"} => "/askama-with-context-toml");
+	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.yaml"} => "/askama-with-context-yaml");
+	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/askama-with-context-json");
+	
 	asset_sass! ("_/css/main.scss");
 	assets_watch! ("_/css");
 	
@@ -32,9 +36,9 @@
 	markdown! ("./markdown/with-frontmatter-yaml.md" => "/with-frontmatter-yaml-simple");
 	markdown! ("./markdown/with-frontmatter-json.md" => "/with-frontmatter-json-simple");
 	
-	markdown_askama! ({"./markdown/with-frontmatter-toml.md", template : "_/markdown-with-frontmatter.html", context : MarkdownWithFrontmatterContext} => "/with-frontmatter-toml-askama");
-	markdown_askama! ({"./markdown/with-frontmatter-yaml.md", template : "_/markdown-with-frontmatter.html", context : MarkdownWithFrontmatterContext} => "/with-frontmatter-yaml-askama");
-	markdown_askama! ({"./markdown/with-frontmatter-json.md", template : "_/markdown-with-frontmatter.html", context : MarkdownWithFrontmatterContext} => "/with-frontmatter-json-askama");
+	markdown_askama! ({"./markdown/with-frontmatter-toml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/with-frontmatter-toml-askama");
+	markdown_askama! ({"./markdown/with-frontmatter-yaml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/with-frontmatter-yaml-askama");
+	markdown_askama! ({"./markdown/with-frontmatter-json.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/with-frontmatter-json-askama");
 	
 	assets! ({"./markdown", glob : "*.md"} => "/md-text");
 	markdowns! ({"./markdown", glob : "*.md"} => "/md-simple");

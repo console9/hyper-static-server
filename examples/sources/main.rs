@@ -17,9 +17,9 @@ fn main () -> ::hyper_static_server::hss::ServerResult {
 
 
 #[ derive (::serde::Deserialize) ]
-struct MarkdownWithFrontmatterContext {
+struct ExampleAskamaContext {
 	pub some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
 }
 
-impl ::hyper_static_server::StaticAskamaContextSerde for MarkdownWithFrontmatterContext {}
+impl ::hyper_static_server::StaticAskamaContextSerde for ExampleAskamaContext {}
 

@@ -1,0 +1,4 @@
+[some_map]
+from = "toml"
+key_a = "value_1"
+key_b = "value_2"

@@ -1,0 +1,19 @@
+
+{% extends "_base.html-0" %}
+
+
+{% block head %}
+	<link rel="stylesheet" href="/assets/css/main.css" />
+{% endblock %}
+
+
+{% block page_title %}Example -- Home (with context){% endblock %}
+{% block page_identifier %}home{% endblock %}
+
+
+{% block main %}
+<h1>Example -- Home (with context)</h1>
+Hello world!
+{{ "{:?}"|format(context.some_map) }}
+{% endblock %}
+
