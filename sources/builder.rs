@@ -460,7 +460,7 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
-			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {} : (deserialize, {:?}, {:?}), {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _context_encoding, _context_path, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _context_encoding, _context_path, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
 		} else {
 			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
 		}
