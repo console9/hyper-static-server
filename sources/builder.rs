@@ -70,6 +70,8 @@ pub struct BuilderConfiguration {
 	pub assets_sources : Option<PathBuf>,
 	#[ cfg (feature = "builder-askama") ]
 	pub templates_sources : Option<PathBuf>,
+	#[ cfg (feature = "builder-markdown") ]
+	pub markdowns_sources : Option<PathBuf>,
 	
 	#[ cfg (feature = "builder-assets") ]
 	pub assets_route_base : Option<PathBuf>,
@@ -110,6 +112,11 @@ impl Default for BuilderConfiguration {
 		#[ cfg (feature = "builder-askama") ]
 		let _templates_sources = if _templates_sources.exists () { Some (_templates_sources) } else { None };
 		
+		#[ cfg (feature = "builder-markdown") ]
+		let _markdowns_sources = _sources.join ("./markdown");
+		#[ cfg (feature = "builder-markdown") ]
+		let _markdowns_sources = if _markdowns_sources.exists () { Some (_markdowns_sources) } else { None };
+		
 		let _generated = _outputs.join ("./hss-builder-generated-default.in");
 		
 		#[ cfg (feature = "builder-assets") ]
@@ -136,6 +143,8 @@ impl Default for BuilderConfiguration {
 				assets_sources : _assets_sources,
 				#[ cfg (feature = "builder-askama") ]
 				templates_sources : _templates_sources,
+				#[ cfg (feature = "builder-markdown") ]
+				markdowns_sources : _markdowns_sources,
 				
 				#[ cfg (feature = "builder-assets") ]
 				assets_route_base : _assets_route_base,
@@ -177,6 +186,8 @@ impl BuilderConfiguration {
 				assets_sources : None,
 				#[ cfg (feature = "builder-askama") ]
 				templates_sources : None,
+				#[ cfg (feature = "builder-markdown") ]
+				markdowns_sources : None,
 				
 				#[ cfg (feature = "builder-assets") ]
 				assets_route_base : None,
@@ -338,7 +349,7 @@ impl Builder {
 		let (_context_type, _context_path) = _context.unwrap_or (("()", None));
 		if let Some (_context_path) = _context_path {
 			let _sources = self.configuration.sources.as_ref () .map (PathBuf::as_path);
-			let (_, _context_path) = self.resolve_file (_sources, _context_path) ?;
+			let (_, _context_path) = self.resolve_file (None, _context_path) ?;
 			let _context_encoding = match _context_path.extension () .or_wrap (0x70d90b37) ? .to_str () .or_wrap (0xa22f0541) ? {
 				"toml" => "toml",
 				"yaml" => "yaml",
@@ -395,7 +406,8 @@ impl Builder {
 		
 		self.dependencies_include (&_source_template) ?;
 		
-		let (_relative_markdown, _source_markdown) = self.resolve_file (None, _source_markdown_0) ?;
+		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
+		let (_relative_markdown, _source_markdown) = self.resolve_file (_markdowns_sources, _source_markdown_0) ?;
 		
 		let _route_base = Some (Path::new ("/"));
 		
@@ -413,7 +425,8 @@ impl Builder {
 		
 		self.dependencies_include (&_source_template) ?;
 		
-		let (_files_markdown, _folders_markdown) = self.resolve_files (None, _sources_markdown_0, _glob) ?;
+		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
+		let (_files_markdown, _folders_markdown) = self.resolve_files (_markdowns_sources, _sources_markdown_0, _glob) ?;
 		
 		self.dependencies_include_all (_folders_markdown.iter () .map (PathBuf::as_path)) ?;
 		
@@ -498,7 +511,8 @@ impl Builder {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source) ?;
 		
-		let (_relative, _source) = self.resolve_file (None, _source_0) ?;
+		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
+		let (_relative, _source) = self.resolve_file (_markdowns_sources, _source_0) ?;
 		
 		let _route_base = Some (Path::new ("/"));
 		
@@ -510,7 +524,8 @@ impl Builder {
 		
 		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source) ?;
 		
-		let (_files, _folders) = self.resolve_files (None, _sources_0, _glob) ?;
+		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
+		let (_files, _folders) = self.resolve_files (_markdowns_sources, _sources_0, _glob) ?;
 		
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
@@ -532,8 +547,9 @@ impl Builder {
 	#[ cfg (feature = "builder-markdown") ]
 	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> BuilderResult<(Option<String>, Option<String>)> {
 		
-		let _header_source = _header_source.map (|_source| BuilderResult::Ok (self.resolve_file (None, _source) ? .1)) .transpose () ?;
-		let _footer_source = _footer_source.map (|_source| BuilderResult::Ok (self.resolve_file (None, _source) ? .1)) .transpose () ?;
+		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
+		let _header_source = _header_source.map (|_source| BuilderResult::Ok (self.resolve_file (_markdowns_sources, _source) ? .1)) .transpose () ?;
+		let _footer_source = _footer_source.map (|_source| BuilderResult::Ok (self.resolve_file (_markdowns_sources, _source) ? .1)) .transpose () ?;
 		
 		let _header_data = _header_source.as_ref () .map (
 				|_source| {
