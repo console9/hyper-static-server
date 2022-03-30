@@ -8,5 +8,5 @@ some_map :
 
 # Hello from Markdown with YAML frontmatter!
 
-This is some Markdown contents.
+Hello world!
 

@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>@@{{HSS::Markdown::Title}}</title>
+		<meta name="viewport" content="width=device-width, height=device-height" />
+	</head>
+	<body>
+		<header>
+			<p>[header]</p>
+			<hr/>
+		</header>
+		<main>
+		<!-- ################################################################################ -->

@@ -12,9 +12,9 @@
 
 
 {% block main %}
-<div>
-<p>{{ "{:?}"|format(context.some_map) }}</p>
-</div>
 {{ body|safe }}
+<pre>
+{{ "{:?}"|format(context.some_map) }}
+</pre>
 {% endblock %}
 

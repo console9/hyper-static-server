@@ -1,5 +1,5 @@
 
 # Hello from Markdown!
 
-This is some Markdown contents.
+Hello world!
 

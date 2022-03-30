@@ -11,5 +11,5 @@
 
 # Hello from Markdown with JSON frontmatter!
 
-This is some Markdown contents.
+Hello world!
 
