@@ -50,6 +50,7 @@ use crate::hss::{
 		
 		ResultExtWrap as _,
 		ResultExtPanic as _,
+		ErrorExtWrap as _,
 		
 	};
 
@@ -453,7 +454,7 @@ impl Builder {
 		let _markdown_title = _markdown_title.unwrap_or (String::new ());
 		
 		let _output_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
-		create_file_from_str (&_output_markdown, &_markdown_body) ?;
+		create_file_from_str (&_output_markdown, &_markdown_body, true, true) ?;
 		
 		let _output_frontmatter = if let Some ((_type, _data)) = _markdown_frontmatter {
 			let _extension = match _type.as_ref () {
@@ -467,7 +468,7 @@ impl Builder {
 					return Err (error_with_format (0x75f4427f, format_args! ("{}", _type))),
 			};
 			let _path = self.configuration.outputs.join (fingerprint_data (&_data)) .with_extension (_extension);
-			create_file_from_str (&_path, &_data) ?;
+			create_file_from_str (&_path, &_data, true, true) ?;
 			Some ((_extension, _path))
 		} else {
 			None
@@ -602,7 +603,7 @@ impl Builder {
 		};
 		
 		let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
-		create_file_from_str (&_output, &_compiled) ?;
+		create_file_from_str (&_output, &_compiled, true, true) ?;
 		
 		// FIXME:  Here the second argument should be `_source`.
 		self.route_asset_raw (&_relative_1, &_output, "html", _route_base, _route_builder, _extensions_builder, "markdown", _source_0, _source_relative) ?;
@@ -642,7 +643,7 @@ impl Builder {
 		let _compiled = self.compile_sass (&_source) ?;
 		
 		let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
-		create_file_from_str (&_output, &_compiled) ?;
+		create_file_from_str (&_output, &_compiled, true, true) ?;
 		
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
@@ -940,7 +941,7 @@ impl Builder {
 		}
 		writeln! (self.generated, "]);") .infallible (0x57d05438);
 		
-		create_file_from_str (&self.configuration.generated, &self.generated) ?;
+		create_file_from_str (&self.configuration.generated, &self.generated, false, true) ?;
 		
 		if false {
 			eprintln! ("--------------------------------------------------------------------------------");
@@ -1389,11 +1390,36 @@ impl Builder {
 
 
 
-fn create_file_from_str (_path : &Path, _data : &str) -> BuilderResult {
+fn create_file_from_str (_path : &Path, _data : &str, _skip_if_exists : bool, _skip_if_same : bool) -> BuilderResult {
 	
 	fs::create_dir_all (_path.parent () .or_wrap (0x370af23d) ?) ?;
 	
-	let mut _file = fs::File::create (&_path) ?;
+	let _metadata = match fs::symlink_metadata (_path) {
+		Ok (_metadata) =>
+			if _metadata.is_file () {
+				Some (_metadata)
+			} else {
+				return Err (error_with_format (0x7b58f13c, format_args! ("{}", _path.display ())));
+			}
+		Err (_error) if _error.kind () == io::ErrorKind::NotFound =>
+			None,
+		Err (_error) =>
+			return Err (_error.wrap (0xb30cd904)),
+	};
+	if _skip_if_exists && _metadata.is_some () {
+		return Ok (());
+	}
+	if _skip_if_same && _metadata.is_some () {
+		let _data_old = fs::read (_path) .or_wrap (0x6c311b95) ?;
+		let _data_old_fingerprint = fingerprint_data (_data_old);
+		let _data_new_fingerprint = fingerprint_data (_data);
+		if _data_old_fingerprint == _data_new_fingerprint {
+			return Ok (());
+		}
+	}
+	
+	// FIXME:  Use temporary file then rename!
+	let mut _file = fs::File::create (_path) ?;
 	_file.write_all (_data.as_bytes ()) ?;
 	
 	Ok (())
