@@ -8,7 +8,7 @@
 	
 	askamas! ({"_", glob : "*/page-*.html"} => "/askamas");
 	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/askamas-with-context-empty");
-	askamas_watch! ({"_", glob : "*.html-0"});
+	// askamas_watch! ({"_", glob : "*.html-0"});
 	
 	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/askama/home-with-context-json");
 	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.toml"} => "/askama/home-with-context-toml");
@@ -49,10 +49,10 @@
 	
 	
 	asset_sass! ("_/css/main.scss");
-	assets_watch! ("_/css");
+	// assets_watch! ("_/css");
 	
 	asset_js! ("_/js/main.js");
-	assets_watch! ("_/js");
+	// assets_watch! ("_/js");
 	
 	assets_images! ("_/images");
 	assets_icons! ("_/icons");

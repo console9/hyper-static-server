@@ -21,6 +21,7 @@
 	builder-markdown
 	builder-askama
 	builder-sitemaps
+	builder-relaxed-dependencies
 	production
 !!
 

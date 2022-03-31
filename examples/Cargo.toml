@@ -12,6 +12,9 @@ path = "./sources/main.rs"
 
 [features]
 default = ["server", "exporter"]
+development = [
+	"hyper-static-server/builder-relaxed-dependencies",
+]
 production = [
 	"hyper-static-server/production",
 ]
