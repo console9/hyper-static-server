@@ -170,6 +170,8 @@ builder-sitemaps = [
 	"builder",
 ]
 
+builder-relaxed-dependencies = []
+
 
 features-fuzzing = []
 features-none = []

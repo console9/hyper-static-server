@@ -282,6 +282,8 @@ impl Builder {
 		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
+		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source) ?;
 		
 		let _mode = "auto";
@@ -312,6 +314,7 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_templates_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = Some (Path::new ("/"));
@@ -345,10 +348,13 @@ impl Builder {
 		};
 		
 		self.route_names.push (format! ("Route_{}", _id));
+		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source) ?;
 		
 		let (_context_type, _context_path) = _context.unwrap_or (("()", None));
 		if let Some (_context_path) = _context_path {
+			
 			let _sources = self.configuration.sources.as_ref () .map (PathBuf::as_path);
 			let (_, _context_path) = self.resolve_file (None, _context_path) ?;
 			let _context_encoding = match _context_path.extension () .or_wrap (0x70d90b37) ? .to_str () .or_wrap (0xa22f0541) ? {
@@ -358,7 +364,9 @@ impl Builder {
 				_ =>
 					return Err (error_with_format (0xcbc42494, format_args! ("{}", _context_path.display ()))),
 			};
+			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
+			
 			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _description) .infallible (0x35966385);
 		} else {
 			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _description) .infallible (0x35966385);
@@ -375,6 +383,7 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_templates_sources, _source) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source) ?;
 		
 		Ok (())
@@ -386,8 +395,10 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_templates_sources, _sources, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_files.iter () .map (|_pair| _pair.1.as_path ())) ?;
 		
 		Ok (())
@@ -405,6 +416,7 @@ impl Builder {
 		
 		let _template = _relative_template.strip_prefix ("/") .infallible (0xda5e5ad4);
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source_template) ?;
 		
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
@@ -424,11 +436,13 @@ impl Builder {
 		
 		let _template = _relative_template.strip_prefix ("/") .infallible (0xe0168bd3);
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source_template) ?;
 		
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
 		let (_files_markdown, _folders_markdown) = self.resolve_files (_markdowns_sources, _sources_markdown_0, _glob) ?;
 		
+		// !!!!
 		self.dependencies_include_all (_folders_markdown.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = Some (Path::new ("/"));
@@ -448,6 +462,7 @@ impl Builder {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
 		
+		// !!!!
 		self.dependencies_include (_source_markdown) ?;
 		
 		let (_markdown_title, _markdown_body, _markdown_frontmatter) = self.compile_markdown (_source_markdown, false, true) ?;
@@ -528,6 +543,7 @@ impl Builder {
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_markdowns_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = Some (Path::new ("/"));
@@ -555,6 +571,7 @@ impl Builder {
 		let _header_data = _header_source.as_ref () .map (
 				|_source| {
 					let _data = fs::read_to_string (_source) ?;
+					#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 					self.dependencies_include (_source) ?;
 					BuilderResult::Ok (_data)
 				})
@@ -562,6 +579,7 @@ impl Builder {
 		let _footer_data = _footer_source.as_ref () .map (
 				|_source| {
 					let _data = fs::read_to_string (_source) ?;
+					#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 					self.dependencies_include (_source) ?;
 					BuilderResult::Ok (_data)
 				})
@@ -576,6 +594,7 @@ impl Builder {
 		
 		let _relative_1 = _relative.with_extension ("");
 		
+		// !!!!
 		self.dependencies_include (&_source) ?;
 		
 		let _compiled = if _header_data.is_some () || _footer_data.is_some () {
@@ -638,6 +657,7 @@ impl Builder {
 		
 		let _relative_1 = _relative.with_extension ("css");
 		
+		// !!!!
 		self.dependencies_include (&_source) ?;
 		
 		let _compiled = self.compile_sass (&_source) ?;
@@ -692,6 +712,7 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = self.configuration.images_route_base.clone ();
@@ -724,6 +745,7 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = self.configuration.icons_route_base.clone ();
@@ -756,6 +778,7 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = self.configuration.favicons_route_base.clone ();
@@ -805,6 +828,7 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = self.configuration.fonts_route_base.clone ();
@@ -854,6 +878,7 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_assets_sources, _sources_0, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = self.configuration.assets_route_base.clone ();
