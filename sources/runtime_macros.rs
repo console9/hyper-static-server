@@ -364,6 +364,71 @@ macro_rules! resource {
 
 
 #[ macro_export ]
+macro_rules! resource_sass_dynamic {
+	
+	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : literal ) => {
+		
+		#[ allow (non_camel_case_types) ]
+		pub(crate) struct $_resource_name {
+			source : &'static ::std::path::Path,
+		}
+		
+		#[ allow (dead_code) ]
+		impl $_resource_name {
+			
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
+				let _self = Self {
+						source : ::std::path::Path::new ($crate::resource_path! ($_source_path)),
+					};
+				$crate::hss::ServerResult::Ok (_self)
+			}
+			
+			pub fn render (&self) -> $crate::hss::ServerResult<::std::string::String> {
+				$crate::support_sass::compile_sass (self.source)
+						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x548c29d4, _error)))
+			}
+			
+			pub fn into_handler (self) -> impl $crate::hss::Handler {
+				$crate::hss::HandlerSimpleSyncWrapper::new (self)
+			}
+		}
+		
+		impl $crate::StaticResource for $_resource_name {
+			
+			fn content_type (&self) -> $crate::hss::ContentType {
+				$crate::resource_content_type! ($_content_type)
+			}
+			
+			fn description (&self) -> &'static str {
+				$_description
+			}
+			
+			fn into_handler_dyn (self) -> $crate::hss::HandlerDynArc {
+				let _handler = self.into_handler ();
+				let _handler = $crate::hss::HandlerDynArc::new (_handler);
+				_handler
+			}
+		}
+		
+		impl $crate::hss::HandlerSimpleSync for $_resource_name {
+			
+			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::ServerResult {
+				use $crate::hss::ResponseExt as _;
+				use $crate::StaticResource as _;
+				let _body = self.render () ?;
+				_response.set_status_200 ();
+				_response.set_content_type (self.content_type ());
+				_response.set_body (_body);
+				$crate::hss::ServerResult::Ok (())
+			}
+		}
+	};
+}
+
+
+
+
+#[ macro_export ]
 macro_rules! route {
 	
 	

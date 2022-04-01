@@ -603,21 +603,37 @@ impl Builder {
 		
 		let _relative_1 = _relative.with_extension ("css");
 		
-		// !!!!
-		self.dependencies_include (&_source) ?;
-		
-		let _compiled = self.compile_sass (&_source) ?;
-		
-		let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
-		create_file_from_str (&_output, &_compiled, true, true) ?;
-		
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		// FIXME:  Here the second argument should be `_source`.
-		self.route_asset_raw (&_relative_1, &_output, "css", _route_base, _route_builder, _extensions_builder, "resource_sass", _source_0, None) ?;
-		
-		self.dependencies_exclude (&_output) ?;
+		if cfg! (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-assets-sass-dynamic-any"), feature = "production")) {
+			
+			self.dependencies_include (&_source) ?;
+			
+			let _compiled = self.compile_sass (&_source) ?;
+			
+			let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("css");
+			create_file_from_str (&_output, &_compiled, true, true) ?;
+			
+			// FIXME:  Here the second argument should be `_source`.
+			self.route_asset_raw (&_relative_1, &_output, "css", _route_base, _route_builder, _extensions_builder, "resource_sass", _source_0, None) ?;
+			
+			self.dependencies_exclude (&_output) ?;
+			
+		} else {
+			
+			let _route = _route_builder.build (&_relative_1, &_source, _route_base, None) ?;
+			let _extensions = _extensions_builder.build () ?;
+			
+			let _id = self.generate_id ();
+			
+			let _description = format! ("{} (file = `{}`)", "resource_sass", _source_0);
+			
+			self.route_names.push (format! ("Route_{}", _id));
+			
+			writeln! (self.generated, "::hyper_static_server::resource_sass_dynamic! (Resource_{}, {}, (relative_to_cwd, {:?}), {:?});", _id, "css", _source, _description) .infallible (0xb7dd2208);
+			writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x506e8636);
+		}
 		
 		Ok (())
 	}

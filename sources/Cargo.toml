@@ -156,6 +156,22 @@ builder-assets-sass-alt = [
 
 builder-assets-sass-any = []
 
+builder-assets-sass-dynamic = [
+	"builder-assets-sass-dynamic-rs",
+]
+
+builder-assets-sass-dynamic-rs = [
+	"builder-assets-sass-dynamic-any",
+	"support-sass-rs",
+]
+
+builder-assets-sass-dynamic-alt = [
+	"builder-assets-sass-dynamic-any",
+	"support-sass-alt",
+]
+
+builder-assets-sass-dynamic-any = []
+
 builder-markdown = [
 	"builder",
 	"support-markdown",

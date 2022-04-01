@@ -30,10 +30,10 @@ pub use crate::exporter::*;
 
 
 
-#[ cfg (feature = "builder") ]
+#[ cfg (any (feature = "builder", feature = "support-sass-any", feature = "support-markdown")) ]
 pub(crate) mod builder_errors;
 
-#[ cfg (feature = "builder") ]
+#[ cfg (any (feature = "builder", feature = "support-sass-any", feature = "support-markdown")) ]
 pub use crate::builder_errors::*;
 
 
@@ -102,8 +102,8 @@ pub use ::hyper_simple_server::*;
 
 
 #[ cfg (feature = "support-sass-any") ]
-pub(crate) mod support_sass;
+pub mod support_sass;
 
 #[ cfg (feature = "support-markdown") ]
-pub(crate) mod support_markdown;
+pub mod support_markdown;
 
