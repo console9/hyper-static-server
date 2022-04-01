@@ -158,7 +158,7 @@ builder-assets-sass-any = []
 
 builder-markdown = [
 	"builder",
-	"pulldown-cmark",
+	"support-markdown",
 ]
 
 builder-askama = [
@@ -182,6 +182,10 @@ support-sass-alt = [
 ]
 
 support-sass-any = []
+
+support-markdown = [
+	"pulldown-cmark",
+]
 
 features-fuzzing = []
 features-none = []

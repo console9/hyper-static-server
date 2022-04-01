@@ -32,9 +32,6 @@ use ::walkdir;
 use ::blake2;
 use ::proc_macro2;
 
-#[ cfg (feature = "builder-markdown") ]
-use ::pulldown_cmark as cmark;
-
 
 use crate::builder_errors::*;
 
@@ -443,7 +440,7 @@ impl Builder {
 		// !!!!
 		self.dependencies_include (_source_markdown) ?;
 		
-		let (_markdown_title, _markdown_body, _markdown_frontmatter) = self.compile_markdown (_source_markdown, false, true) ?;
+		let (_markdown_body, _markdown_title, _markdown_frontmatter) = self.compile_markdown_raw (_source_markdown, true) ?;
 		let _markdown_title = _markdown_title.unwrap_or (String::new ());
 		
 		let _output_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
@@ -575,32 +572,13 @@ impl Builder {
 		// !!!!
 		self.dependencies_include (&_source) ?;
 		
-		let _compiled = if _header_data.is_some () || _footer_data.is_some () {
-			
-			let _header_data = _header_data.map (String::as_str) .unwrap_or ("");
-			let _footer_data = _footer_data.map (String::as_str) .unwrap_or ("");
-			
-			let (_title, _contents_data, _frontmatter) = self.compile_markdown (&_source, false, true) ?;
-			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
-			let _title = {
-				let mut _buffer = String::with_capacity (_title.len () * 3 / 2);
-				cmark::escape::escape_html (&mut _buffer, &_title) .infallible (0xef399d64);
-				_buffer
-			};
-			
-			let mut _buffer = String::with_capacity (_header_data.len () + _contents_data.len () + _footer_data.len ());
-			_buffer.push_str (&_header_data.replace ("@@{{HSS::Markdown::Title}}", &_title));
-			_buffer.push_str (&_contents_data);
-			_buffer.push_str (&_footer_data.replace ("@@{{HSS::Markdown::Title}}", &_title));
-			_buffer
-			
-		} else {
-			let (_title, _contents_data, _frontmatter) = self.compile_markdown (&_source, true, true) ?;
-			_contents_data
-		};
+		let _header_data = _header_data.map (String::as_str);
+		let _footer_data = _footer_data.map (String::as_str);
 		
-		let _output = self.configuration.outputs.join (fingerprint_data (&_compiled)) .with_extension ("html");
-		create_file_from_str (&_output, &_compiled, true, true) ?;
+		let _html_data = self.compile_markdown_html (&_source, _header_data, _footer_data) ?;
+		
+		let _output = self.configuration.outputs.join (fingerprint_data (&_html_data)) .with_extension ("html");
+		create_file_from_str (&_output, &_html_data, true, true) ?;
 		
 		// FIXME:  Here the second argument should be `_source`.
 		self.route_asset_raw (&_relative_1, &_output, "html", _route_base, _route_builder, _extensions_builder, "markdown", _source_0, _source_relative) ?;
@@ -1154,138 +1132,17 @@ impl Builder {
 impl Builder {
 	
 	
-	fn compile_markdown (&self, _source : &Path, _html_wrapper : bool, _title_detect : bool) -> BuilderResult<(Option<String>, String, Option<(String, String)>)> {
-		
-		let _input = fs::read_to_string (_source) ?;
-		
-		let mut _input : Vec<&str> = _input.lines () .skip_while (|_line| _line.is_empty ()) .collect ();
-		while let Some (_line) = _input.last () {
-			if _line.is_empty () {
-				_input.pop ();
-			} else {
-				break;
-			}
-		}
-		
-		if _input.is_empty () {
-			return Err (error_with_code (0x1fc18809));
-		}
-		
-		let (_input, _frontmatter) = {
-			let _detected = if let Some (_line) = _input.first () {
-				let _line_trimmed = _line.trim ();
-				match _line_trimmed {
-					"+++" =>
-						Some (("toml", "+++")),
-					"---" =>
-						Some (("yaml", "---")),
-					"{{{" =>
-						Some (("json", "}}}")),
-					_ =>
-						None,
-				}
-			} else {
-				None
-			};
-			if let Some ((_type, _marker)) = _detected {
-				let mut _input = _input.into_iter ();
-				let mut _frontmatter = Vec::new ();
-				let mut _frontmatter_is_empty = true;
-				_input.next ();
-				while let Some (_line) = _input.next () {
-					let _line_trimmed = _line.trim ();
-					if _line_trimmed == _marker {
-						break;
-					} else {
-						_frontmatter.push (_line);
-						if ! _line_trimmed.is_empty () {
-							_frontmatter_is_empty = false;
-						}
-					}
-				}
-				let _input : Vec<&str> = _input.collect ();
-				let _frontmatter = if ! _frontmatter_is_empty {
-					let _type = String::from (_type);
-					let _frontmatter = _frontmatter.join ("\n");
-					Some ((_type, _frontmatter))
-				} else {
-					None
-				};
-				(_input, _frontmatter)
-			} else {
-				(_input, None)
-			}
+	fn compile_markdown_raw (&self, _source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
+		crate::support_markdown::compile_markdown_raw (_source, _title_detect)
+	}
+	
+	fn compile_markdown_html (&self, _source : &Path, _header : Option<&str>, _footer : Option<&str>) -> BuilderResult<String> {
+		let _header_and_footer = if _header.is_some () || _footer.is_some () {
+			Some ((_header.unwrap_or (""), _footer.unwrap_or ("")))
+		} else {
+			None
 		};
-		
-		let _input = _input.join ("\n");
-		
-		let mut _options = cmark::Options::empty ();
-		_options.insert (cmark::Options::ENABLE_TABLES);
-		_options.insert (cmark::Options::ENABLE_FOOTNOTES);
-		_options.insert (cmark::Options::ENABLE_STRIKETHROUGH);
-		_options.insert (cmark::Options::ENABLE_TASKLISTS);
-		
-		let mut _contents = String::with_capacity (_input.len () * 2);
-		
-		let mut _title = None;
-		let mut _title_capture = None;
-		if ! _title_detect {
-			_title_capture = Some (false);
-		}
-		
-		let _parser = cmark::Parser::new_ext (&_input, _options);
-		
-		let _parser = _parser.into_iter () .inspect (
-				|_event| {
-					match _event {
-						cmark::Event::Start (cmark::Tag::Heading (1)) =>
-							if _title_capture == None {
-								_title_capture = Some (true);
-							},
-						cmark::Event::Text (_text) =>
-							if _title_capture == Some (true) {
-								if ! _text.is_empty () {
-									_title = Some (_text.as_ref () .to_owned ());
-								}
-								_title_capture = Some (false);
-							},
-						_ =>
-							(),
-					}
-				});
-		
-		cmark::html::push_html (&mut _contents, _parser);
-		
-		if ! _html_wrapper {
-			return Ok ((_title, _contents, _frontmatter));
-		}
-		
-		let mut _output = String::with_capacity (_contents.len () + 1024);
-		
-		{
-			_output.push_str ("<!DOCTYPE html>\n");
-			_output.push_str ("<html>\n");
-			_output.push_str ("<head>\n");
-			let _title = _title.as_ref () .map (String::as_str) .unwrap_or ("");
-			if ! _title.is_empty () {
-				_output.push_str ("<title>");
-				cmark::escape::escape_html (&mut _output, &_title) .infallible (0xdc5ea905);
-				_output.push_str ("</title>\n");
-			}
-			_output.push_str (r#"<meta name="viewport" content="width=device-width, height=device-height" />"#);
-			_output.push_str ("\n");
-			_output.push_str ("</head>\n");
-			_output.push_str ("<body>\n");
-		}
-		
-		_output.push_str (&_contents);
-		
-		{
-			_output.push_str ("</body>\n");
-			_output.push_str ("</html>\n");
-		}
-		
-		Ok ((_title, _output, _frontmatter))
+		crate::support_markdown::compile_markdown_html (_source, _header_and_footer)
 	}
 }
 

@@ -104,3 +104,6 @@ pub use ::hyper_simple_server::*;
 #[ cfg (feature = "support-sass-any") ]
 pub(crate) mod support_sass;
 
+#[ cfg (feature = "support-markdown") ]
+pub(crate) mod support_markdown;
+
