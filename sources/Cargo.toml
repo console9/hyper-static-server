@@ -181,6 +181,8 @@ builder-askama = [
 	"builder",
 ]
 
+builder-askama-dynamic = []
+
 builder-sitemaps = [
 	"builder",
 ]

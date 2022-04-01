@@ -27,33 +27,58 @@ macro_rules! askama {
 			pub __is_development : bool,
 		}
 		
-		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_resource_name {
-			template : $_template_name,
+		$crate::cfg_builder_askama_dynamic_disabled! {
+			#[ allow (non_camel_case_types) ]
+			pub(crate) struct $_resource_name {
+				template : $_template_name,
+			}
+		}
+		
+		$crate::cfg_builder_askama_dynamic_enabled! {
+			#[ allow (non_camel_case_types) ]
+			pub(crate) struct $_resource_name {}
 		}
 		
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<Self> {
-				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) ?;
-				let _self = Self {
-						template : $_template_name {
-								context : _context,
-								__is_production : cfg! (feature = "production"),
-								__is_development : cfg! (not (feature = "production")),
-							},
-					};
+				$crate::cfg_builder_askama_dynamic_disabled! {
+					let _self = Self {
+							template : Self::template_build (_extensions) ?,
+						};
+				}
+				$crate::cfg_builder_askama_dynamic_enabled! {
+					let _self = Self {};
+				}
 				$crate::hss::ServerResult::Ok (_self)
 			}
 			
 			pub fn render (&self) -> $crate::hss::ServerResult<::std::string::String> {
-				::askama::Template::render (&self.template)
+				$crate::cfg_builder_askama_dynamic_disabled! {
+					let _template = &self.template;
+				}
+				$crate::cfg_builder_askama_dynamic_enabled! {
+					// FIXME:  Somehow use the extensions from the resource constructor!
+					let _template = Self::template_build (&$crate::hss::Extensions::new ()) ?;
+					let _template = &_template;
+				}
+				::askama::Template::render (_template)
 						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x60beda55, _error)))
 			}
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)
+			}
+			
+			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<$_template_name> {
+				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) ?;
+				let _template = $_template_name {
+						context : _context,
+						__is_production : $crate::cfg_if_production! ({ true } | { false }),
+						__is_development : $crate::cfg_if_production! ({ false } | { true }),
+					};
+				$crate::hss::ServerResult::Ok (_template)
 			}
 		}
 		
@@ -134,8 +159,8 @@ macro_rules! askama_with_title_and_body {
 								context : _context,
 								title : $_title,
 								body : ::std::include_str! ($_body_path),
-								__is_production : cfg! (feature = "production"),
-								__is_development : cfg! (not (feature = "production")),
+								__is_production : $crate::cfg_if_production! ({ true } | { false }),
+								__is_development : $crate::cfg_if_production! ({ false } | { true }),
 							},
 					};
 				$crate::hss::ServerResult::Ok (_self)
@@ -227,10 +252,32 @@ macro_rules! askama_context_new {
 	
 	( { type : $_context_type : ty, deserialize : ( $_context_encoding : literal, $_context_path : literal ) }, $_extensions : expr ) => {
 		{
+			$crate::cfg_builder_askama_dynamic_disabled! {
+				let _context = $crate::askama_context_new! ({ type : $_context_type, (deserialize, embedded) : ($_context_encoding, $_context_path)}, $_extensions);
+			}
+			$crate::cfg_builder_askama_dynamic_enabled! {
+				let _context = $crate::askama_context_new! ({ type : $_context_type, (deserialize, dynamic) : ($_context_encoding, $_context_path)}, $_extensions);
+			}
+			_context
+		}
+	};
+	
+	( { type : $_context_type : ty, (deserialize, embedded) : ( $_context_encoding : literal, $_context_path : literal ) }, $_extensions : expr ) => {
+		{
 			let _encoding : &str = $_context_encoding;
 			let _data : &[u8] = ::std::include_bytes! ($_context_path);
 			let _extensions : &$crate::hss::Extensions = $_extensions;
 			<$_context_type as $crate::StaticAskamaContext>::new_with_deserialization (_encoding, _data, _extensions)
+		}
+	};
+	
+	( { type : $_context_type : ty, (deserialize, dynamic) : ( $_context_encoding : literal, $_context_path : literal ) }, $_extensions : expr ) => {
+		{
+			use $crate::hss::ResultExtWrap as _;
+			let _encoding : &str = $_context_encoding;
+			let _data = ::std::fs::read_to_string ($_context_path) .or_wrap (0x98ea260c) ?;
+			let _extensions : &$crate::hss::Extensions = $_extensions;
+			<$_context_type as $crate::StaticAskamaContext>::new_with_deserialization (_encoding, _data.as_bytes (), _extensions)
 		}
 	};
 }
@@ -243,10 +290,11 @@ macro_rules! resource {
 	
 	
 	( $_resource_name : ident, $_content_type : tt, auto, $_resource_path : tt, $_description : literal ) => {
-		#[ cfg (not (feature = "production")) ]
-		$crate::resource! ($_resource_name, $_content_type, dynamic, $_resource_path, $_description);
-		#[ cfg (feature = "production") ]
-		$crate::resource! ($_resource_name, $_content_type, embedded, $_resource_path, $_description);
+		$crate::cfg_if_production! {{
+			$crate::resource! ($_resource_name, $_content_type, embedded, $_resource_path, $_description);
+		} | {
+			$crate::resource! ($_resource_name, $_content_type, dynamic, $_resource_path, $_description);
+		}}
 	};
 	
 	
@@ -787,5 +835,52 @@ macro_rules! resource_path {
 	( $_path : literal ) => {
 		$crate::resource_path! ( ( relative_to_crate, $_path ) )
 	};
+}
+
+
+
+
+#[ macro_export ]
+#[ cfg (feature = "production") ]
+macro_rules! cfg_if_production {
+	( { $( $_then_token : tt )* } | { $( $_else_token : tt )* } ) => { $( $_then_token )* };
+	( { $( $_then_token : tt )* } ) => { $( $_then_token )* };
+}
+
+#[ macro_export ]
+#[ cfg (not (feature = "production")) ]
+macro_rules! cfg_if_production {
+	( { $( $_then_token : tt )* } | { $( $_else_token : tt )* } ) => { $( $_else_token )* };
+	( { $( $_then_token : tt )* } ) => {};
+}
+
+
+
+
+#[ macro_export ]
+#[ cfg (any (not (feature = "builder-askama-dynamic"), feature = "production")) ]
+macro_rules! cfg_builder_askama_dynamic_disabled {
+	( $( $_token : tt )* ) => { $( $_token )* };
+}
+
+#[ macro_export ]
+#[ cfg (all (feature = "builder-askama-dynamic", not (feature = "production"))) ]
+macro_rules! cfg_builder_askama_dynamic_disabled {
+	( $( $_token : tt )* ) => {};
+}
+
+
+#[ macro_export ]
+#[ cfg (all (feature = "builder-askama-dynamic", not (feature = "production"))) ]
+macro_rules! cfg_builder_askama_dynamic_enabled {
+	( $( $_token : tt )* ) => {
+		$( $_token )*
+	};
+}
+
+#[ macro_export ]
+#[ cfg (any (not (feature = "builder-askama-dynamic"), feature = "production")) ]
+macro_rules! cfg_builder_askama_dynamic_enabled {
+	( $( $_token : tt )* ) => {};
 }
 
