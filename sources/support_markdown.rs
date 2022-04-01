@@ -31,11 +31,17 @@ use crate::builder_errors::*;
 
 
 
-pub fn compile_markdown_raw (_source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
+pub fn compile_markdown_body_from_path (_source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
 	
-	let _input = fs::read_to_string (_source) ?;
+	let _source = fs::read_to_string (_source) ?;
 	
-	let mut _input : Vec<&str> = _input.lines () .skip_while (|_line| _line.is_empty ()) .collect ();
+	compile_markdown_body_from_data (_source.as_str (), _title_detect)
+}
+
+
+pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
+	
+	let mut _input : Vec<&str> = _source.lines () .skip_while (|_line| _line.is_empty ()) .collect ();
 	while let Some (_line) = _input.last () {
 		if _line.is_empty () {
 			_input.pop ();
@@ -139,11 +145,28 @@ pub fn compile_markdown_raw (_source : &Path, _title_detect : bool) -> BuilderRe
 
 
 
-pub fn compile_markdown_html (_source : &Path, _header_and_footer : Option<(&str, &str)>) -> BuilderResult<String> {
+pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>, _footer : Option<&Path>) -> BuilderResult<String> {
 	
-	let (_body, _title, _frontmatter) = compile_markdown_raw (_source, true) ?;
+	let _source = fs::read_to_string (_source) ?;
+	let _header = if let Some (_header) = _header { Some (fs::read_to_string (_header) ?) } else { None };
+	let _footer = if let Some (_footer) = _footer { Some (fs::read_to_string (_footer) ?) } else { None };
 	
-	let _html = if let Some ((_header, _footer)) = _header_and_footer {
+	let _source = _source.as_str ();
+	let _header = _header.as_ref () .map (String::as_str);
+	let _footer = _footer.as_ref () .map (String::as_str);
+	
+	compile_markdown_html_from_data (_source, _header, _footer)
+}
+
+
+pub fn compile_markdown_html_from_data (_source : &str, _header : Option<&str>, _footer : Option<&str>) -> BuilderResult<String> {
+	
+	let (_body, _title, _frontmatter) = compile_markdown_body_from_data (_source, true) ?;
+	
+	let _html = if _header.is_some () || _footer.is_some () {
+		
+		let _header = _header.unwrap_or ("");
+		let _footer = _footer.unwrap_or ("");
 		
 		let _title = if let Some (_title) = _title {
 			let mut _buffer = String::with_capacity (_title.len () * 3 / 2);

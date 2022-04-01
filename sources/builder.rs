@@ -540,40 +540,48 @@ impl Builder {
 		let _header_source = _header_source.map (|_source| BuilderResult::Ok (self.resolve_file (_markdowns_sources, _source) ? .1)) .transpose () ?;
 		let _footer_source = _footer_source.map (|_source| BuilderResult::Ok (self.resolve_file (_markdowns_sources, _source) ? .1)) .transpose () ?;
 		
-		let _header_data = _header_source.as_ref () .map (
-				|_source| {
-					let _data = fs::read_to_string (_source) ?;
-					#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
-					self.dependencies_include (_source) ?;
-					BuilderResult::Ok (_data)
-				})
-				.transpose () ?;
-		let _footer_data = _footer_source.as_ref () .map (
-				|_source| {
-					let _data = fs::read_to_string (_source) ?;
-					#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
-					self.dependencies_include (_source) ?;
-					BuilderResult::Ok (_data)
-				})
-				.transpose () ?;
-		
-		let _header_data = _header_data.as_ref () .map (String::as_str);
-		let _footer_data = _footer_data.as_ref () .map (String::as_str);
-		
 		let _relative_1 = _relative.with_extension ("");
 		
-		// !!!!
-		self.dependencies_include (&_source) ?;
-		
-		let _html_data = self.compile_markdown_html (&_source, _header_data, _footer_data) ?;
-		
-		let _output = self.configuration.outputs.join (fingerprint_data (&_html_data)) .with_extension ("html");
-		create_file_from_str (&_output, &_html_data, true, true) ?;
-		
-		// FIXME:  Here the second argument should be `_source`.
-		self.route_asset_raw (&_relative_1, &_output, "html", _route_base, _route_builder, _extensions_builder, "markdown", _source_0, _source_relative) ?;
-		
-		self.dependencies_exclude (&_output) ?;
+		if cfg! (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-markdown-dynamic"), feature = "production")) {
+			
+			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-markdown-dynamic"), feature = "production")) ]
+			{
+				self.dependencies_include (&_source) ?;
+				if let Some (_header_source) = &_header_source {
+					self.dependencies_include (_header_source) ?;
+				}
+				if let Some (_header_source) = &_footer_source {
+					self.dependencies_include (_footer_source) ?;
+				}
+			}
+			
+			let _header_source = _header_source.as_ref () .map (PathBuf::as_path);
+			let _footer_source = _footer_source.as_ref () .map (PathBuf::as_path);
+			
+			let _html_data = self.compile_markdown_html (_source, _header_source, _footer_source) ?;
+			
+			let _output = self.configuration.outputs.join (fingerprint_data (&_html_data)) .with_extension ("html");
+			create_file_from_str (&_output, &_html_data, true, true) ?;
+			
+			// FIXME:  Here the second argument should be `_source`.
+			self.route_asset_raw (&_relative_1, &_output, "html", _route_base, _route_builder, _extensions_builder, "markdown", _source_0, _source_relative) ?;
+			
+			self.dependencies_exclude (&_output) ?;
+			
+		} else {
+			
+			let _route = _route_builder.build (&_relative_1, &_source, _route_base, None) ?;
+			let _extensions = _extensions_builder.build () ?;
+			
+			let _id = self.generate_id ();
+			
+			let _description = format! ("{} (file = `{}`)", "resource_markdown", _source_0);
+			
+			self.route_names.push (format! ("Route_{}", _id));
+			
+			writeln! (self.generated, "::hyper_static_server::resource_markdown_dynamic! (Resource_{}, {}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?});", _id, "html", _source, _header_source, _footer_source, _description) .infallible (0x15f089dc);
+			writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xbf41dd16);
+		}
 		
 		Ok (())
 	}
@@ -1137,18 +1145,12 @@ impl Builder {
 #[ cfg (feature = "builder-markdown") ]
 impl Builder {
 	
-	
-	fn compile_markdown_raw (&self, _source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
-		crate::support_markdown::compile_markdown_raw (_source, _title_detect)
+	fn compile_markdown_body (&self, _source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
+		crate::support_markdown::compile_markdown_body_from_path (_source, _title_detect)
 	}
 	
-	fn compile_markdown_html (&self, _source : &Path, _header : Option<&str>, _footer : Option<&str>) -> BuilderResult<String> {
-		let _header_and_footer = if _header.is_some () || _footer.is_some () {
-			Some ((_header.unwrap_or (""), _footer.unwrap_or ("")))
-		} else {
-			None
-		};
-		crate::support_markdown::compile_markdown_html (_source, _header_and_footer)
+	fn compile_markdown_html (&self, _source : &Path, _header : Option<&Path>, _footer : Option<&Path>) -> BuilderResult<String> {
+		crate::support_markdown::compile_markdown_html_from_path (_source, _header, _footer)
 	}
 }
 

@@ -177,6 +177,10 @@ builder-markdown = [
 	"support-markdown",
 ]
 
+builder-markdown-dynamic = [
+	"support-markdown",
+]
+
 builder-askama = [
 	"builder",
 ]
