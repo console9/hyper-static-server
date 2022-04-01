@@ -349,9 +349,9 @@ macro_rules! resource {
 		
 		impl $crate::hss::Handler for $_resource_name {
 			
-			type Future = <$crate::hss::EmbeddedResource as $crate::hss::Handler>::Future;
-			type ResponseBody = <$crate::hss::EmbeddedResource as $crate::hss::Handler>::ResponseBody;
-			type ResponseBodyError = <$crate::hss::EmbeddedResource as $crate::hss::Handler>::ResponseBodyError;
+			type Future = <$crate::hss::FileResource as $crate::hss::Handler>::Future;
+			type ResponseBody = <$crate::hss::FileResource as $crate::hss::Handler>::ResponseBody;
+			type ResponseBodyError = <$crate::hss::FileResource as $crate::hss::Handler>::ResponseBodyError;
 			
 			fn handle (&self, _request : $crate::hss::Request<$crate::hss::Body>) -> Self::Future {
 				self.resource.handle (_request)
