@@ -1113,6 +1113,8 @@ impl Builder {
 			self.dependencies.insert (_dependency);
 		}
 		
+		self.dependencies.insert (PathBuf::from (file! ()));
+		
 		Ok (())
 	}
 }
