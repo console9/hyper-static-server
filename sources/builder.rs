@@ -417,7 +417,7 @@ impl Builder {
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
 		let (_files_markdown, _folders_markdown) = self.resolve_files (_markdowns_sources, _sources_markdown_0, _glob) ?;
 		
-		// !!!!
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders_markdown.iter () .map (PathBuf::as_path)) ?;
 		
 		let _route_base = Some (Path::new ("/"));
@@ -437,14 +437,17 @@ impl Builder {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
 		
-		// !!!!
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-markdown-dynamic"), not (feature = "builder-askama-dynamic"), feature = "production")) ]
 		self.dependencies_include (_source_markdown) ?;
 		
-		let (_markdown_body, _markdown_title, _markdown_frontmatter) = self.compile_markdown_raw (_source_markdown, true) ?;
+		let (_markdown_body, _markdown_title, _markdown_frontmatter) = self.compile_markdown_body (_source_markdown, true) ?;
 		let _markdown_title = _markdown_title.unwrap_or (String::new ());
 		
-		let _output_markdown = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
-		create_file_from_str (&_output_markdown, &_markdown_body, true, true) ?;
+		let _output_title = self.configuration.outputs.join (fingerprint_data (&_markdown_title)) .with_extension ("txt");
+		create_file_from_str (&_output_title, &_markdown_title, true, true) ?;
+		
+		let _output_body = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
+		create_file_from_str (&_output_body, &_markdown_body, true, true) ?;
 		
 		let _output_frontmatter = if let Some ((_type, _data)) = _markdown_frontmatter {
 			let _extension = match _type.as_ref () {
@@ -480,14 +483,14 @@ impl Builder {
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			if let Some (_context_type) = _context {
-				writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _output_title, _output_body, _description) .infallible (0xd64341cb);
 			} else {
 				let _context_type = _context.unwrap_or ("()");
-				writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _output_title, _output_body, _description) .infallible (0xd64341cb);
 			}
 		} else {
 			let _context_type = _context.unwrap_or ("()");
-			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
+			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _output_title, _output_body, _description) .infallible (0xd64341cb);
 		}
 		
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
