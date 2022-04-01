@@ -145,17 +145,16 @@ builder-assets-sass = [
 builder-assets-sass-rs = [
 	"builder",
 	"builder-assets-sass-any",
-	"sass-rs",
+	"support-sass-rs",
 ]
 
 builder-assets-sass-alt = [
 	"builder",
 	"builder-assets-sass-any",
-	"sass-alt",
+	"support-sass-alt",
 ]
 
-builder-assets-sass-any = [
-]
+builder-assets-sass-any = []
 
 builder-markdown = [
 	"builder",
@@ -172,6 +171,17 @@ builder-sitemaps = [
 
 builder-relaxed-dependencies = []
 
+support-sass-rs = [
+	"support-sass-any",
+	"sass-rs",
+]
+
+support-sass-alt = [
+	"support-sass-any",
+	"sass-alt",
+]
+
+support-sass-any = []
 
 features-fuzzing = []
 features-none = []
