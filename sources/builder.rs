@@ -489,6 +489,7 @@ impl Builder {
 			let _context_type = _context.unwrap_or ("()");
 			writeln! (self.generated, "::hyper_static_server::askama_with_title_and_body! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _markdown_title, _output_markdown, _description) .infallible (0xd64341cb);
 		}
+		
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
 		
 		Ok (())
@@ -500,20 +501,16 @@ impl Builder {
 	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdown (&mut self, _source_0 : &str, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
-		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source) ?;
-		
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_markdowns_sources, _source_0) ?;
 		
 		let _route_base = Some (Path::new ("/"));
 		
-		self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _extensions_builder, _source_0, None)
+		self.route_markdown_0 (&_relative, &_source, _header_source, _footer_source, _route_base, _route_builder, _extensions_builder, _source_0, None)
 	}
 	
 	#[ cfg (feature = "builder-markdown") ]
 	pub fn route_markdowns (&mut self, _sources_0 : &str, _glob : Option<&str>, _header_source : Option<&str>, _footer_source : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
-		
-		let (_header_data, _footer_data) = self.route_markdown_brackets (_header_source, _footer_source) ?;
 		
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_markdowns_sources, _sources_0, _glob) ?;
@@ -529,7 +526,7 @@ impl Builder {
 				return Err (error_with_format (0x393ea45d, format_args! ("{}", _source.display ())));
 			}
 			
-			self.route_markdown_0 (&_relative, &_source, _header_data.as_ref (), _footer_data.as_ref (), _route_base, _route_builder, _extensions_builder, _sources_0, Some (_relative.as_path ())) ?;
+			self.route_markdown_0 (&_relative, &_source, _header_source, _footer_source, _route_base, _route_builder, _extensions_builder, _sources_0, Some (_relative.as_path ())) ?;
 		}
 		
 		Ok (())
@@ -537,7 +534,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "builder-markdown") ]
-	fn route_markdown_brackets (&mut self, _header_source : Option<&str>, _footer_source : Option<&str>) -> BuilderResult<(Option<String>, Option<String>)> {
+	fn route_markdown_0 (&mut self, _relative : &Path, _source : &Path, _header_source : Option<&str>, _footer_source : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _markdowns_sources = self.configuration.markdowns_sources.as_ref () .map (PathBuf::as_path);
 		let _header_source = _header_source.map (|_source| BuilderResult::Ok (self.resolve_file (_markdowns_sources, _source) ? .1)) .transpose () ?;
@@ -560,20 +557,13 @@ impl Builder {
 				})
 				.transpose () ?;
 		
-		Ok ((_header_data, _footer_data))
-	}
-	
-	
-	#[ cfg (feature = "builder-markdown") ]
-	fn route_markdown_0 (&mut self, _relative : &Path, _source : &Path, _header_data : Option<&String>, _footer_data : Option<&String>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+		let _header_data = _header_data.as_ref () .map (String::as_str);
+		let _footer_data = _footer_data.as_ref () .map (String::as_str);
 		
 		let _relative_1 = _relative.with_extension ("");
 		
 		// !!!!
 		self.dependencies_include (&_source) ?;
-		
-		let _header_data = _header_data.map (String::as_str);
-		let _footer_data = _footer_data.map (String::as_str);
 		
 		let _html_data = self.compile_markdown_html (&_source, _header_data, _footer_data) ?;
 		
