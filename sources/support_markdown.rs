@@ -145,6 +145,48 @@ pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) ->
 
 
 
+pub fn compile_markdown_body_to_paths (_source_path : &Path, _context_path : Option<&Path>, _title_path : Option<&Path>, _body_path : Option<&Path>) -> BuilderResult {
+	
+	let (_body, _title, _frontmatter) = compile_markdown_body_from_path (_source_path, _title_path.is_some ()) ?;
+	
+	if let Some (_path) = _context_path {
+		let _data = if let Some ((_type, _data)) = _frontmatter {
+			match _type.as_str () {
+				"toml" => "## toml\n".to_owned () + &_data,
+				"yaml" => "## yaml\n".to_owned () + &_data,
+				"json" => _data,
+				_ =>
+					return Err (error_with_code (0xfc776131)),
+			}
+		} else {
+			String::new ()
+		};
+		let mut _file = fs::File::create (_path) ?;
+		_file.write_all (_data.as_bytes ()) ?;
+	}
+	
+	if let Some (_path) = _title_path {
+		let _data = if let Some (_title) = _title {
+			_title
+		} else {
+			String::new ()
+		};
+		let mut _file = fs::File::create (_path) ?;
+		_file.write_all (_data.as_bytes ()) ?;
+	}
+	
+	if let Some (_path) = _body_path {
+		let _data = _body;
+		let mut _file = fs::File::create (_path) ?;
+		_file.write_all (_data.as_bytes ()) ?;
+	}
+	
+	Ok (())
+}
+
+
+
+
 pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>, _footer : Option<&Path>) -> BuilderResult<String> {
 	
 	let _source = fs::read_to_string (_source) ?;

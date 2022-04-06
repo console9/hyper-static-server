@@ -70,6 +70,19 @@ pub trait StaticAskamaContextSerde
 			"json" =>
 				::serde_json::from_slice (_data) .or_wrap (0xa8d9dccf),
 			
+			"auto" => {
+				let _encoding = if _data.starts_with (b"## toml\n") {
+					"toml"
+				} else if _data.starts_with (b"## yaml\n") {
+					"yaml"
+				} else if _data.starts_with (b"{") || _data.starts_with (b"[") {
+					"json"
+				} else {
+					fail_with_format! (0x164f2b63, "encoding `{}` failed to match", _encoding);
+				};
+				Self::new_with_serde (_encoding, _data)
+			}
+			
 			_ =>
 				fail_with_format! (0x95017b94, "encoding `{}` not supported", _encoding),
 		}

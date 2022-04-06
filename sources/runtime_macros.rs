@@ -130,6 +130,7 @@ macro_rules! askama_document {
 			$_template_path : literal,
 			$_title_path : literal,
 			$_body_path : literal,
+			$( $_refresher_name : ident, )?
 			$_description : literal
 	) => {
 		
@@ -190,16 +191,21 @@ macro_rules! askama_document {
 			
 			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::hss::ServerResult<$_template_name> {
 				use ::std::convert::From as _;
-				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) ?;
 				$crate::cfg_builder_askama_dynamic_disabled! {
+					$(
+						::std::compile_error ("`refresher` not supported without dynamic feature!");
+						type _refresher_type = $_refresher_name;
+					)?
 					let _title = ::std::string::String::from (::std::include_str! ($_title_path));
 					let _body = ::std::string::String::from (::std::include_str! ($_body_path));
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
+					$( $_refresher_name::refresh () ?; )?
 					use $crate::hss::ResultExtWrap as _;
 					let _title = ::std::fs::read_to_string ($_title_path) .or_wrap (0x32c4e114) ?;
 					let _body = ::std::fs::read_to_string ($_body_path) .or_wrap (0x222c7659) ?;
 				}
+				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) ?;
 				let _template = $_template_name {
 						context : _context,
 						title : _title,
@@ -447,7 +453,7 @@ macro_rules! resource {
 
 
 #[ macro_export ]
-// #[ cfg (all (feature = "builder-sass-dynamic-any", not (feature = "production"))) ]
+#[ cfg (all (feature = "builder-assets-sass-dynamic-any", not (feature = "production"))) ]
 macro_rules! resource_sass_dynamic {
 	
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : literal ) => {
@@ -513,7 +519,7 @@ macro_rules! resource_sass_dynamic {
 
 
 #[ macro_export ]
-// #[ cfg (all (feature = "builder-markdown-dynamic", not (feature = "production"))) ]
+#[ cfg (all (feature = "builder-markdown-dynamic", not (feature = "production"))) ]
 macro_rules! resource_markdown_dynamic {
 	
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_header_path : tt, $_footer_path : tt, $_description : literal ) => {
@@ -583,6 +589,34 @@ macro_rules! resource_markdown_dynamic {
 
 
 #[ macro_export ]
+#[ cfg (all (feature = "builder-markdown-dynamic", not (feature = "production"))) ]
+macro_rules! resource_markdown_refresher {
+	
+	( $_refresher_name : ident, $_source_path : tt, $_context_path : tt, $_title_path : tt, $_body_path : tt ) => {
+		
+		#[ allow (non_camel_case_types) ]
+		pub(crate) struct $_refresher_name {}
+		
+		#[ allow (dead_code) ]
+		impl $_refresher_name {
+			
+			fn refresh () -> $crate::hss::ServerResult {
+				$crate::support_markdown::compile_markdown_body_to_paths (
+						::std::path::Path::new ($crate::resource_path! ($_source_path)),
+						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_context_path))),
+						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_title_path))),
+						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_body_path))),
+					)
+					.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0xec077645, _error)))
+			}
+		}
+	};
+}
+
+
+
+
+#[ macro_export ]
 macro_rules! route {
 	
 	
@@ -597,7 +631,7 @@ macro_rules! route {
 				use ::std::convert::From as _;
 				use $crate::StaticResource as _;
 				let _resource = <$_resource_name>::new (_extensions) ?;
-			//	let _ : &dyn $crate::StaticResource = &_resource;
+				// let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = _resource.description ();
 				let _handler = $crate::hss::RouteHandler::HandlerDynArc (_resource.into_handler_dyn () .into_arc ());
@@ -653,7 +687,7 @@ macro_rules! route_sitemap {
 				let _prefix = ::std::string::String::from ($_prefix);
 				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
 				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format, ::std::option::Option::Some (_extensions)) ?;
-			//	let _ : &dyn $crate::StaticResource = &_resource;
+				// let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = _resource.description ();
 				let _handler = $crate::hss::RouteHandler::HandlerDynArc (_resource.into_handler_dyn () .into_arc ());
@@ -805,7 +839,7 @@ macro_rules! routes {
 						$(
 							{
 								let _route : $_route = <$_route>::new (_extensions) ?;
-							//	let _ : &dyn $crate::StaticRoute = &_route;
+								// let _ : &dyn $crate::StaticRoute = &_route;
 								let _route = _route.into_route ();
 								_route
 							},
