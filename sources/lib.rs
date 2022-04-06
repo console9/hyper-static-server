@@ -30,10 +30,10 @@ pub use crate::exporter::*;
 
 
 
-#[ cfg (any (feature = "builder", feature = "support-sass", feature = "support-markdown")) ]
+#[ cfg (feature = "support-builder") ]
 pub(crate) mod builder_errors;
 
-#[ cfg (any (feature = "builder", feature = "support-sass", feature = "support-markdown")) ]
+#[ cfg (feature = "support-builder") ]
 pub use crate::builder_errors::*;
 
 
@@ -91,7 +91,7 @@ pub use crate::runtime_sitemaps::*;
 
 
 
-#[ cfg (any (feature = "runtime", feature = "builder") ) ]
+#[ cfg (any (feature = "runtime", feature = "support-builder") ) ]
 pub use ::hyper_simple_server as hss;
 
 #[ cfg (feature = "runtime") ]

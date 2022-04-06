@@ -73,11 +73,6 @@ server = [
 ]
 
 exporter = [
-	"hyper-simple-server/hss-handler",
-	"hyper-simple-server/hss-routes",
-	"hyper-simple-server/hss-extensions",
-	"hyper-simple-server/hss-runtime",
-	"hyper-simple-server/hss-exports",
 	"hyper-simple-server/hss-config",
 	"hyper-simple-server/hss-cli",
 	"runtime",
@@ -85,6 +80,11 @@ exporter = [
 ]
 
 runtime = [
+	"hyper-simple-server/hss-handler",
+	"hyper-simple-server/hss-routes",
+	"hyper-simple-server/hss-extensions",
+	"hyper-simple-server/hss-runtime",
+	"hyper-simple-server/hss-exports",
 	"hyper-simple-server/hss-errors",
 ]
 
@@ -123,10 +123,9 @@ runtime-hss-exports = [
 ]
 
 builder = [
-	"hyper-simple-server/hss-errors",
+	"support-builder",
 	"walkdir",
 	"globset",
-	"blake2",
 	"proc-macro2",
 ]
 
@@ -169,11 +168,18 @@ builder-sitemaps = [
 builder-relaxed-dependencies = []
 
 support-sass = [
+	"support-builder",
 	"sass-rs",
 ]
 
 support-markdown = [
+	"support-builder",
 	"pulldown-cmark",
+]
+
+support-builder = [
+	"hyper-simple-server/hss-errors",
+	"blake2",
 ]
 
 features-fuzzing = []
