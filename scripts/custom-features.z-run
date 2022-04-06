@@ -17,11 +17,13 @@
 	builder-macros
 	builder-assets
 	builder-assets-sass
-	builder-assets-sass-rs
 	builder-markdown
 	builder-askama
 	builder-sitemaps
 	builder-relaxed-dependencies
+	builder-assets-sass-dynamic
+	builder-markdown-dynamic
+	builder-askama-dynamic
 	production
 !!
 

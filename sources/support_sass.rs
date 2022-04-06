@@ -1,10 +1,7 @@
 
 
-#[ cfg (feature = "support-sass-rs") ]
+#[ cfg (feature = "support-sass") ]
 use ::sass_rs as sass;
-
-#[ cfg (feature = "support-sass-alt") ]
-use ::sass_alt as sass;
 
 
 use ::std::{
@@ -36,7 +33,7 @@ use crate::builder_errors::*;
 
 
 
-#[ cfg (feature = "support-sass-rs") ]
+#[ cfg (feature = "support-sass") ]
 pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 	
 	let _extension = _source.extension () .or_wrap (0x836ff108) ? .to_str () .or_wrap (0x4068e13f) ?;

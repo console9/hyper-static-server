@@ -269,7 +269,7 @@ macro_rules! builder_call_asset_css {
 	};
 }
 
-#[ cfg (feature = "builder-assets-sass-any") ]
+#[ cfg (feature = "builder-assets-sass") ]
 #[ macro_export ]
 macro_rules! builder_call_asset_sass {
 	( $_builder : ident, { $_source : literal } ) => {

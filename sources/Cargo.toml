@@ -139,38 +139,13 @@ builder-assets = [
 ]
 
 builder-assets-sass = [
-	"builder-assets-sass-rs",
-]
-
-builder-assets-sass-rs = [
 	"builder",
-	"builder-assets-sass-any",
-	"support-sass-rs",
+	"support-sass",
 ]
-
-builder-assets-sass-alt = [
-	"builder",
-	"builder-assets-sass-any",
-	"support-sass-alt",
-]
-
-builder-assets-sass-any = []
 
 builder-assets-sass-dynamic = [
-	"builder-assets-sass-dynamic-rs",
+	"support-sass",
 ]
-
-builder-assets-sass-dynamic-rs = [
-	"builder-assets-sass-dynamic-any",
-	"support-sass-rs",
-]
-
-builder-assets-sass-dynamic-alt = [
-	"builder-assets-sass-dynamic-any",
-	"support-sass-alt",
-]
-
-builder-assets-sass-dynamic-any = []
 
 builder-markdown = [
 	"builder",
@@ -193,17 +168,9 @@ builder-sitemaps = [
 
 builder-relaxed-dependencies = []
 
-support-sass-rs = [
-	"support-sass-any",
+support-sass = [
 	"sass-rs",
 ]
-
-support-sass-alt = [
-	"support-sass-any",
-	"sass-alt",
-]
-
-support-sass-any = []
 
 support-markdown = [
 	"pulldown-cmark",

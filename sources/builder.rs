@@ -630,7 +630,7 @@ impl Builder {
 	
 	
 	#[ cfg (feature = "builder-assets") ]
-	#[ cfg (feature = "builder-assets-sass-any") ]
+	#[ cfg (feature = "builder-assets-sass") ]
 	pub fn route_sass (&mut self, _source_0 : &str, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _css_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
@@ -641,7 +641,7 @@ impl Builder {
 		let _route_base = self.configuration.css_route_base.clone ();
 		let _route_base = _route_base.as_ref () .map (PathBuf::as_path);
 		
-		if cfg! (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-assets-sass-dynamic-any"), feature = "production")) {
+		if cfg! (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-assets-sass-dynamic"), feature = "production")) {
 			
 			self.dependencies_include (&_source) ?;
 			
@@ -1159,7 +1159,7 @@ impl Builder {
 
 
 
-#[ cfg (feature = "builder-assets-sass-any") ]
+#[ cfg (feature = "builder-assets-sass") ]
 impl Builder {
 	
 	

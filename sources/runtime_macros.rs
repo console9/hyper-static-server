@@ -453,7 +453,7 @@ macro_rules! resource {
 
 
 #[ macro_export ]
-#[ cfg (all (feature = "builder-assets-sass-dynamic-any", not (feature = "production"))) ]
+#[ cfg (all (feature = "builder-assets-sass-dynamic", not (feature = "production"))) ]
 macro_rules! resource_sass_dynamic {
 	
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : literal ) => {
