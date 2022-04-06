@@ -14,6 +14,9 @@ path = "./sources/main.rs"
 default = ["server", "exporter"]
 development = [
 	"hyper-static-server/builder-relaxed-dependencies",
+	"hyper-static-server/builder-assets-sass-dynamic",
+	"hyper-static-server/builder-markdown-dynamic",
+	"hyper-static-server/builder-askama-dynamic",
 ]
 production = [
 	"hyper-static-server/production",
