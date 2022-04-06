@@ -553,7 +553,7 @@ impl Builder {
 				if let Some (_header_source) = &_header_source {
 					self.dependencies_include (_header_source) ?;
 				}
-				if let Some (_header_source) = &_footer_source {
+				if let Some (_footer_source) = &_footer_source {
 					self.dependencies_include (_footer_source) ?;
 				}
 			}
