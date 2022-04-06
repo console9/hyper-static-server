@@ -8,6 +8,7 @@
 	
 	askamas! ({"_", glob : "*/page-*.html"} => "/askamas");
 	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/askamas-with-context-empty");
+	// NOTE:  Not required, because `askama` properly tracks its dependencies.
 	// askamas_watch! ({"_", glob : "*.html-0"});
 	
 	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/askama/home-with-context-json");
@@ -49,9 +50,11 @@
 	
 	
 	asset_sass! ("_/css/main.scss");
-	// assets_watch! ("_/css");
+	// NOTE:  Required, because `sass-rs` doesn't properly track imported files.
+	assets_watch! ("_/css");
 	
 	asset_js! ("_/js/main.js");
+	// NOTE:  Not required for the moment.
 	// assets_watch! ("_/js");
 	
 	assets_images! ("_/images");
