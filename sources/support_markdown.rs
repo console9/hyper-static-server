@@ -107,6 +107,7 @@ pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) ->
 	_options.insert (cmark::Options::ENABLE_FOOTNOTES);
 	_options.insert (cmark::Options::ENABLE_STRIKETHROUGH);
 	_options.insert (cmark::Options::ENABLE_TASKLISTS);
+	_options.insert (cmark::Options::ENABLE_HEADING_ATTRIBUTES);
 	
 	let mut _body = String::with_capacity (_input.len () * 2);
 	
@@ -121,7 +122,7 @@ pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) ->
 	let _parser = _parser.into_iter () .inspect (
 			|_event| {
 				match _event {
-					cmark::Event::Start (cmark::Tag::Heading (1)) =>
+					cmark::Event::Start (cmark::Tag::Heading (cmark::HeadingLevel::H1, _, _)) =>
 						if _title_capture == None {
 							_title_capture = Some (true);
 						},

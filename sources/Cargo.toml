@@ -199,7 +199,7 @@ features-none = []
 hyper-simple-server = { version = "0.3.0", default-features = false, optional = true }
 
 globset = { version = "0.4.6", default-features = false, optional = true }
-pulldown-cmark = { version = "0.8.0", default-features = false, optional = true }
+pulldown-cmark = { version = "0.9.1", default-features = false, optional = true }
 rand = { version = "0.8.3", default-features = false, features = ["std", "std_rng"], optional = true }
 sass-rs = { version = "0.2.2", default-features = false, optional = true }
 sass-alt = { version = "0.2.7", default-features = false, optional = true }
