@@ -441,8 +441,10 @@ impl Builder {
 			
 			self.dependencies_include (_source_markdown) ?;
 			
-			let (_markdown_body, _markdown_title, _markdown_frontmatter) = self.compile_markdown_body (_source_markdown, true) ?;
-			let _markdown_title = _markdown_title.unwrap_or (String::new ());
+			let _markdown = self.compile_markdown_body (_source_markdown, true) ?;
+			let _markdown_title = _markdown.title.unwrap_or (String::new ());
+			let _markdown_body = _markdown.body;
+			let _markdown_frontmatter = _markdown.frontmatter;
 			
 			let _output_title = self.configuration.outputs.join (fingerprint_data (&_markdown_title)) .with_extension ("txt");
 			create_file_from_str (&_output_title, &_markdown_title, true, true) ?;
@@ -1174,8 +1176,10 @@ impl Builder {
 #[ cfg (feature = "builder-markdown") ]
 impl Builder {
 	
-	fn compile_markdown_body (&self, _source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
-		crate::support_markdown::compile_markdown_body_from_path (_source, _title_detect)
+	fn compile_markdown_body (&self, _source : &Path, _title_detect : bool) -> BuilderResult<crate::support_markdown::MarkdownOutput> {
+		let mut _options = crate::support_markdown::MarkdownOptions::new ();
+		_options.title_detect = _title_detect;
+		crate::support_markdown::compile_markdown_body_from_path (_source, _options)
 	}
 	
 	fn compile_markdown_html (&self, _source : &Path, _header : Option<&Path>, _footer : Option<&Path>) -> BuilderResult<String> {

@@ -31,15 +31,59 @@ use crate::builder_errors::*;
 
 
 
-pub fn compile_markdown_body_from_path (_source : &Path, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
+pub struct MarkdownOptions {
 	
-	let _source = fs::read_to_string (_source) ?;
+	pub title_detect : bool,
+	pub headings_detect : bool,
+	pub headings_anchors : bool,
 	
-	compile_markdown_body_from_data (_source.as_str (), _title_detect)
+	pub enable_tables : bool,
+	pub enable_footnotes : bool,
+	pub enable_strikethrough : bool,
+	pub enable_tasklists : bool,
+	pub enable_headings_attributes : bool,
+	
 }
 
 
-pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) -> BuilderResult<(String, Option<String>, Option<(String, String)>)> {
+impl MarkdownOptions {
+	
+	pub fn new () -> Self {
+		Self {
+				
+				title_detect : false,
+				headings_detect : false,
+				headings_anchors : false,
+				
+				enable_tables : true,
+				enable_footnotes : true,
+				enable_strikethrough : true,
+				enable_tasklists : true,
+				enable_headings_attributes : false,
+				
+			}
+	}
+}
+
+
+pub struct MarkdownOutput {
+	pub body : String,
+	pub title : Option<String>,
+	pub frontmatter : Option<(String, String)>,
+}
+
+
+
+
+pub fn compile_markdown_body_from_path (_source : &Path, _options : MarkdownOptions) -> BuilderResult<MarkdownOutput> {
+	
+	let _source = fs::read_to_string (_source) ?;
+	
+	compile_markdown_body_from_data (_source.as_str (), _options)
+}
+
+
+pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptions) -> BuilderResult<MarkdownOutput> {
 	
 	let mut _input : Vec<&str> = _source.lines () .skip_while (|_line| _line.is_empty ()) .collect ();
 	while let Some (_line) = _input.last () {
@@ -102,45 +146,59 @@ pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) ->
 	
 	let _input = _input.join ("\n");
 	
-	let mut _options = cmark::Options::empty ();
-	_options.insert (cmark::Options::ENABLE_TABLES);
-	_options.insert (cmark::Options::ENABLE_FOOTNOTES);
-	_options.insert (cmark::Options::ENABLE_STRIKETHROUGH);
-	_options.insert (cmark::Options::ENABLE_TASKLISTS);
-	_options.insert (cmark::Options::ENABLE_HEADING_ATTRIBUTES);
+	let mut _parser_options = cmark::Options::empty ();
+	if _options.enable_tables {
+		_parser_options.insert (cmark::Options::ENABLE_TABLES);
+	}
+	if _options.enable_footnotes {
+		_parser_options.insert (cmark::Options::ENABLE_FOOTNOTES);
+	}
+	if _options.enable_strikethrough {
+		_parser_options.insert (cmark::Options::ENABLE_STRIKETHROUGH);
+	}
+	if _options.enable_tasklists {
+		_parser_options.insert (cmark::Options::ENABLE_TASKLISTS);
+	}
+	if _options.enable_headings_attributes {
+		_parser_options.insert (cmark::Options::ENABLE_HEADING_ATTRIBUTES);
+	}
 	
 	let mut _body = String::with_capacity (_input.len () * 2);
 	
+	
+	let _parser = cmark::Parser::new_ext (&_input, _parser_options);
+	
+	let _events : Vec<_> = _parser.into_iter () .collect ();
+	
 	let mut _title = None;
-	let mut _title_capture = None;
-	if ! _title_detect {
-		_title_capture = Some (false);
+	if _options.title_detect {
+		let mut _capture_next = false;
+		for _event in _events.iter () {
+			match _event {
+				cmark::Event::Start (cmark::Tag::Heading (cmark::HeadingLevel::H1, _, _)) =>
+					_capture_next = true,
+				cmark::Event::Text (_text) =>
+					if _capture_next {
+						if ! _text.is_empty () {
+							_title = Some (_text.as_ref () .to_owned ());
+						}
+						break;
+					},
+				_ =>
+					(),
+			}
+		}
 	}
 	
-	let _parser = cmark::Parser::new_ext (&_input, _options);
+	cmark::html::push_html (&mut _body, _events.into_iter ());
 	
-	let _parser = _parser.into_iter () .inspect (
-			|_event| {
-				match _event {
-					cmark::Event::Start (cmark::Tag::Heading (cmark::HeadingLevel::H1, _, _)) =>
-						if _title_capture == None {
-							_title_capture = Some (true);
-						},
-					cmark::Event::Text (_text) =>
-						if _title_capture == Some (true) {
-							if ! _text.is_empty () {
-								_title = Some (_text.as_ref () .to_owned ());
-							}
-							_title_capture = Some (false);
-						},
-					_ =>
-						(),
-				}
-			});
+	let _output = MarkdownOutput {
+			body : _body,
+			title : _title,
+			frontmatter : _frontmatter,
+		};
 	
-	cmark::html::push_html (&mut _body, _parser);
-	
-	Ok ((_body, _title, _frontmatter))
+	Ok (_output)
 }
 
 
@@ -148,7 +206,14 @@ pub fn compile_markdown_body_from_data (_source : &str, _title_detect : bool) ->
 
 pub fn compile_markdown_body_to_paths (_source_path : &Path, _context_path : Option<&Path>, _title_path : Option<&Path>, _body_path : Option<&Path>) -> BuilderResult {
 	
-	let (_body, _title, _frontmatter) = compile_markdown_body_from_path (_source_path, _title_path.is_some ()) ?;
+	let mut _options = MarkdownOptions::new ();
+	_options.title_detect = _title_path.is_some ();
+	
+	let _output = compile_markdown_body_from_path (_source_path, _options) ?;
+	
+	let _body = _output.body;
+	let _title = _output.title;
+	let _frontmatter = _output.frontmatter;
 	
 	if let Some (_path) = _context_path {
 		let _data = if let Some ((_type, _data)) = _frontmatter {
@@ -204,7 +269,14 @@ pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>
 
 pub fn compile_markdown_html_from_data (_source : &str, _header : Option<&str>, _footer : Option<&str>) -> BuilderResult<String> {
 	
-	let (_body, _title, _frontmatter) = compile_markdown_body_from_data (_source, true) ?;
+	let mut _options = MarkdownOptions::new ();
+	_options.title_detect = true;
+	
+	let _output = compile_markdown_body_from_data (_source, _options) ?;
+	
+	let _body = _output.body;
+	let _title = _output.title;
+	let _frontmatter = _output.frontmatter;
 	
 	let _html = if _header.is_some () || _footer.is_some () {
 		
