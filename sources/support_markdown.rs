@@ -1,5 +1,6 @@
 
 use ::pulldown_cmark as cmark;
+use ::any_ascii as any_ascii;
 
 
 use ::std::{
@@ -53,7 +54,7 @@ impl MarkdownOptions {
 				
 				title_detect : false,
 				headings_detect : false,
-				headings_anchors : false,
+				headings_anchors : true,
 				
 				enable_tables : true,
 				enable_footnotes : true,
@@ -168,7 +169,7 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 	
 	let _parser = cmark::Parser::new_ext (&_input, _parser_options);
 	
-	let _events : Vec<_> = _parser.into_iter () .collect ();
+	let mut _events : Vec<_> = _parser.into_iter () .collect ();
 	
 	let mut _title = None;
 	if _options.title_detect {
@@ -183,9 +184,43 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 							_title = Some (_text.as_ref () .to_owned ());
 						}
 						break;
-					},
+					}
 				_ =>
 					(),
+			}
+		}
+	}
+	
+	let mut _headings_anchors = Vec::new ();
+	if _options.headings_anchors {
+		let mut _generate_next = false;
+		for (_index, _event) in _events.iter () .enumerate () {
+			match _event {
+				cmark::Event::Start (cmark::Tag::Heading (_, _anchor, _)) =>
+					if _anchor.is_none () {
+						_generate_next = true;
+					}
+				cmark::Event::Text (_text) =>
+					if _generate_next {
+						if ! _text.is_empty () {
+							let _anchor_id = markdown_anchor_from_text (_text.as_ref ());
+							if ! _anchor_id.is_empty () {
+								_headings_anchors.push ((_index - 1, _anchor_id));
+							}
+						}
+						_generate_next = false;
+					}
+				_ =>
+					(),
+			}
+		}
+		for (_index, _anchor_id) in _headings_anchors.iter () {
+			let _event = _events.get_mut (*_index) .infallible (0xf65facdb);
+			match _event {
+				cmark::Event::Start (cmark::Tag::Heading (_, ref mut _anchor, _)) =>
+					*_anchor = Some (_anchor_id),
+				_ =>
+					unreachable! ("[eddfdaf1]"),
 			}
 		}
 	}
@@ -326,5 +361,35 @@ pub fn compile_markdown_html_from_data (_source : &str, _header : Option<&str>, 
 	};
 	
 	Ok (_html)
+}
+
+
+
+
+pub fn markdown_anchor_from_text (_text : &str) -> String {
+	
+	let mut _text = any_ascii::any_ascii (_text);
+	_text.make_ascii_lowercase ();
+	
+	let _max_length = std::cmp::max (_text.len (), 128);
+	let mut _id = String::with_capacity (_max_length);
+	
+	let mut _separator = false;
+	for _character in _text.chars () {
+		if _id.len () >= _max_length {
+			break;
+		}
+		if _character.is_ascii_alphabetic () || _character.is_ascii_digit () {
+			if _separator {
+				_id.push ('_');
+				_separator = false;
+			}
+			_id.push (_character);
+		} else {
+			_separator = true;
+		}
+	}
+	
+	return _id;
 }
 
