@@ -52,8 +52,8 @@ impl MarkdownOptions {
 	pub fn new () -> Self {
 		Self {
 				
-				title_detect : false,
-				headings_detect : false,
+				title_detect : true,
+				headings_detect : true,
 				headings_anchors : true,
 				
 				enable_tables : true,
@@ -67,10 +67,26 @@ impl MarkdownOptions {
 }
 
 
+
+
 pub struct MarkdownOutput {
 	pub body : String,
 	pub title : Option<String>,
-	pub frontmatter : Option<(String, String)>,
+	pub headers : Option<Vec<MarkdownHeader>>,
+	pub frontmatter : Option<MarkdownFrontmatter>,
+}
+
+
+pub struct MarkdownHeader {
+	pub level : u8,
+	pub text : String,
+	pub anchor : String,
+}
+
+
+pub struct MarkdownFrontmatter {
+	pub encoding : String,
+	pub data : String,
 }
 
 
@@ -115,7 +131,7 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 		} else {
 			None
 		};
-		if let Some ((_type, _marker)) = _detected {
+		if let Some ((_encoding, _marker)) = _detected {
 			let mut _input = _input.into_iter ();
 			let mut _frontmatter = Vec::new ();
 			let mut _frontmatter_is_empty = true;
@@ -133,9 +149,9 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 			}
 			let _input : Vec<&str> = _input.collect ();
 			let _frontmatter = if ! _frontmatter_is_empty {
-				let _type = String::from (_type);
+				let _encoding = String::from (_encoding);
 				let _frontmatter = _frontmatter.join ("\n");
-				Some ((_type, _frontmatter))
+				Some ((_encoding, _frontmatter))
 			} else {
 				None
 			};
@@ -227,9 +243,21 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 	
 	cmark::html::push_html (&mut _body, _events.into_iter ());
 	
+	let _frontmatter = if let Some ((_encoding, _data)) = _frontmatter {
+		Some (MarkdownFrontmatter {
+				encoding : _encoding,
+				data : _data,
+			})
+	} else {
+		None
+	};
+	
+	let _headers = None;
+	
 	let _output = MarkdownOutput {
 			body : _body,
 			title : _title,
+			headers : _headers,
 			frontmatter : _frontmatter,
 		};
 	
@@ -251,11 +279,11 @@ pub fn compile_markdown_body_to_paths (_source_path : &Path, _context_path : Opt
 	let _frontmatter = _output.frontmatter;
 	
 	if let Some (_path) = _context_path {
-		let _data = if let Some ((_type, _data)) = _frontmatter {
-			match _type.as_str () {
-				"toml" => "## toml\n".to_owned () + &_data,
-				"yaml" => "## yaml\n".to_owned () + &_data,
-				"json" => _data,
+		let _data = if let Some (_frontmatter) = _frontmatter {
+			match _frontmatter.encoding.as_str () {
+				"toml" => "## toml\n".to_owned () + &_frontmatter.data,
+				"yaml" => "## yaml\n".to_owned () + &_frontmatter.data,
+				"json" => _frontmatter.data,
 				_ =>
 					return Err (error_with_code (0xfc776131)),
 			}

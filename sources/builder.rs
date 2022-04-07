@@ -452,8 +452,10 @@ impl Builder {
 			let _output_body = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
 			create_file_from_str (&_output_body, &_markdown_body, true, true) ?;
 			
-			let _output_frontmatter = if let Some ((_type, _data)) = _markdown_frontmatter {
-				let _extension = match _type.as_ref () {
+			let _output_frontmatter = if let Some (_frontmatter) = _markdown_frontmatter {
+				let _encoding = _frontmatter.encoding.as_ref ();
+				let _data = _frontmatter.data.as_ref ();
+				let _extension = match _encoding {
 					"toml" =>
 						"toml",
 					"yaml" =>
@@ -461,7 +463,7 @@ impl Builder {
 					"json" =>
 						"json",
 					_ =>
-						return Err (error_with_format (0x75f4427f, format_args! ("{}", _type))),
+						return Err (error_with_format (0x75f4427f, format_args! ("{}", _encoding))),
 				};
 				let _path = self.configuration.outputs.join (fingerprint_data (&_data)) .with_extension (_extension);
 				create_file_from_str (&_path, &_data, true, true) ?;
