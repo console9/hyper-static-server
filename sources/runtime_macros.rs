@@ -128,8 +128,9 @@ macro_rules! askama_document {
 			$_context_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
-			$_title_path : literal,
 			$_body_path : literal,
+			$_title_path : literal,
+			$_metadata_path : literal,
 			$( $_refresher_name : ident, )?
 			$_description : literal
 	) => {
@@ -139,8 +140,9 @@ macro_rules! askama_document {
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_template_name {
 			pub context : $crate::askama_context_type! ($_context_descriptor),
-			pub title : ::std::string::String,
 			pub body : ::std::string::String,
+			pub title : ::std::string::String,
+			pub metadata : $crate::AskamaDocumentMetadata,
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
@@ -196,20 +198,25 @@ macro_rules! askama_document {
 						::std::compile_error ("`refresher` not supported without dynamic feature!");
 						type _refresher_type = $_refresher_name;
 					)?
-					let _title = ::std::string::String::from (::std::include_str! ($_title_path));
 					let _body = ::std::string::String::from (::std::include_str! ($_body_path));
+					let _title = ::std::string::String::from (::std::include_str! ($_title_path));
+					let _metadata = ::std::include_str! ($_metadata_path);
+					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (_metadata) ?;
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					$( $_refresher_name::refresh () ?; )?
 					use $crate::hss::ResultExtWrap as _;
-					let _title = ::std::fs::read_to_string ($_title_path) .or_wrap (0x32c4e114) ?;
 					let _body = ::std::fs::read_to_string ($_body_path) .or_wrap (0x222c7659) ?;
+					let _title = ::std::fs::read_to_string ($_title_path) .or_wrap (0x32c4e114) ?;
+					let _metadata = ::std::fs::read_to_string ($_metadata_path) .or_wrap (0xc07d6b78) ?;
+					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) ?;
 				}
 				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) ?;
 				let _template = $_template_name {
 						context : _context,
-						title : _title,
 						body : _body,
+						title : _title,
+						metadata : _metadata,
 						__is_production : $crate::cfg_if_production! ({ true } | { false }),
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
 					};
@@ -277,7 +284,7 @@ macro_rules! askama_context_new {
 	( { type : $_context_type : ty }, $_extensions : expr ) => {
 		{
 			let _extensions : &$crate::hss::Extensions = $_extensions;
-			<$_context_type as $crate::StaticAskamaContext>::new_with_extensions (_extensions)
+			<$_context_type as $crate::AskamaContext>::new_with_extensions (_extensions)
 		}
 	};
 	
@@ -308,7 +315,7 @@ macro_rules! askama_context_new {
 			let _encoding : &str = $_context_encoding;
 			let _data : &[u8] = ::std::include_bytes! ($_context_path);
 			let _extensions : &$crate::hss::Extensions = $_extensions;
-			<$_context_type as $crate::StaticAskamaContext>::new_with_deserialization (_encoding, _data, _extensions)
+			<$_context_type as $crate::AskamaContext>::new_with_deserialization (_encoding, _data, _extensions)
 		}
 	};
 	
@@ -318,7 +325,7 @@ macro_rules! askama_context_new {
 			let _encoding : &str = $_context_encoding;
 			let _data = ::std::fs::read ($_context_path) .or_wrap (0x98ea260c) ?;
 			let _extensions : &$crate::hss::Extensions = $_extensions;
-			<$_context_type as $crate::StaticAskamaContext>::new_with_deserialization (_encoding, &_data, _extensions)
+			<$_context_type as $crate::AskamaContext>::new_with_deserialization (_encoding, &_data, _extensions)
 		}
 	};
 }
@@ -544,7 +551,7 @@ macro_rules! resource_markdown_dynamic {
 			}
 			
 			pub fn render (&self) -> $crate::hss::ServerResult<::std::string::String> {
-				$crate::support_markdown::compile_markdown_html_from_path (self.source, self.header, self.footer)
+				$crate::support_markdown::compile_markdown_html_from_path (self.source, self.header, self.footer, ::std::option::Option::None)
 						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x35c91763, _error)))
 			}
 			
@@ -592,7 +599,7 @@ macro_rules! resource_markdown_dynamic {
 #[ cfg (all (feature = "builder-markdown-dynamic", not (feature = "production"))) ]
 macro_rules! resource_markdown_refresher {
 	
-	( $_refresher_name : ident, $_source_path : tt, $_context_path : tt, $_title_path : tt, $_body_path : tt ) => {
+	( $_refresher_name : ident, $_source_path : tt, $_body_path : tt, $_title_path : tt, $_metadata_path : tt, $_frontmatter_path : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_refresher_name {}
@@ -601,11 +608,13 @@ macro_rules! resource_markdown_refresher {
 		impl $_refresher_name {
 			
 			fn refresh () -> $crate::hss::ServerResult {
-				$crate::support_markdown::compile_markdown_body_to_paths (
+				$crate::support_markdown::compile_markdown_from_path_to_paths (
 						::std::path::Path::new ($crate::resource_path! ($_source_path)),
-						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_context_path))),
-						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_title_path))),
+						::std::option::Option::None,
 						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_body_path))),
+						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_title_path))),
+						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_metadata_path))),
+						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_frontmatter_path))),
 					)
 					.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0xec077645, _error)))
 			}

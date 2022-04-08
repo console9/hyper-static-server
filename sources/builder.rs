@@ -437,31 +437,34 @@ impl Builder {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
 		
-		let (_output_title, _output_body, _output_frontmatter, _refresher) = if cfg! (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-markdown-dynamic"), not (feature = "builder-askama-dynamic"), feature = "production")) {
+		let (_output_body, _output_title, _output_metadata, _output_frontmatter, _refresher) = if cfg! (any (not (feature = "builder-relaxed-dependencies"), not (feature = "builder-markdown-dynamic"), not (feature = "builder-askama-dynamic"), feature = "production")) {
 			
 			self.dependencies_include (_source_markdown) ?;
 			
 			let _markdown = self.compile_markdown_body (_source_markdown, true) ?;
-			let _markdown_title = _markdown.title.unwrap_or (String::new ());
 			let _markdown_body = _markdown.body;
+			let _markdown_metadata = _markdown.metadata;
 			let _markdown_frontmatter = _markdown.frontmatter;
 			
+			let _markdown_title = _markdown_metadata.title.as_ref () .map (String::as_str) .unwrap_or ("");
+			
 			let _output_title = self.configuration.outputs.join (fingerprint_data (&_markdown_title)) .with_extension ("txt");
-			create_file_from_str (&_output_title, &_markdown_title, true, true) ?;
+			create_file_from_str (&_output_title, _markdown_title, true, true) ?;
 			
 			let _output_body = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("html");
 			create_file_from_str (&_output_body, &_markdown_body, true, true) ?;
+			
+			let _output_metadata = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("meta");
+			let _markdown_metadata = ::serde_json::to_string_pretty (&_markdown_metadata) .or_wrap (0x94fe158d) ?;
+			create_file_from_str (&_output_metadata, &_markdown_metadata, true, true) ?;
 			
 			let _output_frontmatter = if let Some (_frontmatter) = _markdown_frontmatter {
 				let _encoding = _frontmatter.encoding.as_ref ();
 				let _data = _frontmatter.data.as_ref ();
 				let _extension = match _encoding {
-					"toml" =>
-						"toml",
-					"yaml" =>
-						"yaml",
-					"json" =>
-						"json",
+					"toml" => "toml",
+					"yaml" => "yaml",
+					"json" => "json",
 					_ =>
 						return Err (error_with_format (0x75f4427f, format_args! ("{}", _encoding))),
 				};
@@ -472,19 +475,21 @@ impl Builder {
 				None
 			};
 			
-			(_output_title, _output_body, _output_frontmatter, false)
+			(_output_body, _output_title, _output_metadata, _output_frontmatter, false)
 			
 		} else {
 			
 			let _token = fingerprint_data (_source_markdown.to_string_lossy () .as_bytes ());
 			
+			let _output_body = self.configuration.outputs.join (&_token) .with_extension ("html");
+			
 			let _output_title = self.configuration.outputs.join (&_token) .with_extension ("txt");
 			
-			let _output_body = self.configuration.outputs.join (&_token) .with_extension ("html");
+			let _output_metadata = self.configuration.outputs.join (&_token) .with_extension ("meta");
 			
 			let _output_frontmatter = self.configuration.outputs.join (&_token) .with_extension ("data");
 			
-			(_output_title, _output_body, Some (("auto", _output_frontmatter)), true)
+			(_output_body, _output_title, _output_metadata, Some (("auto", _output_frontmatter)), true)
 		};
 		
 		let _route = _route_builder.build (&_relative_markdown_1, _source_markdown, _route_base, None) ?;
@@ -503,7 +508,7 @@ impl Builder {
 		
 		let _refresher_code = if _refresher {
 			let (_context_encoding, _context_path) = _output_frontmatter.as_ref () .or_panic (0xc27ad812);
-			writeln! (self.generated, "::hyper_static_server::resource_markdown_refresher! (Refresher_{}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}));", _id, _source_markdown, _context_path, _output_title, _output_body) .infallible (0x2b54879e);
+			writeln! (self.generated, "::hyper_static_server::resource_markdown_refresher! (Refresher_{}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}));", _id, _source_markdown, _output_body, _output_title, _output_metadata, _context_path) .infallible (0x2b54879e);
 			format! ("Refresher_{},", _id)
 		} else {
 			String::new ()
@@ -511,14 +516,14 @@ impl Builder {
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			if let Some (_context_type) = _context {
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _output_title, _output_body, _refresher_code, _description) .infallible (0xd64341cb);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 			} else {
 				let _context_type = _context.unwrap_or ("()");
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _content_type, _template, _output_title, _output_body, _refresher_code, _description) .infallible (0xd64341cb);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 			}
 		} else {
 			let _context_type = _context.unwrap_or ("()");
-			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _content_type, _template, _output_title, _output_body, _refresher_code, _description) .infallible (0xd64341cb);
+			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 		}
 		
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
@@ -1179,13 +1184,13 @@ impl Builder {
 impl Builder {
 	
 	fn compile_markdown_body (&self, _source : &Path, _title_detect : bool) -> BuilderResult<crate::support_markdown::MarkdownOutput> {
-		let mut _options = crate::support_markdown::MarkdownOptions::new ();
+		let mut _options = crate::support_markdown::MarkdownOptions::default ();
 		_options.title_detect = _title_detect;
-		crate::support_markdown::compile_markdown_body_from_path (_source, _options)
+		crate::support_markdown::compile_markdown_from_path (_source, Some (&_options))
 	}
 	
 	fn compile_markdown_html (&self, _source : &Path, _header : Option<&Path>, _footer : Option<&Path>) -> BuilderResult<String> {
-		crate::support_markdown::compile_markdown_html_from_path (_source, _header, _footer)
+		crate::support_markdown::compile_markdown_html_from_path (_source, _header, _footer, None)
 	}
 }
 
@@ -1368,8 +1373,7 @@ fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'stati
 		"otf" => "font_otf",
 		"woff" => "font_woff",
 		"woff2" => "font_woff2",
-		_ =>
-			return Err (error_with_format (0x2bd15bab, format_args! ("{}", _source.display ()))),
+		_ => "unknown",
 	};
 	
 	Ok (_content_type)

@@ -18,7 +18,7 @@ use crate::{
 
 
 
-pub trait StaticAskamaContext
+pub trait AskamaContext
 		where Self : Sized
 {
 	fn new_with_defaults () -> ServerResult<Self> {
@@ -35,7 +35,7 @@ pub trait StaticAskamaContext
 }
 
 
-impl StaticAskamaContext for () {
+impl AskamaContext for () {
 	
 	fn new_with_defaults () -> ServerResult<()> {
 		Ok (())
@@ -50,7 +50,7 @@ impl StaticAskamaContext for () {
 
 
 #[ cfg (feature = "runtime-askama-serde") ]
-pub trait StaticAskamaContextSerde
+pub trait AskamaContextSerde
 		where
 				Self : Sized,
 				Self : ::serde::de::DeserializeOwned,
@@ -91,10 +91,56 @@ pub trait StaticAskamaContextSerde
 
 
 #[ cfg (feature = "runtime-askama-serde") ]
-impl <S : StaticAskamaContextSerde> StaticAskamaContext for S {
+impl <S : AskamaContextSerde> AskamaContext for S {
 	
 	fn new_with_deserialization (_encoding : &str, _data : &[u8], _extensions : &hss::Extensions) -> ServerResult<Self> {
 		Self::new_with_serde (_encoding, _data)
+	}
+}
+
+
+
+
+#[ cfg (feature = "runtime-askama-serde") ]
+#[ derive (Debug, Clone) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
+pub struct AskamaDocumentMetadata {
+	pub title : Option<String>,
+	pub headings : Option<Vec<AskamaDocumentHeading>>,
+}
+
+
+#[ cfg (feature = "runtime-askama-serde") ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
+#[ derive (Debug, Clone) ]
+pub struct AskamaDocumentHeading {
+	pub level : u8,
+	pub text : Option<String>,
+	pub anchor : Option<String>,
+}
+
+
+#[ cfg (feature = "runtime-askama-serde") ]
+impl AskamaDocumentMetadata {
+	
+	pub fn load_from_json (_json : &str) -> ServerResult<Self> {
+		::serde_json::from_str (_json) .or_wrap (0x6410e85f)
+	}
+}
+
+
+
+
+#[ cfg (not (feature = "runtime-askama-serde")) ]
+#[ derive (Debug, Clone) ]
+pub struct AskamaDocumentMetadata ();
+
+
+#[ cfg (not (feature = "runtime-askama-serde")) ]
+impl AskamaDocumentMetadata {
+	
+	pub fn load_from_json (_json : &str) -> ServerResult<Self> {
+		Ok (Self ())
 	}
 }
 

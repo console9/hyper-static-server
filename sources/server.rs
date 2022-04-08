@@ -89,6 +89,9 @@ impl StaticHandler {
 	#[ cfg (not (feature = "production")) ]
 	pub fn serve_routes_index_html (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
+		let mut _routes : Vec<_> = self.routes.routes () .collect ();
+		_routes.sort_by_key (|_route| &_route.path);
+		
 		let mut _buffer = String::with_capacity (128 * 1024);
 		
 		fn _sanitize (_text : &str, _quote : bool) -> String {
@@ -103,9 +106,10 @@ impl StaticHandler {
 			return _text;
 		}
 		
-		_buffer.push_str ("<!DOCTYPE html><html lang=\"en\"><head><title>Vaktundur -- routes</title></head>\n");
+		_buffer.push_str ("<!DOCTYPE html><html lang=\"en\">\n");
+		_buffer.push_str ("<head><title>Vaktundur -- routes</title><script src=\"/__/reload.js\" defer></script></head>\n");
 		_buffer.push_str ("<body><ul>\n");
-		for _route in self.routes.routes () {
+		for _route in _routes.into_iter () {
 			_buffer.push_str ("<li><code><a href=\"");
 			_buffer.push_str (& _sanitize (&_route.path, true));
 			_buffer.push_str ("\">");
@@ -126,9 +130,12 @@ impl StaticHandler {
 	#[ cfg (not (feature = "production")) ]
 	pub fn serve_routes_index_txt (&self, _request : hss::Request<hss::Body>) -> hss::HandlerFutureDynBox {
 		
+		let mut _routes : Vec<_> = self.routes.routes () .collect ();
+		_routes.sort_by_key (|_route| &_route.path);
+		
 		let mut _buffer = String::with_capacity (128 * 1024);
 		
-		for _route in self.routes.routes () {
+		for _route in _routes.into_iter () {
 			_buffer.push_str ("* ");
 			_buffer.push_str (&_route.path);
 			if let Some (_debug) = _route.extensions.get::<StaticRouteDebug> () {
