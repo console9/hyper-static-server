@@ -4,9 +4,17 @@
 
 
 <<.. features / list
+	all
+	all-dynamic
 	server
+	server-all
+	server-all-dynamic
 	exporter
+	exporter-all
+	exporter-all-dynamic
 	runtime
+	runtime-all
+	runtime-all-dynamic
 	runtime-macros
 	runtime-askama
 	runtime-askama-serde
@@ -14,6 +22,8 @@
 	runtime-sitemaps-xml
 	runtime-hss-exports
 	builder
+	builder-all
+	builder-all-dynamic
 	builder-macros
 	builder-assets
 	builder-assets-sass

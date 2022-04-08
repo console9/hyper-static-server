@@ -11,31 +11,22 @@ name = "example"
 path = "./sources/main.rs"
 
 [features]
-default = ["server", "exporter"]
+default = [
+	"server",
+	"exporter",
+]
 development = [
-	"hyper-static-server/builder-relaxed-dependencies",
-	"hyper-static-server/builder-assets-sass-dynamic",
-	"hyper-static-server/builder-markdown-dynamic",
-	"hyper-static-server/builder-askama-dynamic",
+	"hyper-static-server/server-all-dynamic",
+	"hyper-static-server/exporter-all-dynamic",
+]
+server = [
+	"hyper-static-server/server-all",
+]
+exporter = [
+	"hyper-static-server/exporter-all",
 ]
 production = [
 	"hyper-static-server/production",
-]
-server = [
-	"hyper-static-server/server",
-	"hyper-static-server/runtime-macros",
-	"hyper-static-server/runtime-askama",
-	"hyper-static-server/runtime-askama-serde",
-	"hyper-static-server/runtime-sitemaps",
-	"hyper-static-server/runtime-sitemaps-xml",
-]
-exporter = [
-	"hyper-static-server/exporter",
-	"hyper-static-server/runtime-macros",
-	"hyper-static-server/runtime-askama",
-	"hyper-static-server/runtime-askama-serde",
-	"hyper-static-server/runtime-sitemaps",
-	"hyper-static-server/runtime-sitemaps-xml",
 ]
 
 [dependencies]
@@ -45,14 +36,7 @@ askama = { package = "askama_patched", version = "*", default-features = true }
 serde = { version = "1.0.136", default-features = true }
 
 [build-dependencies]
-hyper-static-server = { version = "0.4.0", default-features = false, features = [
-		"builder-macros",
-		"builder-assets",
-		"builder-assets-sass",
-		"builder-markdown",
-		"builder-askama",
-		"builder-sitemaps",
-	] }
+hyper-static-server = { version = "0.4.0", default-features = false, features = ["builder-all-dynamic"] }
 
 [patch.crates-io]
 hyper-static-server = { path = "../../hyper-static-server/sources" }

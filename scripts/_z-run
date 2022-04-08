@@ -51,4 +51,5 @@
 
 && _/custom-environment.z-run
 && _/custom-features.z-run
+&& _/custom-scriptlets.z-run
 

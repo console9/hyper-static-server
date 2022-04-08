@@ -2,6 +2,6 @@
 
 
 :: rust / features / set / quick / default :: export -- _RUST_FEATURES=default _EXAMPLE_FEATURES=default
-:: rust / features / set / quick / production :: export -- _RUST_FEATURES=default _EXAMPLE_FEATURES=default,production
-:: rust / features / set / quick / development :: export -- _RUST_FEATURES=default _EXAMPLE_FEATURES=default,development
+:: rust / features / set / quick / production :: export -- _RUST_FEATURES=all,production _EXAMPLE_FEATURES=default,production
+:: rust / features / set / quick / development :: export -- _RUST_FEATURES=all-dynamic _EXAMPLE_FEATURES=default,development
 

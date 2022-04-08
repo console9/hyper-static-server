@@ -1,0 +1,53 @@
+#!/dev/null
+
+
+
+
+--<<== project / generator / features / custom
+	#! <template>
+	
+	{{ $_features := array
+			
+			"all"
+			"server-all"
+			"exporter-all"
+			"runtime-all"
+			"builder-all"
+			
+			"all-dynamic"
+			"server-all-dynamic"
+			"exporter-all-dynamic"
+			"runtime-all-dynamic"
+			"builder-all-dynamic"
+			
+			"production,all"
+			"production,server-all"
+			"production,exporter-all"
+			"production,runtime-all"
+			"production,builder-all"
+	}}
+	
+	{{ $_actions := array
+			
+			"debug / build / lib"
+			"debug / check / lib"
+			
+			"docs / crate / internals / build"
+			"docs / crate / exports / build"
+	}}
+	
+	{{ range $_, $_action := $_actions }}
+	::// {{ $_action }} / with / ...
+	{{ range $_, $_feature := $_features }}
+	<< {{ $_action }} / with / {{ $_feature }}
+		#! <bash+>
+		Z_zexec ':: features / run / with' ':: '{{ $_action | shell_quote }} {{ $_feature | shell_quote }} "${@}"
+	!!
+	<< watch / {{ $_action }} / with / {{ $_feature }}
+		#! <bash+>
+		Z_zexec ':: tools / watch' ':: features / run / with' ':: '{{ $_action | shell_quote }} {{ $_feature | shell_quote }} "${@}"
+	!!
+	{{ end }}
+	{{ end }}
+!!
+

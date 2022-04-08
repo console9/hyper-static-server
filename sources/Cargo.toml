@@ -46,8 +46,41 @@ path = "./lib.rs"
 [features]
 
 default = [
+	"all-dynamic",
+]
+
+all = [
+	"server-all",
+	"exporter-all",
+	"runtime-all",
+	"builder-all",
+]
+all-dynamic = [
+	"server-all-dynamic",
+	"exporter-all-dynamic",
+	"runtime-all-dynamic",
+	"builder-all-dynamic",
+]
+
+server-all = [
 	"server",
+	"runtime-all",
+]
+server-all-dynamic = [
+	"server",
+	"runtime-all-dynamic",
+]
+
+exporter-all = [
 	"exporter",
+	"runtime-all",
+]
+exporter-all-dynamic = [
+	"exporter",
+	"runtime-all-dynamic",
+]
+
+runtime-all = [
 	"runtime",
 	"runtime-macros",
 	"runtime-askama",
@@ -55,6 +88,15 @@ default = [
 	"runtime-sitemaps",
 	"runtime-sitemaps-xml",
 #!	"runtime-hss-exports",
+]
+runtime-all-dynamic = [
+	"runtime-all",
+	"builder-assets-sass-dynamic",
+	"builder-markdown-dynamic",
+	"builder-askama-dynamic",
+]
+
+builder-all = [
 	"builder",
 	"builder-macros",
 	"builder-assets",
@@ -62,6 +104,13 @@ default = [
 	"builder-markdown",
 	"builder-askama",
 	"builder-sitemaps",
+]
+builder-all-dynamic = [
+	"builder-all",
+	"builder-relaxed-dependencies",
+	"builder-assets-sass-dynamic",
+	"builder-markdown-dynamic",
+	"builder-askama-dynamic",
 ]
 
 production = []
