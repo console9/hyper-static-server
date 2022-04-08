@@ -935,6 +935,7 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative, _source) = self.resolve_file (_assets_sources, _source) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source) ?;
 		
 		Ok (())
@@ -946,8 +947,10 @@ impl Builder {
 		let _assets_sources = self.configuration.assets_sources.as_ref () .map (PathBuf::as_path);
 		let (_files, _folders) = self.resolve_files (_assets_sources, _sources, _glob) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_folders.iter () .map (PathBuf::as_path)) ?;
 		
+		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include_all (_files.iter () .map (|_pair| _pair.1.as_path ())) ?;
 		
 		Ok (())
