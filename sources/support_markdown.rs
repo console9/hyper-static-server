@@ -1,6 +1,8 @@
 
 use ::pulldown_cmark as cmark;
-use ::any_ascii as any_ascii;
+use ::any_ascii;
+use ::serde;
+use ::serde_json;
 
 
 use ::std::{
@@ -32,7 +34,8 @@ use crate::builder_errors::*;
 
 
 
-#[ derive (Debug) ]
+#[ derive (Debug, Clone) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
 pub struct MarkdownOptions {
 	
 	pub title_detect : bool,
@@ -48,9 +51,9 @@ pub struct MarkdownOptions {
 }
 
 
-impl MarkdownOptions {
+impl Default for MarkdownOptions {
 	
-	pub fn new () -> Self {
+	fn default () -> Self {
 		Self {
 				
 				title_detect : true,
@@ -70,16 +73,25 @@ impl MarkdownOptions {
 
 
 
-#[ derive (Debug) ]
+#[ derive (Debug, Clone, Default) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
 pub struct MarkdownOutput {
 	pub body : String,
-	pub title : Option<String>,
-	pub headings : Option<Vec<MarkdownHeading>>,
+	pub metadata : MarkdownMetadata,
 	pub frontmatter : Option<MarkdownFrontmatter>,
 }
 
 
-#[ derive (Debug) ]
+#[ derive (Debug, Clone, Default) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
+pub struct MarkdownMetadata {
+	pub title : Option<String>,
+	pub headings : Option<Vec<MarkdownHeading>>,
+}
+
+
+#[ derive (Debug, Clone, Default) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
 pub struct MarkdownHeading {
 	pub level : u8,
 	pub text : Option<String>,
@@ -87,7 +99,8 @@ pub struct MarkdownHeading {
 }
 
 
-#[ derive (Debug) ]
+#[ derive (Debug, Clone, Default) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
 pub struct MarkdownFrontmatter {
 	pub encoding : String,
 	pub data : String,
@@ -96,15 +109,25 @@ pub struct MarkdownFrontmatter {
 
 
 
-pub fn compile_markdown_body_from_path (_source : &Path, _options : MarkdownOptions) -> BuilderResult<MarkdownOutput> {
+pub fn compile_markdown_from_path (_source : &Path, _options : Option<&MarkdownOptions>) -> BuilderResult<MarkdownOutput> {
 	
 	let _source = fs::read_to_string (_source) ?;
 	
-	compile_markdown_body_from_data (_source.as_str (), _options)
+	compile_markdown_from_data (_source.as_str (), _options)
 }
 
 
-pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptions) -> BuilderResult<MarkdownOutput> {
+
+
+pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOptions>) -> BuilderResult<MarkdownOutput> {
+	
+	let mut _default_options = None;
+	let _options = if let Some (_options) = _options {
+		_options
+	} else {
+		_default_options = Some (MarkdownOptions::default ());
+		_default_options.as_ref () .infallible (0x1fe3a806)
+	};
 	
 	let mut _input : Vec<&str> = _source.lines () .skip_while (|_line| _line.is_empty ()) .collect ();
 	while let Some (_line) = _input.last () {
@@ -184,9 +207,6 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 		_parser_options.insert (cmark::Options::ENABLE_HEADING_ATTRIBUTES);
 	}
 	
-	let mut _body = String::with_capacity (_input.len () * 2);
-	
-	
 	let _parser = cmark::Parser::new_ext (&_input, _parser_options);
 	
 	let mut _events : Vec<_> = _parser.into_iter () .collect ();
@@ -223,7 +243,7 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 				cmark::Event::Text (_text) =>
 					if _generate_next {
 						if ! _text.is_empty () {
-							let _anchor_id = markdown_anchor_from_text (_text.as_ref ());
+							let _anchor_id = build_markdown_anchor_from_text (_text.as_ref ());
 							if ! _anchor_id.is_empty () {
 								_headings_anchors.push ((_index - 1, _anchor_id));
 							}
@@ -288,6 +308,8 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 		}
 	}
 	
+	let mut _body = String::with_capacity (_input.len () * 2);
+	
 	cmark::html::push_html (&mut _body, _events.into_iter ());
 	
 	let _frontmatter = if let Some ((_encoding, _data)) = _frontmatter {
@@ -299,10 +321,14 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 		None
 	};
 	
-	let _output = MarkdownOutput {
-			body : _body,
+	let _metadata = MarkdownMetadata {
 			title : _title,
 			headings : _headings,
+		};
+	
+	let _output = MarkdownOutput {
+			body : _body,
+			metadata : _metadata,
 			frontmatter : _frontmatter,
 		};
 	
@@ -312,18 +338,61 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 
 
 
-pub fn compile_markdown_body_to_paths (_source_path : &Path, _context_path : Option<&Path>, _title_path : Option<&Path>, _body_path : Option<&Path>) -> BuilderResult {
+pub fn compile_markdown_from_path_to_paths (
+			_source_path : &Path,
+			_options : Option<&MarkdownOptions>,
+			_body_path : Option<&Path>,
+			_title_path : Option<&Path>,
+			_metadata_path : Option<&Path>,
+			_frontmatter_path : Option<&Path>,
+		) -> BuilderResult
+{
+	let _markdown = compile_markdown_from_path (_source_path, _options) ?;
 	
-	let mut _options = MarkdownOptions::new ();
-	_options.title_detect = _title_path.is_some ();
+	write_markdown_to_paths (_markdown, _body_path, _title_path, _metadata_path, _frontmatter_path)
+}
+
+
+
+
+pub fn write_markdown_to_paths (
+			_markdown : MarkdownOutput,
+			_body_path : Option<&Path>,
+			_title_path : Option<&Path>,
+			_metadata_path : Option<&Path>,
+			_frontmatter_path : Option<&Path>,
+		) -> BuilderResult
+{
+	let _body = _markdown.body;
+	let _metadata = _markdown.metadata;
+	let _frontmatter = _markdown.frontmatter;
 	
-	let _output = compile_markdown_body_from_path (_source_path, _options) ?;
+	if let Some (_path) = _body_path {
+		let _data = _body;
+		let mut _file = fs::File::create (_path) ?;
+		_file.write_all (_data.as_bytes ()) ?;
+	}
 	
-	let _body = _output.body;
-	let _title = _output.title;
-	let _frontmatter = _output.frontmatter;
+	if let Some (_path) = _title_path {
+		let _data = if let Some (ref _title) = _metadata.title {
+			_title.as_str ()
+		} else {
+			""
+		};
+		let mut _file = fs::File::create (_path) ?;
+		_file.write_all (_data.as_bytes ()) ?;
+	}
 	
-	if let Some (_path) = _context_path {
+	if let Some (_path) = _metadata_path {
+	}
+	
+	if let Some (_path) = _metadata_path {
+		let _data = serde_json::to_string_pretty (&_metadata) .or_wrap (0xa0176504) ?;
+		let mut _file = fs::File::create (_path) ?;
+		_file.write_all (_data.as_bytes ()) ?;
+	}
+	
+	if let Some (_path) = _frontmatter_path {
 		let _data = if let Some (_frontmatter) = _frontmatter {
 			match _frontmatter.encoding.as_str () {
 				"toml" => "## toml\n".to_owned () + &_frontmatter.data,
@@ -339,29 +408,13 @@ pub fn compile_markdown_body_to_paths (_source_path : &Path, _context_path : Opt
 		_file.write_all (_data.as_bytes ()) ?;
 	}
 	
-	if let Some (_path) = _title_path {
-		let _data = if let Some (_title) = _title {
-			_title
-		} else {
-			String::new ()
-		};
-		let mut _file = fs::File::create (_path) ?;
-		_file.write_all (_data.as_bytes ()) ?;
-	}
-	
-	if let Some (_path) = _body_path {
-		let _data = _body;
-		let mut _file = fs::File::create (_path) ?;
-		_file.write_all (_data.as_bytes ()) ?;
-	}
-	
 	Ok (())
 }
 
 
 
 
-pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>, _footer : Option<&Path>) -> BuilderResult<String> {
+pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>, _footer : Option<&Path>, _options : Option<&MarkdownOptions>) -> BuilderResult<String> {
 	
 	let _source = fs::read_to_string (_source) ?;
 	let _header = if let Some (_header) = _header { Some (fs::read_to_string (_header) ?) } else { None };
@@ -371,19 +424,18 @@ pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>
 	let _header = _header.as_ref () .map (String::as_str);
 	let _footer = _footer.as_ref () .map (String::as_str);
 	
-	compile_markdown_html_from_data (_source, _header, _footer)
+	compile_markdown_html_from_data (_source, _header, _footer, _options)
 }
 
 
-pub fn compile_markdown_html_from_data (_source : &str, _header : Option<&str>, _footer : Option<&str>) -> BuilderResult<String> {
+
+
+pub fn compile_markdown_html_from_data (_source : &str, _header : Option<&str>, _footer : Option<&str>, _options : Option<&MarkdownOptions>) -> BuilderResult<String> {
 	
-	let mut _options = MarkdownOptions::new ();
-	_options.title_detect = true;
-	
-	let _output = compile_markdown_body_from_data (_source, _options) ?;
+	let _output = compile_markdown_from_data (_source, _options) ?;
 	
 	let _body = _output.body;
-	let _title = _output.title;
+	let _title = _output.metadata.title;
 	let _frontmatter = _output.frontmatter;
 	
 	let _html = if _header.is_some () || _footer.is_some () {
@@ -439,7 +491,7 @@ pub fn compile_markdown_html_from_data (_source : &str, _header : Option<&str>, 
 
 
 
-pub fn markdown_anchor_from_text (_text : &str) -> String {
+pub fn build_markdown_anchor_from_text (_text : &str) -> String {
 	
 	let mut _text = any_ascii::any_ascii (_text);
 	_text.make_ascii_lowercase ();
