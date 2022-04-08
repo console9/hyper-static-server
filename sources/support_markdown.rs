@@ -218,15 +218,20 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 			match _event {
 				cmark::Event::Start (cmark::Tag::Heading (cmark::HeadingLevel::H1, _, _)) =>
 					_capture_next = true,
+				cmark::Event::End (cmark::Tag::Heading (_, _, _)) =>
+					if _capture_next {
+						break;
+					}
 				cmark::Event::Text (_text) =>
 					if _capture_next {
 						if ! _text.is_empty () {
 							_title = Some (_text.as_ref () .to_owned ());
 						}
-						break;
 					}
 				_ =>
-					(),
+					if _capture_next {
+						return Err (error_with_code (0xc36cbd17));
+					}
 			}
 		}
 	}
@@ -240,6 +245,10 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 					if _anchor.is_none () {
 						_generate_next = true;
 					}
+				cmark::Event::End (cmark::Tag::Heading (_, _, _)) =>
+					if _generate_next {
+						_generate_next = false;
+					}
 				cmark::Event::Text (_text) =>
 					if _generate_next {
 						if ! _text.is_empty () {
@@ -248,10 +257,11 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 								_headings_anchors.push ((_index - 1, _anchor_id));
 							}
 						}
-						_generate_next = false;
 					}
 				_ =>
-					(),
+					if _generate_next {
+						return Err (error_with_code (0xd9b3a175));
+					}
 			}
 		}
 		for (_index, _anchor_id) in _headings_anchors.iter () {

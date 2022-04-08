@@ -18,6 +18,7 @@ default = [
 development = [
 	"hyper-static-server/server-all-dynamic",
 	"hyper-static-server/exporter-all-dynamic",
+	"hyper-static-server/builder-all-dynamic",
 ]
 server = [
 	"hyper-static-server/server-all",
@@ -36,7 +37,7 @@ askama = { package = "askama_patched", version = "*", default-features = true }
 serde = { version = "1.0.136", default-features = true }
 
 [build-dependencies]
-hyper-static-server = { version = "0.4.0", default-features = false, features = ["builder-all-dynamic"] }
+hyper-static-server = { version = "0.4.0", default-features = false, features = ["builder-all"] }
 
 [patch.crates-io]
 hyper-static-server = { path = "../../hyper-static-server/sources" }

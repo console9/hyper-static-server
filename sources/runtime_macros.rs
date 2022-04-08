@@ -195,7 +195,7 @@ macro_rules! askama_document {
 				use ::std::convert::From as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					$(
-						::std::compile_error ("`refresher` not supported without dynamic feature!");
+						::std::compile_error! ("`refresher` not supported without dynamic feature!");
 						type _refresher_type = $_refresher_name;
 					)?
 					let _body = ::std::string::String::from (::std::include_str! ($_body_path));
