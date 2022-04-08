@@ -16,10 +16,12 @@ fn main () -> ::hyper_static_server::hss::ServerResult {
 }
 
 
+#[ derive (::std::fmt::Debug) ]
 #[ derive (::serde::Deserialize) ]
+#[ allow (dead_code) ]
 struct ExampleAskamaContext {
-	pub some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+	some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
 }
 
-impl ::hyper_static_server::StaticAskamaContextSerde for ExampleAskamaContext {}
+impl ::hyper_static_server::AskamaContextSerde for ExampleAskamaContext {}
 

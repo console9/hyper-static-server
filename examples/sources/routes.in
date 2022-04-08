@@ -3,47 +3,53 @@
 	// ################################################################################
 	
 	
-	askama! ("_/home.html" => "/askama/home");
-	askama! ({"_/home.html", context : ()} => "/askama/home-with-context-empty");
+	askama! ("_/home.html" => "/examples/askama/without-context/home");
 	
-	askamas! ({"_", glob : "*/page-*.html"} => "/askamas");
-	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/askamas-with-context-empty");
+	askama! ({"_/home.html", context : ()} => "/examples/askama/with-context-empty/home-nodebug");
+	askama! ({"_/home-with-context.html", context : ()} => "/examples/askama/with-context-empty/home-debug");
+	
+	askamas! ({"_", glob : "*/page-*.html"} => "/examples/askamas-recursive/without-context");
+	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/examples/askamas-recursive/with-context-empty");
 	// NOTE:  Not required, because `askama` properly tracks its dependencies.
 	// askamas_watch! ({"_", glob : "*.html-0"});
 	
-	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/askama/home-with-context-json");
-	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.toml"} => "/askama/home-with-context-toml");
-	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.yaml"} => "/askama/home-with-context-yaml");
+	askama! ({"_/home.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/examples/askama/with-context-example/home-json-nodebug");
+	askama! ({"_/home.html", context : ExampleAskamaContext, context_from : "./files/context.toml"} => "/examples/askama/with-context-example/home-toml-nodebug");
+	askama! ({"_/home.html", context : ExampleAskamaContext, context_from : "./files/context.yaml"} => "/examples/askama/with-context-example/home-yaml-nodebug");
+	
+	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/examples/askama/with-context-example/home-json-debug");
+	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.toml"} => "/examples/askama/with-context-example/home-toml-debug");
+	askama! ({"_/home-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.yaml"} => "/examples/askama/with-context-example/home-yaml-debug");
 	
 	
 	// ################################################################################
 	
 	
-	markdown! ("_/hello.md" => "/markdown/hello");
-	markdown! ({"_/hello.md", header : "_/_header.html-0", footer : "_/_footer.html-0"} => "/markdown/hello-with-header-and-footer");
+	markdown! ("_/hello.md" => "/examples/markdown/plain/hello");
+	markdown! ({"_/hello.md", header : "_/_header.html-0", footer : "_/_footer.html-0"} => "/examples/markdown/simple/hello");
 	
-	markdown_askama! ({"_/hello.md", template : "_/markdown.html"} => "/markdown-askama/hello");
-	markdown_askama! ({"_/hello.md", template : "_/markdown.html", context : ()} => "/markdown-askama/hello-with-context-empty");
-	
-	
-	markdowns! ({"_", glob : "*.md"} => "/markdowns");
-	markdowns! ({"_", glob : "*.md", header : "_/_header.html-0", footer : "_/_footer.html-0"} => "/markdowns-with-header-and-footer");
-	
-	markdowns_askama! ({"_", glob : "*.md", template : "_/markdown.html"} => "/markdowns-askama");
-	markdowns_askama! ({"_", glob : "*.md", template : "_/markdown.html", context : ()} => "/markdowns-askama-with-context-empty");
+	markdown_askama! ({"_/hello.md", template : "_/markdown.html"} => "/examples/markdown/askama/without-context/hello");
+	markdown_askama! ({"_/hello.md", template : "_/markdown.html", context : ()} => "/examples/markdown/askama/with-context-empty/hello");
 	
 	
-	markdown! ("_/with-frontmatter-json.md" => "/markdown/with-frontmatter-json");
-	markdown! ("_/with-frontmatter-toml.md" => "/markdown/with-frontmatter-toml");
-	markdown! ("_/with-frontmatter-yaml.md" => "/markdown/with-frontmatter-yaml");
+	markdowns! ({"_", glob : "*.md"} => "/examples/markdowns-recursive/plain");
+	markdowns! ({"_", glob : "*.md", header : "_/_header.html-0", footer : "_/_footer.html-0"} => "/examples/markdowns-recursive/simple");
 	
-	markdown_askama! ({"_/with-frontmatter-json.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/markdown-askama/with-frontmatter-json");
-	markdown_askama! ({"_/with-frontmatter-toml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/markdown-askama/with-frontmatter-toml");
-	markdown_askama! ({"_/with-frontmatter-yaml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/markdown-askama/with-frontmatter-yaml");
+	markdowns_askama! ({"_", glob : "*.md", template : "_/markdown.html"} => "/examples/markdowns-recursive/askama/without-context");
+	markdowns_askama! ({"_", glob : "*.md", template : "_/markdown.html", context : ()} => "/examples/markdowns-recursive/askama/with-context-empty");
 	
 	
-	asset! ("./markdown/hello.md" => "/markdown-text/hello");
-	assets! ({"./markdown", glob : "*.md"} => "/markdowns-text");
+	markdown! ("_/with-frontmatter-json.md" => "/examples/markdown/plain/with-frontmatter-json");
+	markdown! ("_/with-frontmatter-toml.md" => "/examples/markdown/plain/with-frontmatter-toml");
+	markdown! ("_/with-frontmatter-yaml.md" => "/examples/markdown/plain/with-frontmatter-yaml");
+	
+	markdown_askama! ({"_/with-frontmatter-json.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/examples/markdown/askama/with-context/with-frontmatter-json");
+	markdown_askama! ({"_/with-frontmatter-toml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/examples/markdown/askama/with-context/with-frontmatter-toml");
+	markdown_askama! ({"_/with-frontmatter-yaml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/examples/markdown/askama/with-context/with-frontmatter-yaml");
+	
+	
+	asset! ("./markdown/hello.md" => "/examples/markdown/text/hello");
+	assets! ({"./markdown", glob : "*.md"} => "/examples/markdowns-recursive/text");
 	
 	
 	// ################################################################################
@@ -51,11 +57,13 @@
 	
 	asset_sass! ("_/css/main.scss");
 	// NOTE:  Required, because `sass-rs` doesn't properly track imported files.
-	assets_watch! ("_/css");
+	// assets_watch! ("_/css");
+	
 	
 	asset_js! ("_/js/main.js");
 	// NOTE:  Not required for the moment.
 	// assets_watch! ("_/js");
+	
 	
 	assets_images! ("_/images");
 	assets_icons! ("_/icons");
@@ -63,26 +71,41 @@
 	assets_favicons! ("_/favicons");
 	asset_favicon! ("_/favicons/favicon.ico" => "/favicon.ico");
 	
+	
+	// ################################################################################
+	
+	
 	asset! ("./files/robots.txt" => "/robots.txt");
 	
-	asset! ("./files/data.txt" => "/data.txt");
-	asset! ({"./files/data.txt", content_type : text} => "/data-with-content-type.txt");
+	asset! ("./files/data.txt" => "/files/data/with-automatic-content-type.txt");
+	asset! ({"./files/data.txt", content_type : text} => "/files/data/with-explicit-content-type.txt");
+	
+	assets! ({"./files", glob : "*"} => "/files/all");
+	
+	assets! ({"_", glob : "*"} => "/files/assets-all");
+	assets! ({"_/css", glob : "*"} => "/files/assets-css");
+	assets! ({"_/js", glob : "*"} => "/files/assets-js");
+	assets! ({"_/images", glob : "*"} => "/files/assets-images");
+	assets! ({"_/icons", glob : "*"} => "/files/assets-icons");
+	assets! ({"_/favicons", glob : "*"} => "/files/assets-favicons");
+	
+	assets! ({".", glob : "*"} => "/sources");
 	
 	
 	// ################################################################################
 	
 	
-	asset! ("./files/data.txt" => {"/route-with-extensions/a"});
-	asset! ("./files/data.txt" => {"/route-with-extensions/b-1", extensions : ()});
-	asset! ("./files/data.txt" => {"/route-with-extensions/b-2", extensions : {}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/c-1", extensions : {debug : "custom-debug"}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-1", extensions : {sitemap}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-2", extensions : {sitemap : {frequency : always}}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-3", extensions : {sitemap : {frequency : default}}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-4", extensions : {sitemap : {frequency : always, priority : 0.7}}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-5", extensions : {sitemap : {frequency : default, priority : 0.7}}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-6", extensions : {sitemap : {frequency : default, priority : default}}});
-	asset! ("./files/data.txt" => {"/route-with-extensions/d-7", extensions : {sitemap, debug : "custom-debug-with-sitemap"}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/a"});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/b-1", extensions : ()});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/b-2", extensions : {}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/c-1", extensions : {debug : "custom-debug"}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-1", extensions : {sitemap}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-2", extensions : {sitemap : {frequency : always}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-3", extensions : {sitemap : {frequency : default}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-4", extensions : {sitemap : {frequency : always, priority : 0.7}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-5", extensions : {sitemap : {frequency : default, priority : 0.7}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-6", extensions : {sitemap : {frequency : default, priority : default}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/d-7", extensions : {sitemap, debug : "custom-debug-with-sitemap"}});
 	
 	
 	// ################################################################################

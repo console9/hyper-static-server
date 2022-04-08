@@ -8,10 +8,16 @@
 
 
 {% block page_title %}{{ title }}{% endblock %}
-{% block page_identifier %}markdown{% endblock %}
+{% block page_classes %}markdown markdown-askama{% endblock %}
 
 
 {% block main %}
+<div id="markdown-body">
 {{ body|safe }}
+</div>
+<hr />
+<pre id="markdown-metadata">
+{{ "{:?}"|format(metadata) }}
+</pre>
 {% endblock %}
 

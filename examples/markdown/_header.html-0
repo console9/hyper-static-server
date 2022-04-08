@@ -3,11 +3,13 @@
 	<head>
 		<title>@@{{HSS::Markdown::Title}}</title>
 		<meta name="viewport" content="width=device-width, height=device-height" />
+		<link rel="stylesheet" href="/assets/css/main.css" />
 	</head>
-	<body>
+	<body class="markdown markdown-simple">
 		<header>
 			<p>[header]</p>
 			<hr/>
 		</header>
 		<main>
-		<!-- ################################################################################ -->
+			<div id="markdown-body">
+			<!-- ################################################################################ -->

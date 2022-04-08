@@ -19,7 +19,7 @@
 	</head>
 	
 	
-	<body class="{% block page_identifier %}{% endblock %}">
+	<body class="{% block page_classes %}{% endblock %}">
 		
 		<header>
 			{% block header %}{% include "_header.html-0" %}{% endblock %}
