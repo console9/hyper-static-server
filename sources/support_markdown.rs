@@ -32,6 +32,7 @@ use crate::builder_errors::*;
 
 
 
+#[ derive (Debug) ]
 pub struct MarkdownOptions {
 	
 	pub title_detect : bool,
@@ -69,21 +70,24 @@ impl MarkdownOptions {
 
 
 
+#[ derive (Debug) ]
 pub struct MarkdownOutput {
 	pub body : String,
 	pub title : Option<String>,
-	pub headers : Option<Vec<MarkdownHeader>>,
+	pub headings : Option<Vec<MarkdownHeading>>,
 	pub frontmatter : Option<MarkdownFrontmatter>,
 }
 
 
-pub struct MarkdownHeader {
+#[ derive (Debug) ]
+pub struct MarkdownHeading {
 	pub level : u8,
-	pub text : String,
-	pub anchor : String,
+	pub text : Option<String>,
+	pub anchor : Option<String>,
 }
 
 
+#[ derive (Debug) ]
 pub struct MarkdownFrontmatter {
 	pub encoding : String,
 	pub data : String,
@@ -241,6 +245,49 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 		}
 	}
 	
+	let mut _headings = None;
+	if _options.headings_detect {
+		let mut _headings_0 = Vec::new ();
+		let mut _capture_next = false;
+		let mut _capture_level = 0;
+		let mut _capture_anchor = String::new ();
+		for _event in _events.iter () {
+			match _event {
+				cmark::Event::Start (cmark::Tag::Heading (_level, _anchor, _)) => {
+					_capture_next = true;
+					if let Some (_anchor) = _anchor {
+						_capture_anchor = (*_anchor).to_owned ();
+					}
+					_capture_level = match _level {
+						cmark::HeadingLevel::H1 => 1,
+						cmark::HeadingLevel::H2 => 2,
+						cmark::HeadingLevel::H3 => 3,
+						cmark::HeadingLevel::H4 => 4,
+						cmark::HeadingLevel::H5 => 5,
+						cmark::HeadingLevel::H6 => 6,
+					}
+				}
+				cmark::Event::Text (_text) =>
+					if _capture_next {
+						let _heading = MarkdownHeading {
+								level : _capture_level,
+								text : Some (_text.as_ref () .to_owned ()),
+								anchor : if ! _capture_anchor.is_empty () { Some (_capture_anchor) } else { None },
+							};
+						_headings_0.push (_heading);
+						_capture_next = false;
+						_capture_anchor = String::new ();
+						_capture_level = 0;
+					}
+				_ =>
+					(),
+			}
+		}
+		if ! _headings_0.is_empty () {
+			_headings = Some (_headings_0);
+		}
+	}
+	
 	cmark::html::push_html (&mut _body, _events.into_iter ());
 	
 	let _frontmatter = if let Some ((_encoding, _data)) = _frontmatter {
@@ -252,12 +299,10 @@ pub fn compile_markdown_body_from_data (_source : &str, _options : MarkdownOptio
 		None
 	};
 	
-	let _headers = None;
-	
 	let _output = MarkdownOutput {
 			body : _body,
 			title : _title,
-			headers : _headers,
+			headings : _headings,
 			frontmatter : _frontmatter,
 		};
 	
