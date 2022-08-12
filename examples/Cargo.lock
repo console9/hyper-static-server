@@ -482,6 +482,8 @@ dependencies = [
 [[package]]
 name = "hyper-simple-server"
 version = "0.5.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "416e0d32fa907d4d88cce0a5a72aa2e9eff786a24c6433659e46fe5f646cccc6"
 dependencies = [
  "argparse",
  "bytes",
@@ -498,7 +500,7 @@ dependencies = [
 
 [[package]]
 name = "hyper-static-server"
-version = "0.5.1"
+version = "0.6.0"
 dependencies = [
  "any_ascii",
  "blake2",
@@ -1395,3 +1397,7 @@ checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
 dependencies = [
  "linked-hash-map",
 ]
+
+[[patch.unused]]
+name = "hyper-simple-server"
+version = "0.6.0"
