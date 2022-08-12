@@ -248,24 +248,24 @@ features-none = []
 
 [dependencies]
 
-hyper-simple-server = { version = "0.3.0", default-features = false, optional = true }
+hyper-simple-server = { version = "0.5.1", default-features = false, optional = true }
 
-globset = { version = "0.4.6", default-features = false, optional = true }
-pulldown-cmark = { version = "0.9.1", default-features = false, optional = true }
+globset = { version = "0.4.9", default-features = false, optional = true }
+pulldown-cmark = { version = "0.9.2", default-features = false, optional = true }
 any_ascii = { version = "0.3.1", default-features = false, optional = true }
-rand = { version = "0.8.3", default-features = false, features = ["std", "std_rng"], optional = true }
+rand = { version = "0.8.5", default-features = false, features = ["std", "std_rng"], optional = true }
 sass-rs = { version = "0.2.2", default-features = false, optional = true }
 sass-alt = { version = "0.2.7", default-features = false, optional = true }
-walkdir = { version = "2.3.1", default-features = false, optional = true }
+walkdir = { version = "2.3.2", default-features = false, optional = true }
 proc-macro2 = { version = "1.0.36", default-features = false, features = ["proc-macro"], optional = true }
 url = { version = "2.2.2", default-features = false, optional = true }
-sitewriter = { version = "0.5.1", default-features = false, optional = true }
+sitewriter = { version = "0.5.2", default-features = false, optional = true }
 blake2 = { version = "0.9.1", default-features = false, features = ["std"], optional = true }
 cpio = { version = "0.2.1", default-features = false, optional = true }
-serde = { version = "1.0.136", default-features = false, features = ["std", "derive"], optional = true }
-serde_json = { version = "1.0.79", default-features = false, features = ["std"], optional = true }
-serde_yaml = { version = "0.8.23", default-features = false, features = [], optional = true }
-toml = { version = "0.5.8", default-features = false, features = [], optional = true }
+serde = { version = "1.0.143", default-features = false, features = ["std", "derive"], optional = true }
+serde_json = { version = "1.0.83", default-features = false, features = ["std"], optional = true }
+serde_yaml = { version = "0.8.26", default-features = false, features = [], optional = true }
+toml = { version = "0.5.9", default-features = false, features = [], optional = true }
 
 
 
