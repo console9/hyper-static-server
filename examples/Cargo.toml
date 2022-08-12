@@ -31,16 +31,15 @@ production = [
 ]
 
 [dependencies]
-hyper-static-server = { version = "0.4.0", default-features = false, features = [] }
+hyper-static-server = { path = "../sources", default-features = false, features = [] }
 # askama = { version = "0.10.5", default-features = true }
 askama = { package = "askama_patched", version = "*", default-features = true }
 serde = { version = "1.0.136", default-features = true }
 
 [build-dependencies]
-hyper-static-server = { version = "0.4.0", default-features = false, features = ["builder-all"] }
+hyper-static-server = { path = "../sources", default-features = false, features = ["builder-all"] }
 
 [patch.crates-io]
-hyper-static-server = { path = "../../hyper-static-server/sources" }
 hyper-simple-server = { path = "../../hyper-simple-server/sources" }
 askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "forked/0.10.5/merged" }
 
