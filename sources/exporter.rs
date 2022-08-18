@@ -25,36 +25,38 @@ use crate::{
 	};
 
 
-use crate::hss::{
-		
-		BodyExt as _,
-		ResponseExt as _,
-		
-		ResultExtWrap as _,
-		
-		fail_with_format,
-		
-	};
-
-
 use crate::hss;
 
 
+use crate::hss::{
+		BodyExt as _,
+		ResponseExt as _,
+	};
 
 
-pub fn export_routes_debug (_routes : impl Into<hss::Routes>, _output : impl io::Write) -> hss::ServerResult {
+use ::vrl_errors::*;
+
+
+
+
+define_error! (pub ExportError, result : ExportResult);
+
+
+
+
+pub fn export_routes_debug (_routes : impl Into<hss::Routes>, _output : impl io::Write) -> ExportResult {
 	
 	let mut _output = _output;
 	
 	let mut _consumer = |_route : &hss::Route, _content_type : hss::ContentType, _content_buffer : Vec<u8>| {
 			
 			if let Some (_debug) = _route.extensions.get::<StaticRouteDebug> () {
-				write! (_output, "**  {} -> {:?}\n", _route.path, _debug) .or_wrap (0x99260590) ?;
+				write! (_output, "**  {} -> {:?}\n", _route.path, _debug) .else_wrap (0x99260590) ?;
 			} else {
-				write! (_output, "**  {}\n", _route.path) .or_wrap (0xb7ff2169) ?;
+				write! (_output, "**  {}\n", _route.path) .else_wrap (0xb7ff2169) ?;
 			}
 			
-			write! (_output, ">>  {} bytes of type `{}`;\n", _content_buffer.len (), _content_type.to_str ()) .or_wrap (0xaea1edf5) ?;
+			write! (_output, ">>  {} bytes of type `{}`;\n", _content_buffer.len (), _content_type.to_str ()) .else_wrap (0xaea1edf5) ?;
 			
 			Ok (())
 		};
@@ -65,12 +67,12 @@ pub fn export_routes_debug (_routes : impl Into<hss::Routes>, _output : impl io:
 
 
 
-pub fn export_routes_dump (_routes : impl Into<hss::Routes>, _route_path : &str, _output : impl io::Write) -> hss::ServerResult {
+pub fn export_routes_dump (_routes : impl Into<hss::Routes>, _route_path : &str, _output : impl io::Write) -> ExportResult {
 	
 	let mut _output = _output;
 	
 	let mut _consumer = |_route : &hss::Route, _content_type : hss::ContentType, _content_buffer : Vec<u8>| {
-			_output.write_all (&_content_buffer) .or_wrap (0x2a238b7f)
+			_output.write_all (&_content_buffer) .else_wrap (0x2a238b7f)
 		};
 	
 	return export_routes_one (_routes, _route_path, &mut _consumer);
@@ -79,12 +81,12 @@ pub fn export_routes_dump (_routes : impl Into<hss::Routes>, _route_path : &str,
 
 
 
-pub fn export_routes_cpio (_routes : impl Into<hss::Routes>, _output : impl io::Write) -> hss::ServerResult {
+pub fn export_routes_cpio (_routes : impl Into<hss::Routes>, _output : impl io::Write) -> ExportResult {
 	
 	let mut _output = _output;
 	
-	let _timestamp = time::SystemTime::now () .duration_since (time::UNIX_EPOCH) .or_wrap (0x9c419037) ?;
-	let _timestamp : u32 = _timestamp.as_secs () .try_into () .or_wrap (0x451e1667) ?;
+	let _timestamp = time::SystemTime::now () .duration_since (time::UNIX_EPOCH) .else_wrap (0x9c419037) ?;
+	let _timestamp : u32 = _timestamp.as_secs () .try_into () .else_wrap (0x451e1667) ?;
 	
 	let mut _paths_seen = HashSet::new ();
 	let mut _folders = HashSet::new ();
@@ -92,7 +94,7 @@ pub fn export_routes_cpio (_routes : impl Into<hss::Routes>, _output : impl io::
 	let mut _consumer = |_route : &hss::Route, _content_type : hss::ContentType, _content_buffer : Vec<u8>| {
 			
 			let _path = export_routes_cpio_path (_route, _content_type) ?;
-			let _content_size : u32 = _content_buffer.len () .try_into () .or_wrap (0xc3c8d6c2) ?;
+			let _content_size : u32 = _content_buffer.len () .try_into () .else_wrap (0xc3c8d6c2) ?;
 			
 			if _paths_seen.contains (&_path) {
 				eprintln! ("[ww] [94617879]  duplicate path encountered `{}`;  ignoring!", _path);
@@ -121,7 +123,7 @@ pub fn export_routes_cpio (_routes : impl Into<hss::Routes>, _output : impl io::
 							.mode (0o755 | 0o040000)
 							.mtime (_timestamp)
 							.write (&mut _output, 0)
-							.finish () .or_wrap (0x0bfd8f69) ?
+							.finish () .else_wrap (0x0bfd8f69) ?
 						;
 				}
 			}
@@ -131,15 +133,15 @@ pub fn export_routes_cpio (_routes : impl Into<hss::Routes>, _output : impl io::
 					.mtime (_timestamp)
 				;
 			let mut _cpio_entry = _cpio_entry.write (&mut _output, _content_size);
-			_cpio_entry.write_all (&_content_buffer) .or_wrap (0x29b49136) ?;
-			_cpio_entry.finish () .or_wrap (0x76be56bc) ?;
+			_cpio_entry.write_all (&_content_buffer) .else_wrap (0x29b49136) ?;
+			_cpio_entry.finish () .else_wrap (0x76be56bc) ?;
 			
 			Ok (())
 		};
 	
 	export_routes_all (_routes, &mut _consumer) ?;
 	
-	cpio::trailer (&mut _output) .or_wrap (0x4975bcae) ?;
+	cpio::trailer (&mut _output) .else_wrap (0x4975bcae) ?;
 	
 	return Ok (());
 }
@@ -147,10 +149,10 @@ pub fn export_routes_cpio (_routes : impl Into<hss::Routes>, _output : impl io::
 
 
 
-fn export_routes_cpio_path (_route : &hss::Route, _content_type : hss::ContentType) -> hss::ServerResult<String> {
+fn export_routes_cpio_path (_route : &hss::Route, _content_type : hss::ContentType) -> ExportResult<String> {
 	
 	if ! _route.path.starts_with ("/") || _route.path.is_empty () {
-		fail_with_format! (0xea316ecf, "failed resolving path for `{}` (missing `/` prefix)!", _route.path);
+		fail! (0xea316ecf, "failed resolving path for `{}` (missing `/` prefix)!", _route.path);
 	}
 	let mut _route_path = _route.path[1..].to_owned ();
 	
@@ -201,12 +203,12 @@ fn export_routes_cpio_path (_route : &hss::Route, _content_type : hss::ContentTy
 
 
 
-pub fn export_routes_all <Consumer> (_routes : impl Into<hss::Routes>, _consumer : Consumer) -> hss::ServerResult
+pub fn export_routes_all <Consumer> (_routes : impl Into<hss::Routes>, _consumer : Consumer) -> ExportResult
 	where
-		Consumer : FnMut (&hss::Route, hss::ContentType, Vec<u8>) -> hss::ServerResult,
+		Consumer : FnMut (&hss::Route, hss::ContentType, Vec<u8>) -> ExportResult,
 {
 	let _routes = _routes.into ();
-	let _runtime = hss::runtime_current_thread () ?;
+	let _runtime = hss::runtime_current_thread () .else_wrap (0x1bc10054) ?;
 	
 	let mut _consumer = _consumer;
 	for _route in _routes.routes () {
@@ -219,12 +221,12 @@ pub fn export_routes_all <Consumer> (_routes : impl Into<hss::Routes>, _consumer
 
 
 
-pub fn export_routes_one <Consumer> (_routes : impl Into<hss::Routes>, _route_path : &str, _consumer : Consumer) -> hss::ServerResult
+pub fn export_routes_one <Consumer> (_routes : impl Into<hss::Routes>, _route_path : &str, _consumer : Consumer) -> ExportResult
 	where
-		Consumer : FnMut (&hss::Route, hss::ContentType, Vec<u8>) -> hss::ServerResult,
+		Consumer : FnMut (&hss::Route, hss::ContentType, Vec<u8>) -> ExportResult,
 {
 	let _routes = _routes.into ();
-	let _runtime = hss::runtime_current_thread () ?;
+	let _runtime = hss::runtime_current_thread () .else_wrap (0x4b6d65a6) ?;
 	
 	export_route_resolve (&_routes, _route_path, _consumer, &_runtime) ?;
 	
@@ -234,17 +236,17 @@ pub fn export_routes_one <Consumer> (_routes : impl Into<hss::Routes>, _route_pa
 
 
 
-pub fn export_route_resolve <Consumer> (_routes : &hss::Routes, _route_path : &str, _consumer : Consumer, _runtime : &hss::Runtime) -> hss::ServerResult
+pub fn export_route_resolve <Consumer> (_routes : &hss::Routes, _route_path : &str, _consumer : Consumer, _runtime : &hss::Runtime) -> ExportResult
 	where
-		Consumer : FnOnce (&hss::Route, hss::ContentType, Vec<u8>) -> hss::ServerResult,
+		Consumer : FnOnce (&hss::Route, hss::ContentType, Vec<u8>) -> ExportResult,
 {
 	let _route_matched = match _routes.resolve (_route_path) {
 		Ok (Some (_route_matched)) =>
 			_route_matched,
 		Ok (None) =>
-			fail_with_format! (0xa712904b, "failed resolving route for `{}` (resolution failed)!", _route_path),
+			fail! (0xa712904b, "failed resolving route for `{}` (resolution failed)!", _route_path),
 		Err (_error) =>
-			fail_with_format! (0xea0e6963, "failed resolving route for `{}` (resolution failed)!  //  {}", _route_path, _error),
+			fail! (0xea0e6963, "failed resolving route for `{}` (resolution failed)!  //  {}", _route_path, _error),
 	};
 	
 	return export_route_matched (_route_matched, _consumer, _runtime);
@@ -253,9 +255,9 @@ pub fn export_route_resolve <Consumer> (_routes : &hss::Routes, _route_path : &s
 
 
 
-pub fn export_route_matched <Consumer> (_route_matched : hss::RouteMatched, _consumer : Consumer, _runtime : &hss::Runtime) -> hss::ServerResult
+pub fn export_route_matched <Consumer> (_route_matched : hss::RouteMatched, _consumer : Consumer, _runtime : &hss::Runtime) -> ExportResult
 	where
-		Consumer : FnOnce (&hss::Route, hss::ContentType, Vec<u8>) -> hss::ServerResult,
+		Consumer : FnOnce (&hss::Route, hss::ContentType, Vec<u8>) -> ExportResult,
 {
 	let _route = _route_matched.route.clone ();
 	
@@ -269,11 +271,11 @@ pub fn export_route_matched <Consumer> (_route_matched : hss::RouteMatched, _con
 
 
 
-pub fn export_route_matched_0 (_route_matched : hss::RouteMatched, _runtime : &hss::Runtime) -> hss::ServerResult<(hss::ContentType, Vec<u8>)> {
+pub fn export_route_matched_0 (_route_matched : hss::RouteMatched, _runtime : &hss::Runtime) -> ExportResult<(hss::ContentType, Vec<u8>)> {
 	
 	let _route = sync::Arc::clone (&_route_matched.route);
 	
-	let _request = hss::Request::get (_route.path.clone ()) .body (hss::Body::default ()) .or_wrap (0x5fbdc50e) ?;
+	let _request = hss::Request::get (_route.path.clone ()) .body (hss::Body::default ()) .else_wrap (0x5fbdc50e) ?;
 	
 	let _future = _route.handle (_request, _route_matched);
 	
@@ -281,7 +283,7 @@ pub fn export_route_matched_0 (_route_matched : hss::RouteMatched, _runtime : &h
 		Ok (_response) =>
 			_response,
 		Err (_error) =>
-			fail_with_format! (0x349294f0, "failed generating response for `{}` (handling failed)!  //  {}", _route.path, _error),
+			fail! (0x349294f0, "failed generating response for `{}` (handling failed)!  //  {}", _route.path, _error),
 	};
 	
 	let _status = _response.status ();
@@ -291,14 +293,14 @@ pub fn export_route_matched_0 (_route_matched : hss::RouteMatched, _runtime : &h
 		hss::consts::OK =>
 			_response.into_body (),
 		_ =>
-			fail_with_format! (0xbb5e6327, "failed generating response for `{}` (status {})!", _route.path, _status),
+			fail! (0xbb5e6327, "failed generating response for `{}` (status {})!", _route.path, _status),
 	};
 	
 	let _buffer = match export_body (_body, _runtime) {
 		Ok (_buffer) =>
 			_buffer,
 		Err (_error) =>
-			fail_with_format! (0x622b887a, "failed generating response for `{}` (streaming failed)!  //  {}", _route.path, _error),
+			fail! (0x622b887a, "failed generating response for `{}` (streaming failed)!  //  {}", _route.path, _error),
 	};
 	
 	return Ok ((_content_type, _buffer));
@@ -307,9 +309,9 @@ pub fn export_route_matched_0 (_route_matched : hss::RouteMatched, _runtime : &h
 
 
 
-fn export_body (_body : hss::BodyDynBox, _runtime : &hss::Runtime) -> hss::ServerResult<Vec<u8>> {
+fn export_body (_body : hss::BodyDynBox, _runtime : &hss::Runtime) -> ExportResult<Vec<u8>> {
 	
 	let mut _body = _body;
-	return _body.consume_to_vec (Some (_runtime));
+	return _body.consume_to_vec (Some (_runtime)) .else_wrap (0x5a7fe685);
 }
 

@@ -1,4 +1,5 @@
 
+
 [package]
 name = "hyper-static-server-example"
 version = "0.0.0"
@@ -6,40 +7,64 @@ license = "MIT"
 edition = "2021"
 build = "./sources/build.rs"
 
+
 [[bin]]
 name = "example"
 path = "./sources/main.rs"
 
+
+
+
+[dependencies]
+
+hyper-static-server = { path = "../sources", default-features = false, features = [] }
+
+# askama = { version = "0.10.5", default-features = true }
+askama = { package = "askama_patched", version = "*", default-features = true }
+
+serde = { version = "1.0.136", default-features = true }
+
+
+[build-dependencies]
+
+hyper-static-server = { path = "../sources", default-features = false, features = ["builder-all"] }
+
+
+
+
 [features]
+
 default = [
 	"server",
 	"exporter",
 ]
+
 development = [
 	"hyper-static-server/server-all-dynamic",
 	"hyper-static-server/exporter-all-dynamic",
 	"hyper-static-server/builder-all-dynamic",
 ]
+
 server = [
 	"hyper-static-server/server-all",
 ]
+
 exporter = [
 	"hyper-static-server/exporter-all",
 ]
+
 production = [
 	"hyper-static-server/production",
 ]
 
-[dependencies]
-hyper-static-server = { path = "../sources", default-features = false, features = [] }
-# askama = { version = "0.10.5", default-features = true }
-askama = { package = "askama_patched", version = "*", default-features = true }
-serde = { version = "1.0.136", default-features = true }
 
-[build-dependencies]
-hyper-static-server = { path = "../sources", default-features = false, features = ["builder-all"] }
+
 
 [patch.crates-io]
+
 hyper-simple-server = { path = "../../hyper-simple-server/sources" }
+
+vrl-errors = { path = "../../volution-rust-libraries/sources/errors" }
+
 askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "forked/0.10.5/merged" }
 

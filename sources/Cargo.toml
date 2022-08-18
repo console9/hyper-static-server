@@ -12,7 +12,7 @@ version = "0.6.0"
 license = "MIT"
 
 edition = "2021"
-rust-version = "1.58"
+rust-version = "1.62"
 resolver = "2"
 publish = false
 
@@ -124,6 +124,7 @@ server = [
 exporter = [
 	"hyper-simple-server/hss-config",
 	"hyper-simple-server/hss-cli",
+	"hyper-simple-server/hss-main",
 	"runtime",
 	"cpio",
 ]
@@ -134,7 +135,6 @@ runtime = [
 	"hyper-simple-server/hss-extensions",
 	"hyper-simple-server/hss-runtime",
 	"hyper-simple-server/hss-exports",
-	"hyper-simple-server/hss-errors",
 ]
 
 runtime-macros = [
@@ -230,7 +230,6 @@ support-markdown = [
 ]
 
 support-builder = [
-	"hyper-simple-server/hss-errors",
 	"blake2",
 ]
 
@@ -248,7 +247,7 @@ features-none = []
 
 [dependencies]
 
-hyper-simple-server = { version = "0.5.1", default-features = false, optional = true }
+hyper-simple-server = { version = "0.6.0", default-features = false, optional = true }
 
 globset = { version = "0.4.9", default-features = false, optional = true }
 pulldown-cmark = { version = "0.9.2", default-features = false, optional = true }
@@ -266,6 +265,8 @@ serde = { version = "1.0.143", default-features = false, features = ["std", "der
 serde_json = { version = "1.0.83", default-features = false, features = ["std"], optional = true }
 serde_yaml = { version = "0.8.26", default-features = false, features = [], optional = true }
 toml = { version = "0.5.9", default-features = false, features = [], optional = true }
+
+vrl-errors = { version = "*", default-features = false, features = [] }
 
 
 
@@ -353,6 +354,8 @@ overflow-checks = true
 [patch.crates-io]
 
 hyper-simple-server = { path = "../../hyper-simple-server/sources" }
+
+vrl-errors = { path = "../../volution-rust-libraries/sources/errors" }
 
 
 

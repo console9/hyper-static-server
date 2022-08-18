@@ -29,6 +29,7 @@ use ::std::{
 
 
 use crate::builder_errors::*;
+use ::vrl_errors::*;
 
 
 
@@ -36,14 +37,14 @@ use crate::builder_errors::*;
 #[ cfg (feature = "support-sass") ]
 pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 	
-	let _extension = _source.extension () .or_wrap (0x836ff108) ? .to_str () .or_wrap (0x4068e13f) ?;
+	let _extension = _source.extension () .else_wrap (0x836ff108) ? .to_str () .else_wrap (0x4068e13f) ?;
 	let _indented_syntax = match _extension {
 		"sass" =>
 			true,
 		"scss" =>
 			false,
 		_ =>
-			return Err (error_with_code (0x720c0c23)),
+			fail! (0x720c0c23),
 	};
 	
 	let _options = sass::Options {
@@ -53,9 +54,10 @@ pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 			include_paths : vec! [],
 		};
 	
-	let mut _context = sass::Context::new_file (&_source) .map_err (|_message| error_with_message (0xfde48681, &_message)) ?;
+	let mut _context = sass::Context::new_file (&_source) .else_replace (0xfde48681) ?;
 	_context.set_options (_options);
-	let _data = _context.compile () .map_err (|_message| error_with_message (0x00c4c0dd, &_message)) ?;
+	
+	let _data = _context.compile () .else_replace (0x00c4c0dd) ?;
 	
 	Ok (_data)
 }
@@ -66,9 +68,9 @@ pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 #[ cfg (feature = "support-sass-alt") ]
 pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 	
-	let _parent = _source.parent () .or_wrap (0xf6ce0d79) ?;
+	let _parent = _source.parent () .else_wrap (0xf6ce0d79) ?;
 	
-	let _extension = _source.extension () .or_wrap (0xf2cd37bc) ? .to_str () .or_wrap (0xdb216e38) ?;
+	let _extension = _source.extension () .else_wrap (0xf2cd37bc) ? .to_str () .else_wrap (0xdb216e38) ?;
 	let _input_syntax = match _extension {
 		"sass" =>
 			sass::InputSyntax::SASS,
@@ -131,7 +133,7 @@ pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 			header_list : rc::Rc::new (sass::SassImporterList::new (Vec::new ())),
 		};
 	
-	let _data = _options.compile_file (_source) .or_wrap (0xbbaffa6f) ?;
+	let _data = _options.compile_file (_source) .else_wrap (0xbbaffa6f) ?;
 	
 	for _dependency in _resolved.borrow () .iter () {
 		self.dependencies_include (_dependency.as_ref ());

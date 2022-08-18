@@ -4,31 +4,34 @@
 use crate::hss;
 
 
+use ::vrl_errors::*;
+
+
 
 
 #[ cfg ( any (feature = "server", feature = "exporter") ) ]
-pub fn main (_routes : impl Into<hss::Routes>) -> hss::ServerResult {
+pub fn main (_routes : impl Into<hss::Routes>) -> hss::MainResult {
 	return main_wrapper (_routes, None, None);
 }
 
 
 #[ cfg ( any (feature = "server", feature = "exporter") ) ]
-pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> hss::ServerResult {
+pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> hss::MainResult {
 	
 	let _arguments = hss::CliArguments::from_args ();
 	
-	fn _main_serve (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : hss::CliArguments) -> hss::ServerResult {
+	fn _main_serve (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : hss::CliArguments) -> hss::MainResult {
 			#[ cfg (feature = "server") ]
 			return main_serve_with_static (_routes, _configuration, Some (_arguments));
 			#[ cfg (not (feature = "server") ) ]
-			hss::fail_with_message! (0x2504f6ba, "executable built without `server` feature!");
+			fail! (0x2504f6ba, "executable built without `server` feature!");
 		}
 	
-	fn _main_export (_routes : impl Into<hss::Routes>, _arguments : hss::CliArguments) -> hss::ServerResult {
+	fn _main_export (_routes : impl Into<hss::Routes>, _arguments : hss::CliArguments) -> hss::MainResult {
 			#[ cfg (feature = "exporter") ]
 			return main_export_with_static (_routes, Some (_arguments));
 			#[ cfg (not (feature = "exporter") ) ]
-			hss::fail_with_message! (0xfc32851f, "executable built without `exporter` feature!");
+			fail! (0xfc32851f, "executable built without `exporter` feature!");
 		}
 	
 	match _arguments.first_str () {
@@ -40,7 +43,7 @@ pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<h
 		Some ("exporter") | Some ("export") =>
 			return _main_export (_routes, _arguments.without_first ()),
 		Some (_mode) if ! _mode.starts_with ("-") =>
-			hss::fail_with_format! (0x98f52b4c, "invalid mode `{}`!", _mode),
+			fail! (0x98f52b4c, "invalid mode `{}`!", _mode),
 		Some (_) =>
 			return _main_serve (_routes, _configuration, _arguments),
 	}
@@ -50,7 +53,7 @@ pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<h
 
 
 #[ cfg (feature = "server") ]
-pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> hss::ServerResult {
+pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> hss::MainResult {
 	
 	let _routes = _routes.into ();
 	let _handler = crate::server::StaticHandler::new (_routes);
@@ -62,7 +65,7 @@ pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration 
 
 
 #[ cfg (feature = "exporter") ]
-pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : Option<hss::CliArguments>) -> hss::ServerResult {
+pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : Option<hss::CliArguments>) -> hss::MainResult {
 	
 	let mut _arguments = hss::CliArguments::unwrap_or_args (_arguments);
 	let _mode = _arguments.remove_first_str ();
@@ -73,32 +76,32 @@ pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : O
 		
 		None | Some ("debug") => {
 			if ! _arguments.is_empty () {
-				hss::fail_with_message! (0x2383b422, "unexpected extra arguments!");
+				fail! (0x2383b422, "unexpected extra arguments!");
 			}
-			return crate::exporter::export_routes_debug (_routes, ::std::io::stdout ());
+			return crate::exporter::export_routes_debug (_routes, ::std::io::stdout ()) .else_wrap (0x9e5d5463);
 		}
 		
 		Some ("cpio") => {
 			if ! _arguments.is_empty () {
-				hss::fail_with_message! (0xba48b225, "unexpected extra arguments!");
+				fail! (0xba48b225, "unexpected extra arguments!");
 			}
-			return crate::exporter::export_routes_cpio (_routes, ::std::io::stdout ());
+			return crate::exporter::export_routes_cpio (_routes, ::std::io::stdout ()) .else_wrap (0x941a4ddb);
 		}
 		
 		Some ("dump") => {
 			let (_route,) = if let Ok (_tuple) = _arguments.into_tuple_1_str () {
 				_tuple
 			} else {
-				hss::fail_with_message! (0x509712ab, "unexpected extra arguments!");
+				fail! (0x509712ab, "unexpected extra arguments!");
 			};
-			return crate::exporter::export_routes_dump (_routes, &_route, ::std::io::stdout ());
+			return crate::exporter::export_routes_dump (_routes, &_route, ::std::io::stdout ()) .else_wrap (0x0aa95c65);
 		}
 		
 		Some (_mode) if ! _mode.starts_with ("-") =>
-			hss::fail_with_format! (0xf108089b, "invalid exporter mode `{}`!", _mode),
+			fail! (0xf108089b, "invalid exporter mode `{}`!", _mode),
 		
 		Some (_) =>
-			hss::fail_with_message! (0x186bfec4, "unexpected extra arguments!"),
+			fail! (0x186bfec4, "unexpected extra arguments!"),
 	}
 }
 

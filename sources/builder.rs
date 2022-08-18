@@ -34,6 +34,7 @@ use ::proc_macro2;
 
 
 use crate::builder_errors::*;
+use ::vrl_errors::*;
 
 
 
@@ -75,8 +76,8 @@ impl Default for BuilderConfiguration {
 	
 	fn default () -> Self {
 		
-		let _sources = Self::resolve_sources () .or_panic (0xc6e7914d);
-		let _outputs = Self::resolve_outputs () .or_panic (0x344e2c9e);
+		let _sources = Self::resolve_sources () .else_panic (0xc6e7914d);
+		let _outputs = Self::resolve_outputs () .else_panic (0x344e2c9e);
 		
 		#[ cfg (feature = "builder-assets") ]
 		let _assets_sources = _sources.join ("./assets");
@@ -190,17 +191,17 @@ impl BuilderConfiguration {
 	}
 	
 	pub fn resolve_sources () -> BuilderResult<PathBuf> {
-		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .or_wrap (0x4c6c04d8) ?);
+		let _sources = PathBuf::from (env::var ("CARGO_MANIFEST_DIR") .else_wrap (0x4c6c04d8) ?);
 		if ! _sources.is_dir () {
-			return Err (error_with_code (0x148bc689));
+			fail! (0x148bc689);
 		}
 		normalize_path (&_sources)
 	}
 	
 	pub fn resolve_outputs () -> BuilderResult<PathBuf> {
-		let _outputs = PathBuf::from (env::var ("OUT_DIR") .or_wrap (0xf039039f) ?);
+		let _outputs = PathBuf::from (env::var ("OUT_DIR") .else_wrap (0xf039039f) ?);
 		if ! _outputs.is_dir () {
-			return Err (error_with_code (0xfcee6b4d));
+			fail! (0xfcee6b4d);
 		}
 		normalize_path (&_outputs)
 	}
@@ -332,12 +333,12 @@ impl Builder {
 			
 			let _sources = self.configuration.sources.as_ref () .map (PathBuf::as_path);
 			let (_, _context_path) = self.resolve_file (None, _context_path) ?;
-			let _context_encoding = match _context_path.extension () .or_wrap (0x70d90b37) ? .to_str () .or_wrap (0xa22f0541) ? {
+			let _context_encoding = match _context_path.extension () .else_wrap (0x70d90b37) ? .to_str () .else_wrap (0xa22f0541) ? {
 				"toml" => "toml",
 				"yaml" => "yaml",
 				"json" => "json",
 				_ =>
-					return Err (error_with_format (0xcbc42494, format_args! ("{}", _context_path.display ()))),
+					fail! (0xcbc42494, "{}", _context_path.display ()),
 			};
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
@@ -455,7 +456,7 @@ impl Builder {
 			create_file_from_str (&_output_body, &_markdown_body, true, true) ?;
 			
 			let _output_metadata = self.configuration.outputs.join (fingerprint_data (&_markdown_body)) .with_extension ("meta");
-			let _markdown_metadata = ::serde_json::to_string_pretty (&_markdown_metadata) .or_wrap (0x94fe158d) ?;
+			let _markdown_metadata = ::serde_json::to_string_pretty (&_markdown_metadata) .else_wrap (0x94fe158d) ?;
 			create_file_from_str (&_output_metadata, &_markdown_metadata, true, true) ?;
 			
 			let _output_frontmatter = if let Some (_frontmatter) = _markdown_frontmatter {
@@ -466,7 +467,7 @@ impl Builder {
 					"yaml" => "yaml",
 					"json" => "json",
 					_ =>
-						return Err (error_with_format (0x75f4427f, format_args! ("{}", _encoding))),
+						fail! (0x75f4427f, "{}", _encoding),
 				};
 				let _path = self.configuration.outputs.join (fingerprint_data (&_data)) .with_extension (_extension);
 				create_file_from_str (&_path, &_data, true, true) ?;
@@ -507,7 +508,7 @@ impl Builder {
 		self.route_names.push (format! ("Route_{}", _id));
 		
 		let _refresher_code = if _refresher {
-			let (_context_encoding, _context_path) = _output_frontmatter.as_ref () .or_panic (0xc27ad812);
+			let (_context_encoding, _context_path) = _output_frontmatter.as_ref () .else_panic (0xc27ad812);
 			writeln! (self.generated, "::hyper_static_server::resource_markdown_refresher! (Refresher_{}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}));", _id, _source_markdown, _output_body, _output_title, _output_metadata, _context_path) .infallible (0x2b54879e);
 			format! ("Refresher_{},", _id)
 		} else {
@@ -558,8 +559,8 @@ impl Builder {
 		
 		for (_relative, _source) in _files.into_iter () {
 			
-			if _source.extension () .or_wrap (0xc1ecda55) ? != "md" {
-				return Err (error_with_format (0x393ea45d, format_args! ("{}", _source.display ())));
+			if _source.extension () .else_wrap (0xc1ecda55) ? != "md" {
+				fail! (0x393ea45d, "{}", _source.display ());
 			}
 			
 			self.route_markdown_0 (&_relative, &_source, _header_source, _footer_source, _route_base, _route_builder, _extensions_builder, _sources_0, Some (_relative.as_path ())) ?;
@@ -807,7 +808,7 @@ impl Builder {
 			"png" | "jpeg" | "icon" | "svg" =>
 				(),
 			_ =>
-				return Err (error_with_format (0x0fd2d804, format_args! ("{}", _source.display ()))),
+				fail! (0x0fd2d804, "{}", _source.display ()),
 		};
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, _extensions_builder, _macro, _source_0, _source_relative)
@@ -857,7 +858,7 @@ impl Builder {
 			"font_ttf" | "font_otf" | "font_woff" | "font_woff2" =>
 				(),
 			_ =>
-				return Err (error_with_format (0x1a4ccbf4, format_args! ("{}", _source.display ()))),
+				fail! (0x1a4ccbf4, "{}", _source.display ()),
 		};
 		
 		self.route_asset_raw (_relative, _source, _content_type, _route_base, _route_builder, _extensions_builder, "resource_font", _source_0, _source_relative)
@@ -1002,7 +1003,7 @@ impl Builder {
 		let (_path, _relative_root) = self.resolve_source (_root, _source, true) ?;
 		
 		if ! _path.is_file () {
-			return Err (error_with_format (0x039d945b, format_args! ("{}", _path.display ())));
+			fail! (0x039d945b, "{}", _path.display ());
 		}
 		
 		self.resolve_relative_and_path (&_path, &_relative_root)
@@ -1014,10 +1015,10 @@ impl Builder {
 		let (_root, _relative_root) = self.resolve_source (_root, _sources, false) ?;
 		
 		if ! _root.is_dir () {
-			return Err (error_with_code (0x621693a6));
+			fail! (0x621693a6);
 		}
 		
-		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .or_wrap (0xf68023ce)) .transpose () ?;
+		let _glob = _glob.map (|_pattern| globset::Glob::new (_pattern) .else_wrap (0xf68023ce)) .transpose () ?;
 		let _glob = _glob.map (|_pattern| _pattern.compile_matcher ());
 		
 		let mut _files = Vec::new ();
@@ -1028,7 +1029,7 @@ impl Builder {
 				.sort_by (|_left, _right| ffi::OsStr::cmp (_left.file_name (), _right.file_name ()));
 		
 		for _entry in _walker {
-			let _entry = _entry ?;
+			let _entry = _entry.else_wrap (0xdeed2955) ?;
 			let _path = _entry.path ();
 			
 			if _path.is_file () {
@@ -1059,7 +1060,7 @@ impl Builder {
 	fn resolve_source (&self, _root : Option<&Path>, _source : &str, _name_only : bool) -> BuilderResult<(PathBuf, PathBuf)> {
 		
 		let _path = if _source.starts_with ("_/") || (_source == "_") {
-			let _root = _root.or_wrap (0x6e3319c9) ?;
+			let _root = _root.else_wrap (0x6e3319c9) ?;
 			if _source != "_" {
 				_root.join (&_source[2..])
 			} else {
@@ -1067,22 +1068,22 @@ impl Builder {
 			}
 			
 		} else if _source.starts_with ("./") || _source.starts_with ("..") || (_source == ".") || (_source == "..") {
-			let _root = self.configuration.sources.as_ref () .or_wrap (0x0791a9b4) ?;
+			let _root = self.configuration.sources.as_ref () .else_wrap (0x0791a9b4) ?;
 			_root.join (&_source)
 			
 		} else if _source.starts_with (">") {
 			PathBuf::from (&_source[1..])
 			
 		} else {
-			return Err (error_with_code (0x41071330));
+			fail! (0x41071330);
 		};
 		
 		if ! _path.exists () {
-			return Err (error_with_format (0x1086bd9d, format_args! ("{}", _path.display ())));
+			fail! (0x1086bd9d, "{}", _path.display ());
 		}
 		
 		if _name_only {
-			let _relative_root = _path.parent () .or_wrap (0x067a2cad) ? .to_path_buf ();
+			let _relative_root = _path.parent () .else_wrap (0x067a2cad) ? .to_path_buf ();
 			Ok ((_path, _relative_root))
 		} else {
 			Ok ((_path.clone (), _path))
@@ -1092,7 +1093,7 @@ impl Builder {
 	
 	fn resolve_relative_and_path (&self, _path : &Path, _relative_root : &Path) -> BuilderResult<(PathBuf, PathBuf)> {
 		
-		let _relative = _path.strip_prefix (_relative_root) .or_wrap (0x546e7cd9) ? .to_str () .or_wrap (0xa48f283c) ?;
+		let _relative = _path.strip_prefix (_relative_root) .else_wrap (0x546e7cd9) ? .to_str () .else_wrap (0xa48f283c) ?;
 		let _relative = ["/", _relative].concat () .into ();
 		
 		let _path = normalize_path (&_path) ?;
@@ -1137,10 +1138,10 @@ impl Builder {
 		
 		for _dependency in self.dependencies.iter () {
 			
-			let _metadata = fs::symlink_metadata (_dependency) .or_wrap (0x06a4fbd5) ?;
+			let _metadata = fs::symlink_metadata (_dependency) .else_wrap (0x06a4fbd5) ?;
 			
 			if _metadata.file_type () .is_symlink () {
-				let _target = _dependency.canonicalize () .or_wrap (0x8df4310e) ?;
+				let _target = _dependency.canonicalize () .else_wrap (0x8df4310e) ?;
 				_extra.push (_target);
 			}
 		}
@@ -1202,25 +1203,25 @@ impl Builder {
 
 fn create_file_from_str (_path : &Path, _data : &str, _skip_if_exists : bool, _skip_if_same : bool) -> BuilderResult {
 	
-	fs::create_dir_all (_path.parent () .or_wrap (0x370af23d) ?) ?;
+	fs::create_dir_all (_path.parent () .else_wrap (0x370af23d) ?) .else_wrap (0xaba3f86c) ?;
 	
 	let _metadata = match fs::symlink_metadata (_path) {
 		Ok (_metadata) =>
 			if _metadata.is_file () {
 				Some (_metadata)
 			} else {
-				return Err (error_with_format (0x7b58f13c, format_args! ("{}", _path.display ())));
+				fail! (0x7b58f13c, "{}", _path.display ());
 			}
 		Err (_error) if _error.kind () == io::ErrorKind::NotFound =>
 			None,
 		Err (_error) =>
-			return Err (_error.wrap (0xb30cd904)),
+			fail! (0xb30cd904, cause => _error),
 	};
 	if _skip_if_exists && _metadata.is_some () {
 		return Ok (());
 	}
 	if _skip_if_same && _metadata.is_some () {
-		let _data_old = fs::read (_path) .or_wrap (0x6c311b95) ?;
+		let _data_old = fs::read (_path) .else_wrap (0x6c311b95) ?;
 		let _data_old_fingerprint = fingerprint_data (_data_old);
 		let _data_new_fingerprint = fingerprint_data (_data);
 		if _data_old_fingerprint == _data_new_fingerprint {
@@ -1229,8 +1230,8 @@ fn create_file_from_str (_path : &Path, _data : &str, _skip_if_exists : bool, _s
 	}
 	
 	// FIXME:  Use temporary file then rename!
-	let mut _file = fs::File::create (_path) ?;
-	_file.write_all (_data.as_bytes ()) ?;
+	let mut _file = fs::File::create (_path) .else_wrap (0xbb2a285c) ?;
+	_file.write_all (_data.as_bytes ()) .else_wrap (0x3f841686) ?;
 	
 	Ok (())
 }
@@ -1292,24 +1293,24 @@ impl RouteExtensionsBuilder for str {
 
 fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _route_infix : Option<&Path>) -> BuilderResult<PathBuf> {
 	
-	let _route_prefix = _route_prefix.or_wrap (0x1ba00780) ?;
+	let _route_prefix = _route_prefix.else_wrap (0x1ba00780) ?;
 	
 	if ! _route_prefix.starts_with ("/") || (_route_prefix.ends_with ("/") && _route_prefix != Path::new ("/")) {
-		return Err (error_with_code (0x6fc9256c));
+		fail! (0x6fc9256c);
 	}
 	if ! _source_relative.starts_with ("/") || _source_relative.ends_with ("/") {
-		return Err (error_with_code (0xace09af4));
+		fail! (0xace09af4);
 	}
 	if let Some (_route_infix) = _route_infix {
 		if _route_infix.starts_with ("/") || _route_infix.ends_with ("/") {
-			return Err (error_with_code (0xd224b592));
+			fail! (0xd224b592);
 		}
 	}
 	
-	let _source_relative = _source_relative.strip_prefix ("/") .or_wrap (0xbd4b80bd) ?;
+	let _source_relative = _source_relative.strip_prefix ("/") .else_wrap (0xbd4b80bd) ?;
 	
 	let _route = if let Some (_route_infix) = _route_infix {
-		let _route_infix = _route_infix.strip_prefix ("/") .or_wrap (0x1a7e3353) ?;
+		let _route_infix = _route_infix.strip_prefix ("/") .else_wrap (0x1a7e3353) ?;
 		_route_prefix.join (_route_infix) .join (_source_relative)
 	} else {
 		_route_prefix.join (_source_relative)
@@ -1322,7 +1323,7 @@ fn generate_route (_source_relative : &Path, _route_prefix : Option<&Path>, _rou
 fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailing_slash : bool) -> BuilderResult<PathBuf> {
 	
 	if ! _path_0.starts_with ("/") {
-		return Err (error_with_code (0x1e7f7bc0));
+		fail! (0x1e7f7bc0);
 	}
 	
 	let mut _path = PathBuf::new ();
@@ -1358,7 +1359,7 @@ fn normalize_path (_path_0 : &Path) -> BuilderResult<PathBuf> {
 
 fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'static str> {
 	
-	let _extension = _source.extension () .or_wrap (0x29957dc8) ? .to_str () .or_wrap (0x908aeea6) ?;
+	let _extension = _source.extension () .else_wrap (0x29957dc8) ? .to_str () .else_wrap (0x908aeea6) ?;
 	
 	let _content_type = match _extension {
 		"text" | "txt" => "text",
@@ -1386,15 +1387,15 @@ fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'stati
 
 
 fn token_tree_parse (_string : &str) -> BuilderResult<proc_macro2::TokenTree> {
-	let _stream = proc_macro2::TokenStream::from_str (_string) .or_wrap (0x72524db6) ?;
+	let _stream = proc_macro2::TokenStream::from_str (_string) .else_replace (0x72524db6) ?;
 	let mut _stream = _stream.into_iter ();
 	let _token = if let Some (_token) = _stream.next () {
 		_token
 	} else {
-		return Err (error_with_code (0xe9c8879a))
+		fail! (0xe9c8879a);
 	};
 	if _stream.next () .is_some () {
-		return Err (error_with_code (0xd96714a4))
+		fail! (0xd96714a4);
 	}
 	Ok (_token)
 }

@@ -30,6 +30,7 @@ use ::std::{
 
 
 use crate::builder_errors::*;
+use ::vrl_errors::*;
 
 
 
@@ -111,7 +112,7 @@ pub struct MarkdownFrontmatter {
 
 pub fn compile_markdown_from_path (_source : &Path, _options : Option<&MarkdownOptions>) -> BuilderResult<MarkdownOutput> {
 	
-	let _source = fs::read_to_string (_source) ?;
+	let _source = fs::read_to_string (_source) .else_wrap (0xe95649e7) ?;
 	
 	compile_markdown_from_data (_source.as_str (), _options)
 }
@@ -139,7 +140,7 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 	}
 	
 	if _input.is_empty () {
-		return Err (error_with_code (0x1fc18809));
+		fail! (0x1fc18809);
 	}
 	
 	let (_input, _frontmatter) = {
@@ -230,7 +231,7 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 					}
 				_ =>
 					if _capture_next {
-						return Err (error_with_code (0xc36cbd17));
+						fail! (0xc36cbd17);
 					}
 			}
 		}
@@ -260,7 +261,7 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 					}
 				_ =>
 					if _generate_next {
-						return Err (error_with_code (0xd9b3a175));
+						fail! (0xd9b3a175);
 					}
 			}
 		}
@@ -379,8 +380,8 @@ pub fn write_markdown_to_paths (
 	
 	if let Some (_path) = _body_path {
 		let _data = _body;
-		let mut _file = fs::File::create (_path) ?;
-		_file.write_all (_data.as_bytes ()) ?;
+		let mut _file = fs::File::create (_path) .else_wrap (0x51e17b27) ?;
+		_file.write_all (_data.as_bytes ()) .else_wrap (0x44f420ef) ?;
 	}
 	
 	if let Some (_path) = _title_path {
@@ -389,17 +390,17 @@ pub fn write_markdown_to_paths (
 		} else {
 			""
 		};
-		let mut _file = fs::File::create (_path) ?;
-		_file.write_all (_data.as_bytes ()) ?;
+		let mut _file = fs::File::create (_path) .else_wrap (0x6bf95100) ?;
+		_file.write_all (_data.as_bytes ()) .else_wrap (0x4b5591e3) ?;
 	}
 	
 	if let Some (_path) = _metadata_path {
 	}
 	
 	if let Some (_path) = _metadata_path {
-		let _data = serde_json::to_string_pretty (&_metadata) .or_wrap (0xa0176504) ?;
-		let mut _file = fs::File::create (_path) ?;
-		_file.write_all (_data.as_bytes ()) ?;
+		let _data = serde_json::to_string_pretty (&_metadata) .else_wrap (0xa0176504) ?;
+		let mut _file = fs::File::create (_path) .else_wrap (0x1ebe4a7f) ?;
+		_file.write_all (_data.as_bytes ()) .else_wrap (0xb71c7980) ?;
 	}
 	
 	if let Some (_path) = _frontmatter_path {
@@ -409,13 +410,13 @@ pub fn write_markdown_to_paths (
 				"yaml" => "## yaml\n".to_owned () + &_frontmatter.data,
 				"json" => _frontmatter.data,
 				_ =>
-					return Err (error_with_code (0xfc776131)),
+					fail! (0xfc776131),
 			}
 		} else {
 			String::new ()
 		};
-		let mut _file = fs::File::create (_path) ?;
-		_file.write_all (_data.as_bytes ()) ?;
+		let mut _file = fs::File::create (_path) .else_wrap (0x66247dcc) ?;
+		_file.write_all (_data.as_bytes ()) .else_wrap (0xecc4c6c4) ?;
 	}
 	
 	Ok (())
@@ -426,9 +427,9 @@ pub fn write_markdown_to_paths (
 
 pub fn compile_markdown_html_from_path (_source : &Path, _header : Option<&Path>, _footer : Option<&Path>, _options : Option<&MarkdownOptions>) -> BuilderResult<String> {
 	
-	let _source = fs::read_to_string (_source) ?;
-	let _header = if let Some (_header) = _header { Some (fs::read_to_string (_header) ?) } else { None };
-	let _footer = if let Some (_footer) = _footer { Some (fs::read_to_string (_footer) ?) } else { None };
+	let _source = fs::read_to_string (_source) .else_wrap (0xa6270ff0) ?;
+	let _header = if let Some (_header) = _header { Some (fs::read_to_string (_header) .else_wrap (0x15c6429c) ?) } else { None };
+	let _footer = if let Some (_footer) = _footer { Some (fs::read_to_string (_footer) .else_wrap (0xa304bc47) ?) } else { None };
 	
 	let _source = _source.as_str ();
 	let _header = _header.as_ref () .map (String::as_str);

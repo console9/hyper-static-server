@@ -29,6 +29,15 @@ use crate::runtime::{
 	};
 
 
+use ::vrl_errors::*;
+
+
+
+
+define_error! (pub SitemapError, result : SitemapResult);
+
+
+
 
 pub enum SitemapFormat {
 	#[ cfg (feature = "runtime-sitemaps-xml") ]
@@ -55,17 +64,17 @@ pub struct SitemapPriority (f32);
 
 impl SitemapFormat {
 	
-	pub fn from_str (_string : &str) -> hss::ServerResult<Self> {
+	pub fn from_str (_string : &str) -> SitemapResult<Self> {
 		match _string {
 			#[ cfg (feature = "runtime-sitemaps-xml") ]
 			"xml" => Ok (Self::Xml),
 			"text" => Ok (Self::Text),
-			_ => hss::fail_with_code! (0xdf9d3bb7),
+			_ => fail! (0xdf9d3bb7),
 		}
 	}
 	
 	pub fn from_str_must (_string : &str) -> Self {
-		Self::from_str (_string) .or_panic (0x685370b7)
+		Self::from_str (_string) .else_panic (0x685370b7)
 	}
 }
 
@@ -74,7 +83,7 @@ impl SitemapFormat {
 
 impl SitemapFrequency {
 	
-	pub fn from_str (_string : &str) -> hss::ServerResult<Option<Self>> {
+	pub fn from_str (_string : &str) -> SitemapResult<Option<Self>> {
 		match _string {
 			"default" => Ok (None),
 			"always" => Ok (Some (Self::Always)),
@@ -84,12 +93,12 @@ impl SitemapFrequency {
 			"monthly" => Ok (Some (Self::Monthly)),
 			"yearly" => Ok (Some (Self::Yearly)),
 			"never" => Ok (Some (Self::Never)),
-			_ => hss::fail_with_code! (0xb2001a05),
+			_ => fail! (0xb2001a05),
 		}
 	}
 	
 	pub fn from_str_must (_string : &str) -> Option<Self> {
-		Self::from_str (_string) .or_panic (0x256f6fc2)
+		Self::from_str (_string) .else_panic (0x256f6fc2)
 	}
 }
 
@@ -100,31 +109,31 @@ impl SitemapPriority {
 		self.0
 	}
 	
-	pub fn from_str (_string : &str) -> hss::ServerResult<Option<Self>> {
+	pub fn from_str (_string : &str) -> SitemapResult<Option<Self>> {
 		match _string {
 			"default" =>
 				Ok (None),
 			_ =>
-				Self::from_f32 (f32::from_str (_string) .or_wrap (0x1dd1e4e7) ?)
+				Self::from_f32 (f32::from_str (_string) .else_wrap (0x1dd1e4e7) ?)
 		}
 	}
 	
-	pub fn from_f32 (_value : f32) -> hss::ServerResult<Option<Self>> {
+	pub fn from_f32 (_value : f32) -> SitemapResult<Option<Self>> {
 		if _value < 0.0 {
-			hss::fail_with_code! (0x55b5a84b);
+			fail! (0x55b5a84b);
 		}
 		if _value > 1.0 {
-			hss::fail_with_code! (0xa233806b);
+			fail! (0xa233806b);
 		}
 		Ok (Some (Self (_value)))
 	}
 	
 	pub fn from_str_must (_string : &str) -> Option<Self> {
-		Self::from_str (_string) .or_panic (0xfe4be058)
+		Self::from_str (_string) .else_panic (0xfe4be058)
 	}
 	
 	pub fn from_f32_must (_value : f32) -> Option<Self> {
-		Self::from_f32 (_value) .or_panic (0x004c83da)
+		Self::from_f32 (_value) .else_panic (0x004c83da)
 	}
 }
 
@@ -161,20 +170,20 @@ pub struct RoutesSitemapResource {
 
 impl RoutesSitemapResource {
 	
-	pub fn new (_prefix : String, _format : SitemapFormat, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
+	pub fn new (_prefix : String, _format : SitemapFormat, _extensions : Option<&hss::Extensions>) -> SitemapResult<Self> {
 		Self::new_with_routes (_prefix, _format, None, _extensions)
 	}
 	
 	#[ cfg (feature = "runtime-sitemaps-xml") ]
-	pub fn new_xml (_prefix : String, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
+	pub fn new_xml (_prefix : String, _extensions : Option<&hss::Extensions>) -> SitemapResult<Self> {
 		Self::new (_prefix, SitemapFormat::Xml, _extensions)
 	}
 	
-	pub fn new_text (_prefix : String, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
+	pub fn new_text (_prefix : String, _extensions : Option<&hss::Extensions>) -> SitemapResult<Self> {
 		Self::new (_prefix, SitemapFormat::Text, _extensions)
 	}
 	
-	pub fn new_with_routes (_prefix : String, _format : SitemapFormat, _routes : Option<hss::Routes>, _extensions : Option<&hss::Extensions>) -> hss::ServerResult<Self> {
+	pub fn new_with_routes (_prefix : String, _format : SitemapFormat, _routes : Option<hss::Routes>, _extensions : Option<&hss::Extensions>) -> SitemapResult<Self> {
 		let _self = Self {
 				prefix : _prefix,
 				format : _format,
@@ -221,7 +230,7 @@ impl StaticResource for RoutesSitemapResource {
 
 impl hss::HandlerSimpleSync for RoutesSitemapResource {
 	
-	fn handle (&self, _request : &hss::Request<hss::Body>, _response : &mut hss::Response<hss::Body>) -> hss::ServerResult {
+	fn handle (&self, _request : &hss::Request<hss::Body>, _response : &mut hss::Response<hss::Body>) -> hss::HandlerResult {
 		
 		let _routes = if let Some (_routes) = &self.routes {
 			_routes.clone ()
@@ -230,7 +239,7 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 		} else if let Some (_routes) = _request.extensions () .get::<hss::Routes> () {
 			_routes.clone ()
 		} else {
-			hss::fail_with_code! (0xee535008);
+			fail! (0xee535008);
 		};
 		
 		let mut _sitemap_routes = Vec::new ();
@@ -242,7 +251,7 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 					_url_buffer.push_str (self.prefix.trim_end_matches ("/"));
 					_url_buffer.push_str ("/");
 					_url_buffer.push_str (_route.path.trim_start_matches ("/"));
-					let _url = ::url::Url::from_str (&_url_buffer) .or_wrap (0x270667a5) ?;
+					let _url = ::url::Url::from_str (&_url_buffer) .else_wrap (0x270667a5) ?;
 					_sitemap_routes.push ((_url, _entry));
 				}
 			}
@@ -272,7 +281,7 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 					if let Some (_priority) = _route_entry.priority.as_ref () {
 						_builder.priority (_priority.to_f32 ());
 					}
-					let _entry = _builder.build () .or_wrap (0x155cdb8f) ?;
+					let _entry = _builder.build () .else_wrap (0x155cdb8f) ?;
 					_entries.push (_entry);
 				}
 				let _buffer = ::sitewriter::generate_str (&_entries);

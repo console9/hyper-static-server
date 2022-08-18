@@ -7,10 +7,12 @@
 // NOTE:  Needed for broken askama...
 use ::std::format;
 
+use ::hyper_static_server::hss::ResultExtWrap as _;
 
-fn main () -> ::hyper_static_server::hss::ServerResult {
+
+fn main () -> ::hyper_static_server::hss::MainResult {
 	
-	let _routes = Routes::new () ?;
+	let _routes = Routes::new () .else_wrap (0x6836acf2) ?;
 	
 	return ::hyper_static_server::main (_routes);
 }
