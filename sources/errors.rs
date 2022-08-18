@@ -1,0 +1,18 @@
+
+
+pub use ::hyper_simple_server::errors::*;
+
+
+#[ cfg (feature = "support-builder") ]
+::vrl_errors::define_error! (pub BuilderError, result : BuilderResult);
+
+#[ cfg (feature = "exporter") ]
+::vrl_errors::define_error! (pub ExportError, result : ExportResult);
+
+#[ cfg (feature = "runtime-askama") ]
+::vrl_errors::define_error! (pub AskamaError, result : AskamaResult);
+
+#[ cfg (feature = "runtime-sitemaps") ]
+::vrl_errors::define_error! (pub SitemapError, result : SitemapResult);
+
+

@@ -34,12 +34,7 @@ use crate::hss::{
 	};
 
 
-use ::vrl_errors::*;
-
-
-
-
-define_error! (pub ExportError, result : ExportResult);
+use crate::errors::*;
 
 
 

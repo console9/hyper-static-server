@@ -4,30 +4,30 @@
 use crate::hss;
 
 
-use ::vrl_errors::*;
+use crate::errors::*;
 
 
 
 
 #[ cfg ( any (feature = "server", feature = "exporter") ) ]
-pub fn main (_routes : impl Into<hss::Routes>) -> hss::MainResult {
+pub fn main (_routes : impl Into<hss::Routes>) -> MainResult {
 	return main_wrapper (_routes, None, None);
 }
 
 
 #[ cfg ( any (feature = "server", feature = "exporter") ) ]
-pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> hss::MainResult {
+pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> MainResult {
 	
 	let _arguments = hss::CliArguments::from_args ();
 	
-	fn _main_serve (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : hss::CliArguments) -> hss::MainResult {
+	fn _main_serve (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : hss::CliArguments) -> MainResult {
 			#[ cfg (feature = "server") ]
 			return main_serve_with_static (_routes, _configuration, Some (_arguments));
 			#[ cfg (not (feature = "server") ) ]
 			fail! (0x2504f6ba, "executable built without `server` feature!");
 		}
 	
-	fn _main_export (_routes : impl Into<hss::Routes>, _arguments : hss::CliArguments) -> hss::MainResult {
+	fn _main_export (_routes : impl Into<hss::Routes>, _arguments : hss::CliArguments) -> MainResult {
 			#[ cfg (feature = "exporter") ]
 			return main_export_with_static (_routes, Some (_arguments));
 			#[ cfg (not (feature = "exporter") ) ]
@@ -53,7 +53,7 @@ pub fn main_wrapper (_routes : impl Into<hss::Routes>, _configuration : Option<h
 
 
 #[ cfg (feature = "server") ]
-pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> hss::MainResult {
+pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration : Option<hss::Configuration>, _arguments : Option<hss::CliArguments>) -> MainResult {
 	
 	let _routes = _routes.into ();
 	let _handler = crate::server::StaticHandler::new (_routes);
@@ -65,7 +65,7 @@ pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration 
 
 
 #[ cfg (feature = "exporter") ]
-pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : Option<hss::CliArguments>) -> hss::MainResult {
+pub fn main_export_with_static (_routes : impl Into<hss::Routes>, _arguments : Option<hss::CliArguments>) -> MainResult {
 	
 	let mut _arguments = hss::CliArguments::unwrap_or_args (_arguments);
 	let _mode = _arguments.remove_first_str ();

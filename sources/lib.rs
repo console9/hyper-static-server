@@ -30,13 +30,6 @@ pub use crate::exporter::*;
 
 
 
-#[ cfg (feature = "support-builder") ]
-pub(crate) mod builder_errors;
-
-#[ cfg (feature = "support-builder") ]
-pub use crate::builder_errors::*;
-
-
 #[ cfg (feature = "builder") ]
 pub(crate) mod builder;
 
@@ -107,4 +100,13 @@ pub mod support_sass;
 
 #[ cfg (feature = "support-markdown") ]
 pub mod support_markdown;
+
+
+
+
+pub mod errors;
+
+
+#[ cfg (feature = "runtime-hss-exports") ]
+pub use crate::errors::*;
 

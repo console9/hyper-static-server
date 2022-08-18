@@ -42,7 +42,7 @@ macro_rules! askama {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _self = Self {
 							template : Self::template_build (_extensions) ?,
@@ -51,11 +51,11 @@ macro_rules! askama {
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					let _self = Self {};
 				}
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::hss::HandlerResult<::std::string::String> {
-				use $crate::hss::ResultExtWrap as _;
+			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _template = &self.template;
 				}
@@ -71,14 +71,15 @@ macro_rules! askama {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)
 			}
 			
-			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<$_template_name> {
+			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<$_template_name> {
+				use $crate::errors::ResultExtWrap as _;
 				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) .else_wrap (0x3fd73d1f) ?;
 				let _template = $_template_name {
 						context : _context,
 						__is_production : $crate::cfg_if_production! ({ true } | { false }),
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
 					};
-				$crate::hss::HandlerResult::Ok (_template)
+				$crate::errors::HandlerResult::Ok (_template)
 			}
 		}
 		
@@ -101,14 +102,14 @@ macro_rules! askama {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::HandlerResult {
+			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::hss::ResponseExt as _;
 				use $crate::StaticResource as _;
 				let _body = self.render () ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
-				$crate::hss::HandlerResult::Ok (())
+				$crate::errors::HandlerResult::Ok (())
 			}
 		}
 	};
@@ -162,7 +163,7 @@ macro_rules! askama_document {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _self = Self {
 							template : Self::template_build (_extensions) ?,
@@ -171,10 +172,11 @@ macro_rules! askama_document {
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					let _self = Self {};
 				}
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::hss::HandlerResult<::std::string::String> {
+			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _template = &self.template;
 				}
@@ -190,7 +192,8 @@ macro_rules! askama_document {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)
 			}
 			
-			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<$_template_name> {
+			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<$_template_name> {
+				use $crate::errors::ResultExtWrap as _;
 				use ::std::convert::From as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					$(
@@ -204,10 +207,9 @@ macro_rules! askama_document {
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					$( $_refresher_name::refresh () ?; )?
-					use $crate::errors::ResultExtWrap as _;
-					let _body = ::std::fs::read_to_string ($_body_path) .or_wrap (0x222c7659) ?;
-					let _title = ::std::fs::read_to_string ($_title_path) .or_wrap (0x32c4e114) ?;
-					let _metadata = ::std::fs::read_to_string ($_metadata_path) .or_wrap (0xc07d6b78) ?;
+					let _body = ::std::fs::read_to_string ($_body_path) .else_wrap (0x222c7659) ?;
+					let _title = ::std::fs::read_to_string ($_title_path) .else_wrap (0x32c4e114) ?;
+					let _metadata = ::std::fs::read_to_string ($_metadata_path) .else_wrap (0xc07d6b78) ?;
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
 				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) .else_wrap (0x01992727) ?;
@@ -219,7 +221,7 @@ macro_rules! askama_document {
 						__is_production : $crate::cfg_if_production! ({ true } | { false }),
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
 					};
-				$crate::hss::HandlerResult::Ok (_template)
+				$crate::errors::HandlerResult::Ok (_template)
 			}
 		}
 		
@@ -242,14 +244,14 @@ macro_rules! askama_document {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::HandlerResult {
+			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::hss::ResponseExt as _;
 				use $crate::StaticResource as _;
 				let _body = self.render () ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
-				$crate::hss::HandlerResult::Ok (())
+				$crate::errors::HandlerResult::Ok (())
 			}
 		}
 	};
@@ -322,7 +324,7 @@ macro_rules! askama_context_new {
 		{
 			use $crate::errors::ResultExtWrap as _;
 			let _encoding : &str = $_context_encoding;
-			let _data = ::std::fs::read ($_context_path) .or_wrap (0x98ea260c) ?;
+			let _data = ::std::fs::read ($_context_path) .else_wrap (0x98ea260c) ?;
 			let _extensions : &$crate::hss::Extensions = $_extensions;
 			<$_context_type as $crate::AskamaContext>::new_with_deserialization (_encoding, &_data, _extensions)
 		}
@@ -353,9 +355,9 @@ macro_rules! resource {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self ();
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
@@ -409,7 +411,7 @@ macro_rules! resource {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self {
 						resource : $crate::hss::FileResource::new (
 								$crate::resource_path! ($_resource_path),
@@ -417,7 +419,7 @@ macro_rules! resource {
 								false,
 							)
 					};
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
@@ -472,16 +474,16 @@ macro_rules! resource_sass_dynamic {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self {
 						source : ::std::path::Path::new ($crate::resource_path! ($_source_path)),
 					};
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::hss::HandlerResult<::std::string::String> {
-				$crate::support_sass::compile_sass (self.source)
-						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x548c29d4, _error)))
+			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+				use $crate::errors::ResultExtWrap as _;
+				$crate::support_sass::compile_sass (self.source) .else_wrap (0xbe93dd79)
 			}
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
@@ -508,14 +510,14 @@ macro_rules! resource_sass_dynamic {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::HandlerResult {
+			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::hss::ResponseExt as _;
 				use $crate::StaticResource as _;
 				let _body = self.render () ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
-				$crate::hss::HandlerResult::Ok (())
+				$crate::errors::HandlerResult::Ok (())
 			}
 		}
 	};
@@ -540,18 +542,18 @@ macro_rules! resource_markdown_dynamic {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self {
 						source : ::std::path::Path::new ($crate::resource_path! ($_source_path)),
 						header : $crate::resource_path! ($_header_path) .map (::std::path::Path::new::<str>),
 						footer : $crate::resource_path! ($_footer_path) .map (::std::path::Path::new::<str>),
 					};
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::hss::HandlerResult<::std::string::String> {
-				$crate::support_markdown::compile_markdown_html_from_path (self.source, self.header, self.footer, ::std::option::Option::None)
-						.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0x35c91763, _error)))
+			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+				use $crate::errors::ResultExtWrap as _;
+				$crate::support_markdown::compile_markdown_html_from_path (self.source, self.header, self.footer, ::std::option::Option::None) .else_wrap (0x0622a827)
 			}
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
@@ -578,14 +580,14 @@ macro_rules! resource_markdown_dynamic {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::hss::HandlerResult {
+			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::hss::ResponseExt as _;
 				use $crate::StaticResource as _;
 				let _body = self.render () ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
-				$crate::hss::HandlerResult::Ok (())
+				$crate::errors::HandlerResult::Ok (())
 			}
 		}
 	};
@@ -606,7 +608,8 @@ macro_rules! resource_markdown_refresher {
 		#[ allow (dead_code) ]
 		impl $_refresher_name {
 			
-			fn refresh () -> $crate::hss::HandlerResult {
+			fn refresh () -> $crate::errors::HandlerResult {
+				use $crate::errors::ResultExtWrap as _;
 				$crate::support_markdown::compile_markdown_from_path_to_paths (
 						::std::path::Path::new ($crate::resource_path! ($_source_path)),
 						::std::option::Option::None,
@@ -615,7 +618,7 @@ macro_rules! resource_markdown_refresher {
 						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_metadata_path))),
 						::std::option::Option::Some (::std::path::Path::new ($crate::resource_path! ($_frontmatter_path))),
 					)
-					.map_err (|_error| ::std::io::Error::new (::std::io::ErrorKind::Other, ::std::format! ("[{:08x}]  {}", 0xec077645, _error)))
+					.else_wrap (0xc4f1eb11)
 			}
 		}
 	};
@@ -635,7 +638,7 @@ macro_rules! route {
 		
 		impl $_route_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				use ::std::convert::From as _;
 				use $crate::StaticResource as _;
 				let _resource = <$_resource_name>::new (_extensions) ?;
@@ -653,7 +656,7 @@ macro_rules! route {
 						extensions : _extensions,
 					};
 				let _self = Self (_route);
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 		}
 		
@@ -689,9 +692,10 @@ macro_rules! route_sitemap {
 		
 		impl $_route_name {
 			
-			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::hss::HandlerResult<Self> {
-				use ::std::convert::From as _;
+			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
+				use $crate::errors::ResultExtWrap as _;
 				use $crate::StaticResource as _;
+				use ::std::convert::From as _;
 				let _prefix = ::std::string::String::from ($_prefix);
 				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
 				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format, ::std::option::Option::Some (_extensions)) .else_wrap (0x255df805) ?;
@@ -709,7 +713,7 @@ macro_rules! route_sitemap {
 						extensions : _extensions,
 					};
 				let _self = Self (_route);
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 		}
 		
@@ -816,11 +820,12 @@ macro_rules! routes {
 		
 		impl $_name {
 			
-			pub fn new () -> $crate::hss::HandlerResult<Self> {
+			pub fn new () -> $crate::errors::HandlerResult<Self> {
 				Self::new_with_extensions (::std::option::Option::None)
 			}
 			
-			pub fn new_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::HandlerResult<Self> {
+			pub fn new_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::errors::HandlerResult<Self> {
+				use $crate::errors::ResultExtWrap as _;
 				use ::std::iter::IntoIterator as _;
 				let _routes = Self::routes_with_extensions (_extensions) ?;
 				let mut _builder = $crate::hss::RoutesBuilder::new ();
@@ -829,17 +834,17 @@ macro_rules! routes {
 				}
 				let _routes = _builder.build () .else_wrap (0x4b34a624) ?;
 				let _self = Self (_routes);
-				$crate::hss::HandlerResult::Ok (_self)
+				$crate::errors::HandlerResult::Ok (_self)
 			}
 		}
 		
 		impl $_name {
 			
-			pub fn routes () -> $crate::hss::HandlerResult<::std::vec::Vec<$crate::hss::Route>> {
+			pub fn routes () -> $crate::errors::HandlerResult<::std::vec::Vec<$crate::hss::Route>> {
 				Self::routes_with_extensions (::std::option::Option::None)
 			}
 			
-			pub fn routes_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::hss::HandlerResult<::std::vec::Vec<$crate::hss::Route>> {
+			pub fn routes_with_extensions (_extensions : ::std::option::Option<&$crate::hss::Extensions>) -> $crate::errors::HandlerResult<::std::vec::Vec<$crate::hss::Route>> {
 				use $crate::StaticRoute as _;
 				let _extensions_none = $crate::hss::Extensions::new ();
 				let _extensions = _extensions.unwrap_or (&_extensions_none);
@@ -853,7 +858,7 @@ macro_rules! routes {
 							},
 						)*
 					);
-				$crate::hss::HandlerResult::Ok (_routes)
+				$crate::errors::HandlerResult::Ok (_routes)
 			}
 		}
 		
@@ -874,7 +879,7 @@ macro_rules! routes {
 		
 		impl $_name {
 			
-			pub fn eprintln () -> $crate::hss::HandlerResult {
+			pub fn eprintln () -> $crate::errors::HandlerResult {
 				use ::std::iter::IntoIterator as _;
 				let _routes = Self::routes () ?;
 				for _route in _routes.into_iter () {
@@ -884,7 +889,7 @@ macro_rules! routes {
 						::std::eprintln! ("[dd] [df531ca1]  **  {}", _route.path);
 					}
 				}
-				$crate::hss::HandlerResult::Ok (())
+				$crate::errors::HandlerResult::Ok (())
 			}
 		}
 	};

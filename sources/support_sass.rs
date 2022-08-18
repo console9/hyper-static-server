@@ -28,8 +28,7 @@ use ::std::{
 	};
 
 
-use crate::builder_errors::*;
-use ::vrl_errors::*;
+use crate::errors::*;
 
 
 
@@ -84,7 +83,7 @@ pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 	impl sass::SassImporter for Importer {
 		fn callback (&mut self, _path_0 : &ffi::CStr, _compiler : sass::SassCompiler) -> Result<Option<Vec<sass::SassImportEntry>>, sass::SassImporterError> {
 			
-			let _path_0 = Path::new (_path_0.to_str () .or_panic (0xfd5fc0a2));
+			let _path_0 = Path::new (_path_0.to_str () .else_panic (0xfd5fc0a2));
 			let _path = self.parent.join (_path_0);
 			
 			for _extension in &["sass", "scss", "css"] {
@@ -98,7 +97,7 @@ pub fn compile_sass (_source : &Path) -> BuilderResult<String> {
 				// NOTE:  The code bellow will keep a reference to `_path` that should live until after the compilation completes.
 				let mut _resolved = self.resolved.borrow_mut ();
 				_resolved.push (_path.into_boxed_path ());
-				let _path = _resolved.last () .or_panic (0x5d9cba96) .as_ref ();
+				let _path = _resolved.last () .else_panic (0x5d9cba96) .as_ref ();
 				let _entry = sass::SassImport::AbsolutePath (_path);
 				
 				return Ok (Some (vec! (_entry.into_sass_import_entry ())));

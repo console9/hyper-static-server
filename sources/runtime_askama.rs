@@ -3,12 +3,7 @@
 use crate::hss;
 
 
-use ::vrl_errors::*;
-
-
-
-
-define_error! (pub AskamaError, result : AskamaResult);
+use crate::errors::*;
 
 
 

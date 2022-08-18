@@ -29,12 +29,7 @@ use crate::runtime::{
 	};
 
 
-use ::vrl_errors::*;
-
-
-
-
-define_error! (pub SitemapError, result : SitemapResult);
+use crate::errors::*;
 
 
 
@@ -230,7 +225,7 @@ impl StaticResource for RoutesSitemapResource {
 
 impl hss::HandlerSimpleSync for RoutesSitemapResource {
 	
-	fn handle (&self, _request : &hss::Request<hss::Body>, _response : &mut hss::Response<hss::Body>) -> hss::HandlerResult {
+	fn handle (&self, _request : &hss::Request<hss::Body>, _response : &mut hss::Response<hss::Body>) -> HandlerResult {
 		
 		let _routes = if let Some (_routes) = &self.routes {
 			_routes.clone ()

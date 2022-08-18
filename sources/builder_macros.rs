@@ -1110,11 +1110,11 @@ macro_rules! main_build_with_defaults {
 	
 	( $_resources : tt ) => {
 		
-		pub fn main () -> $crate::BuilderResult {
+		pub fn main () -> $crate::errors::BuilderResult {
 			
 			$crate::build_with_defaults! ($_resources);
 			
-			$crate::BuilderResult::Ok (())
+			$crate::errors::BuilderResult::Ok (())
 		}
 	};
 }
