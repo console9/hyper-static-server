@@ -3,6 +3,9 @@
 pub use ::hyper_simple_server::errors::*;
 
 
+pub use ::vrl_errors::*;
+
+
 #[ cfg (feature = "support-builder") ]
 ::vrl_errors::define_error! (pub BuilderError, result : BuilderResult);
 
