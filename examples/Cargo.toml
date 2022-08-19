@@ -17,17 +17,17 @@ path = "./sources/main.rs"
 
 [dependencies]
 
-hyper-static-server = { path = "../sources", default-features = false, features = [] }
+hyper-static-server = { version = "*", default-features = false, features = [] }
 
-# askama = { version = "0.10.5", default-features = true }
+# askama = { version = "*", default-features = true }
 askama = { package = "askama_patched", version = "*", default-features = true }
 
-serde = { version = "1.0.136", default-features = true }
+serde = { version = "*", default-features = true }
 
 
 [build-dependencies]
 
-hyper-static-server = { path = "../sources", default-features = false, features = ["builder-all"] }
+hyper-static-server = { version = "*", default-features = false, features = ["builder-all"] }
 
 
 
@@ -62,9 +62,17 @@ production = [
 
 [patch.crates-io]
 
-hyper-simple-server = { path = "../../hyper-simple-server/sources" }
+# hyper-static-server = { git = "https://github.com/console9/hyper-static-server", tag = "v0.6.1" }
+# hyper-simple-server = { git = "https://github.com/console9/hyper-simple-server", tag = "v0.6.1" }
+# vrl-errors = { git = "https://github.com/volution/volution-rust-libraries", tag = "v0.1.1" }
 
-vrl-errors = { path = "../../volution-rust-libraries/sources/errors" }
+# hyper-static-server = { git = "https://github.com/console9/hyper-static-server", branch = "console9" }
+hyper-simple-server = { git = "https://github.com/console9/hyper-simple-server", branch = "console9" }
+vrl-errors = { git = "https://github.com/volution/volution-rust-libraries", branch = "console9" }
+askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "console9" }
 
-askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "forked/0.10.5/merged" }
+hyper-static-server = { path = "../sources" }
+# hyper-simple-server = { path = "../../hyper-simple-server/sources" }
+# vrl-errors = { path = "../../volution-rust-libraries/sources/errors" }
+# askama_patched = { path = "../../askama/askama_patched" }
 

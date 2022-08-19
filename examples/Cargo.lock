@@ -41,7 +41,7 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 [[package]]
 name = "askama_patched"
 version = "0.10.5"
-source = "git+https://github.com/cipriancraciun/askama?branch=forked/0.10.5/merged#0f44e71ef1f19c7651acab15dfd6804f7b76609d"
+source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
 dependencies = [
  "askama_patched_derive",
  "askama_patched_escape",
@@ -51,7 +51,7 @@ dependencies = [
 [[package]]
 name = "askama_patched_derive"
 version = "0.10.5"
-source = "git+https://github.com/cipriancraciun/askama?branch=forked/0.10.5/merged#0f44e71ef1f19c7651acab15dfd6804f7b76609d"
+source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
 dependencies = [
  "askama_patched_shared",
  "proc-macro2",
@@ -61,12 +61,12 @@ dependencies = [
 [[package]]
 name = "askama_patched_escape"
 version = "0.10.1"
-source = "git+https://github.com/cipriancraciun/askama?branch=forked/0.10.5/merged#0f44e71ef1f19c7651acab15dfd6804f7b76609d"
+source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
 
 [[package]]
 name = "askama_patched_shared"
 version = "0.11.1"
-source = "git+https://github.com/cipriancraciun/askama?branch=forked/0.10.5/merged#0f44e71ef1f19c7651acab15dfd6804f7b76609d"
+source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
 dependencies = [
  "askama_patched_escape",
  "humansize",
@@ -482,6 +482,7 @@ dependencies = [
 [[package]]
 name = "hyper-simple-server"
 version = "0.6.0"
+source = "git+https://github.com/console9/hyper-simple-server?branch=console9#e7ee2bbe0889c3fc33757e2fc569d0501fa3dd30"
 dependencies = [
  "argparse",
  "bytes",
@@ -1205,6 +1206,7 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 [[package]]
 name = "vrl-errors"
 version = "0.1.0"
+source = "git+https://github.com/volution/volution-rust-libraries?branch=console9#53d1380d6c5377ea6a8798222a9b36a25dd19ad6"
 
 [[package]]
 name = "walkdir"
