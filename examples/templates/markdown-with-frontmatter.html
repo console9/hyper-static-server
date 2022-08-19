@@ -7,20 +7,20 @@
 {% endblock %}
 
 
-{% block page_title %}{{ title }}{% endblock %}
+{% block page_title %}{{ self.title }}{% endblock %}
 {% block page_classes %}markdown markdown-askama{% endblock %}
 
 
 {% block main %}
 <div id="markdown-body">
-{{ body|safe }}
+{{ self.body|safe }}
 </div>
 <hr />
 <pre id="markdown-metadata">
-{{ "{:?}"|format(metadata) }}
+{{ "{:?}"|format(self.metadata) }}
 <hr />
 <pre id="markdown-frontmatter">
-{{ "{:?}"|format(context) }}
+{{ "{:?}"|format(self.context) }}
 </pre>
 </pre>
 {% endblock %}
