@@ -134,3 +134,10 @@ impl AskamaDocumentMetadata {
 	}
 }
 
+
+
+
+pub trait AskamaTrait
+{
+}
+

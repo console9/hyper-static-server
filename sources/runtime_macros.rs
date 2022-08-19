@@ -13,6 +13,7 @@ macro_rules! askama {
 			$_resource_name : ident,
 			$_template_name : ident,
 			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
 			$_description : literal
@@ -26,6 +27,8 @@ macro_rules! askama {
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
+		
+		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
@@ -127,6 +130,7 @@ macro_rules! askama_document {
 			$_resource_name : ident,
 			$_template_name : ident,
 			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
 			$_body_path : literal,
@@ -147,6 +151,8 @@ macro_rules! askama_document {
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
+		
+		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
@@ -328,6 +334,22 @@ macro_rules! askama_context_new {
 			let _extensions : &$crate::hss::Extensions = $_extensions;
 			<$_context_type as $crate::AskamaContext>::new_with_deserialization (_encoding, &_data, _extensions)
 		}
+	};
+}
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama_trait_impl {
+	
+	( $_template_name : ident, $_trait_type : ty ) => {
+		$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type })
+	};
+	
+	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
+		impl $_trait_type for $_template_name {}
 	};
 }
 

@@ -749,7 +749,7 @@ macro_rules! builder_call_assets_watch {
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
 macro_rules! builder_call_askama {
-	( $_builder : ident, { $_source : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? }, $_route : tt ) => {
+	( $_builder : ident, { $_source : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askama, (
 					$_source,
@@ -761,6 +761,11 @@ macro_rules! builder_call_askama {
 							let _context = ::std::option::Option::Some ((::std::stringify! ($_context_type), _context_path));
 						)?
 						_context
+					},
+					{
+						let _trait = ::std::option::Option::<&str>::None;
+						$( let _trait = ::std::option::Option::Some (::std::stringify! ($_trait_type)); )?
+						_trait
 					},
 					$crate::builder_call_route_path! ($_builder, exact, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
@@ -777,7 +782,7 @@ macro_rules! builder_call_askama {
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
 macro_rules! builder_call_askamas {
-	( $_builder : ident, { $_sources : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
@@ -791,11 +796,16 @@ macro_rules! builder_call_askamas {
 						)?
 						_context
 					},
+					{
+						let _trait = ::std::option::Option::<&str>::None;
+						$( let _trait = ::std::option::Option::Some (::std::stringify! ($_trait_type)); )?
+						_trait
+					},
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x2a28230c));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
@@ -808,6 +818,11 @@ macro_rules! builder_call_askamas {
 							let _context = ::std::option::Option::Some ((::std::stringify! ($_context_type), _context_path));
 						)?
 						_context
+					},
+					{
+						let _trait = ::std::option::Option::<&str>::None;
+						$( let _trait = ::std::option::Option::Some (::std::stringify! ($_trait_type)); )?
+						_trait
 					},
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
@@ -865,7 +880,7 @@ macro_rules! builder_call_askamas_watch {
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
 macro_rules! builder_call_markdown_askama {
-	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown_askama, (
 					$_source_markdown,
@@ -874,6 +889,11 @@ macro_rules! builder_call_markdown_askama {
 						let _context = ::std::option::Option::<&str>::None;
 						$( let _context = ::std::option::Option::Some (::std::stringify! ($_context_type)); )?
 						_context
+					},
+					{
+						let _trait = ::std::option::Option::<&str>::None;
+						$( let _trait = ::std::option::Option::Some (::std::stringify! ($_trait_type)); )?
+						_trait
 					},
 					$crate::builder_call_route_path! ($_builder, exact, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
@@ -885,7 +905,7 @@ macro_rules! builder_call_markdown_askama {
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
 macro_rules! builder_call_markdowns_askama {
-	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
@@ -896,11 +916,16 @@ macro_rules! builder_call_markdowns_askama {
 						$( let _context = ::std::option::Option::Some (::std::stringify! ($_context_type)); )?
 						_context
 					},
+					{
+						let _trait = ::std::option::Option::<&str>::None;
+						$( let _trait = ::std::option::Option::Some (::std::stringify! ($_trait_type)); )?
+						_trait
+					},
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x84a5049c));
 	};
-	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
@@ -910,6 +935,11 @@ macro_rules! builder_call_markdowns_askama {
 						let _context = ::std::option::Option::<&str>::None;
 						$( let _context = ::std::option::Option::Some (::std::stringify! ($_context_type)); )?
 						_context
+					},
+					{
+						let _trait = ::std::option::Option::<&str>::None;
+						$( let _trait = ::std::option::Option::Some (::std::stringify! ($_trait_type)); )?
+						_trait
 					},
 					$crate::builder_call_route_path! ($_builder, prefix, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),
