@@ -180,7 +180,10 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 				let _frontmatter = _frontmatter.join ("\n");
 				Some ((_encoding, _frontmatter))
 			} else {
-				None
+				// FIXME:  `None`?
+				let _encoding = String::from (_encoding);
+				let _frontmatter = String::new ();
+				Some ((_encoding, _frontmatter))
 			};
 			(_input, _frontmatter)
 		} else {
