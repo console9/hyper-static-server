@@ -344,7 +344,7 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _description) .infallible (0x35966385);
+			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _description) .infallible (0x3258a4c6);
 		} else {
 			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?});", _id, _id, _context_type, _content_type, _template, _description) .infallible (0x35966385);
 		}
@@ -518,10 +518,10 @@ impl Builder {
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			if let Some (_context_type) = _context {
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _context_encoding, _context_path, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
 			} else {
 				let _context_type = _context.unwrap_or ("()");
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
 			}
 		} else {
 			let _context_type = _context.unwrap_or ("()");
