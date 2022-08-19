@@ -4,13 +4,10 @@
 
 ::hyper_static_server::builder_generated! ();
 
-// NOTE:  Needed for broken askama...
-use ::std::format;
-
-use ::hyper_static_server::errors::ResultExtWrap as _;
-
 
 fn main () -> ::hyper_static_server::errors::MainResult {
+	
+	use ::hyper_static_server::errors::ResultExtWrap as _;
 	
 	let _routes = Routes::new () .else_wrap (0x6836acf2) ?;
 	
@@ -26,4 +23,13 @@ struct ExampleAskamaContext {
 }
 
 impl ::hyper_static_server::AskamaContextSerde for ExampleAskamaContext {}
+
+
+#[ allow (dead_code) ]
+trait ExampleAskamaTrait {
+	fn some_fn (&self) -> ::std::string::String {
+		use ::std::convert::From as _;
+		::std::string::String::from ("hello")
+	}
+}
 

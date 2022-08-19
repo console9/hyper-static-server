@@ -7,6 +7,7 @@
 	
 	askama! ({"_/home.html", context : ()} => "/examples/askama/with-context-empty/home-nodebug");
 	askama! ({"_/home-with-context.html", context : ()} => "/examples/askama/with-context-empty/home-debug");
+	askama! ({"_/home-with-trait.html", trait : ExampleAskamaTrait} => "/examples/askama/with-trait/home");
 	
 	askamas! ({"_", glob : "*/page-*.html"} => "/examples/askamas-recursive/without-context");
 	askamas! ({"_", glob : "*/page-*.html", context : ()} => "/examples/askamas-recursive/with-context-empty");

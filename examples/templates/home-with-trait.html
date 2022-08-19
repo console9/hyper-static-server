@@ -1,0 +1,22 @@
+
+{% extends "_base.html-0" %}
+
+
+{% block head %}
+	<link rel="stylesheet" href="/assets/css/main.css" />
+{% endblock %}
+
+
+{% block page_title %}Home{% endblock %}
+{% block page_classes %}home{% endblock %}
+
+
+{% block main %}
+<h1>Home (with trait)</h1>
+Hello world!
+<hr />
+<pre id="askama-context">
+{{ self.some_fn() }}
+</pre>
+{% endblock %}
+
