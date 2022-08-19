@@ -114,6 +114,19 @@ pub trait AskamaTraitDefault : AskamaTrait {}
 
 
 
+
+
+
+
+#[ derive (Debug, Clone) ]
+pub struct AskamaDocument {
+	pub title : String,
+	pub body : String,
+}
+
+
+
+
 #[ cfg (feature = "runtime-askama-serde") ]
 #[ derive (Debug, Clone) ]
 #[ derive (serde::Serialize, serde::Deserialize) ]

@@ -7,13 +7,13 @@
 {% endblock %}
 
 
-{% block page_title %}{{ self.title }}{% endblock %}
+{% block page_title %}{{ self.document.title }}{% endblock %}
 {% block page_classes %}markdown markdown-askama{% endblock %}
 
 
 {% block main %}
 <div id="markdown-body">
-{{ self.body|safe }}
+{{ self.document.body|safe }}
 </div>
 <hr />
 <pre id="markdown-metadata">

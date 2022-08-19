@@ -154,8 +154,7 @@ macro_rules! askama_document {
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_template_name {
 			pub context : $crate::askama_context_type! ($_context_descriptor),
-			pub body : ::std::string::String,
-			pub title : ::std::string::String,
+			pub document : $crate::AskamaDocument,
 			pub metadata : $crate::AskamaDocumentMetadata,
 			pub __is_production : bool,
 			pub __is_development : bool,
@@ -237,10 +236,10 @@ macro_rules! askama_document {
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
 				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) .else_wrap (0x01992727) ?;
+				let _document = $crate::AskamaDocument { title : _title, body : _body };
 				let _template = $_template_name {
 						context : _context,
-						body : _body,
-						title : _title,
+						document : _document,
 						metadata : _metadata,
 						__is_production : $crate::cfg_if_production! ({ true } | { false }),
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
