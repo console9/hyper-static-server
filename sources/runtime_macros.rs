@@ -28,6 +28,15 @@ macro_rules! askama {
 			pub __is_development : bool,
 		}
 		
+		impl $crate::AskamaTemplate for $_template_name {
+			
+			type Context = $crate::askama_context_type! ($_context_descriptor);
+			
+			fn context (&self) -> &Self::Context {
+				&self.context
+			}
+		}
+		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
@@ -150,6 +159,15 @@ macro_rules! askama_document {
 			pub metadata : $crate::AskamaDocumentMetadata,
 			pub __is_production : bool,
 			pub __is_development : bool,
+		}
+		
+		impl $crate::AskamaTemplate for $_template_name {
+			
+			type Context = $crate::askama_context_type! ($_context_descriptor);
+			
+			fn context (&self) -> &Self::Context {
+				&self.context
+			}
 		}
 		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
@@ -349,6 +367,9 @@ macro_rules! askama_trait_impl {
 	};
 	
 	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
+		
+		impl $crate::AskamaTrait for $_template_name {}
+		
 		impl $_trait_type for $_template_name {}
 	};
 }

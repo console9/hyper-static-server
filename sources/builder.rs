@@ -330,7 +330,7 @@ impl Builder {
 		self.dependencies_include (&_source) ?;
 		
 		let (_context_type, _context_path) = _context.unwrap_or (("()", None));
-		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaTrait");
+		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaTraitDefault");
 		
 		if let Some (_context_path) = _context_path {
 			
@@ -518,7 +518,7 @@ impl Builder {
 			String::new ()
 		};
 		
-		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaTrait");
+		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaTraitDefault");
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			if let Some (_context_type) = _context {

@@ -26,7 +26,7 @@ impl ::hyper_static_server::AskamaContextSerde for ExampleAskamaContext {}
 
 
 #[ allow (dead_code) ]
-trait ExampleAskamaTrait {
+trait ExampleAskamaTrait : ::hyper_static_server::AskamaTrait<Context = ()> {
 	fn some_fn (&self) -> ::std::string::String {
 		use ::std::convert::From as _;
 		::std::string::String::from ("hello")

@@ -8,8 +8,20 @@ use crate::errors::*;
 
 
 
+pub trait AskamaTemplate
+		where Self : Sized + 'static
+{
+	
+	type Context : AskamaContext;
+	
+	fn context (&self) -> &Self::Context;
+}
+
+
+
+
 pub trait AskamaContext
-		where Self : Sized
+		where Self : Sized + 'static
 {
 	fn new_with_defaults () -> AskamaResult<Self> {
 		fail! (0xe41380ce, "context can't be created with defaults!");
@@ -42,7 +54,7 @@ impl AskamaContext for () {
 #[ cfg (feature = "runtime-askama-serde") ]
 pub trait AskamaContextSerde
 		where
-				Self : Sized,
+				Self : Sized + 'static,
 				Self : ::serde::de::DeserializeOwned,
 {
 	fn new_with_serde <'a> (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
@@ -91,6 +103,17 @@ impl <S : AskamaContextSerde> AskamaContext for S {
 
 
 
+pub trait AskamaTrait
+		where
+			Self : AskamaTemplate,
+{}
+
+
+pub trait AskamaTraitDefault : AskamaTrait {}
+
+
+
+
 #[ cfg (feature = "runtime-askama-serde") ]
 #[ derive (Debug, Clone) ]
 #[ derive (serde::Serialize, serde::Deserialize) ]
@@ -132,12 +155,5 @@ impl AskamaDocumentMetadata {
 	pub fn load_from_json (_json : &str) -> AskamaResult<Self> {
 		Ok (Self ())
 	}
-}
-
-
-
-
-pub trait AskamaTrait
-{
 }
 
