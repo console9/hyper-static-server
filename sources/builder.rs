@@ -518,7 +518,7 @@ impl Builder {
 			String::new ()
 		};
 		
-		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaTraitDefault");
+		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaDocumentTraitDefault");
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			if let Some (_context_type) = _context {

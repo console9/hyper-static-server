@@ -18,6 +18,15 @@ pub trait AskamaTemplate
 }
 
 
+pub trait AskamaTrait
+		where
+			Self : AskamaTemplate,
+{}
+
+
+pub trait AskamaTraitDefault : AskamaTrait {}
+
+
 
 
 pub trait AskamaContext
@@ -103,17 +112,6 @@ impl <S : AskamaContextSerde> AskamaContext for S {
 
 
 
-pub trait AskamaTrait
-		where
-			Self : AskamaTemplate,
-{}
-
-
-pub trait AskamaTraitDefault : AskamaTrait {}
-
-
-
-
 
 
 
@@ -123,6 +121,23 @@ pub struct AskamaDocument {
 	pub title : String,
 	pub body : String,
 }
+
+
+pub trait AskamaDocumentTemplate : AskamaTemplate {
+	
+	fn document (&self) -> &AskamaDocument;
+	fn metadata (&self) -> &AskamaDocumentMetadata;
+}
+
+
+pub trait AskamaDocumentTrait
+		where
+			Self : AskamaDocumentTemplate,
+			Self : AskamaTrait,
+{}
+
+
+pub trait AskamaDocumentTraitDefault : AskamaDocumentTrait {}
 
 
 

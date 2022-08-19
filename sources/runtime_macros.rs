@@ -37,6 +37,8 @@ macro_rules! askama {
 			}
 		}
 		
+		impl $crate::AskamaTrait for $_template_name {}
+		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
@@ -168,6 +170,21 @@ macro_rules! askama_document {
 				&self.context
 			}
 		}
+		
+		impl $crate::AskamaDocumentTemplate for $_template_name {
+			
+			fn document (&self) -> &$crate::AskamaDocument {
+				&self.document
+			}
+			
+			fn metadata (&self) -> &$crate::AskamaDocumentMetadata {
+				&self.metadata
+			}
+		}
+		
+		impl $crate::AskamaTrait for $_template_name {}
+		
+		impl $crate::AskamaDocumentTrait for $_template_name {}
 		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
 		
@@ -366,8 +383,6 @@ macro_rules! askama_trait_impl {
 	};
 	
 	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
-		
-		impl $crate::AskamaTrait for $_template_name {}
 		
 		impl $_trait_type for $_template_name {}
 	};
