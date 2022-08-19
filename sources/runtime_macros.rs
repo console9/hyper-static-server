@@ -6,7 +6,7 @@
 
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
-macro_rules! askama {
+macro_rules! askama_template {
 	
 	
 	(
@@ -14,9 +14,7 @@ macro_rules! askama {
 			$_template_name : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_content_type : tt,
-			$_template_path : literal,
-			$_description : literal
+			$_template_path : literal
 	) => {
 		
 		#[ derive (::askama::Template) ]
@@ -56,6 +54,10 @@ macro_rules! askama {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
+			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _self = Self {
@@ -81,10 +83,6 @@ macro_rules! askama {
 				::askama::Template::render (_template) .else_wrap (0xe73feb57)
 			}
 			
-			pub fn into_handler (self) -> impl $crate::hss::Handler {
-				$crate::hss::HandlerSimpleSyncWrapper::new (self)
-			}
-			
 			fn template_build (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<$_template_name> {
 				use $crate::errors::ResultExtWrap as _;
 				let _context = $crate::askama_context_new! ($_context_descriptor, _extensions) .else_wrap (0x3fd73d1f) ?;
@@ -94,6 +92,37 @@ macro_rules! askama {
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
 					};
 				$crate::errors::HandlerResult::Ok (_template)
+			}
+		}
+	};
+}
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama {
+	
+	
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
+			$_content_type : tt,
+			$_template_path : literal,
+			$_description : literal
+	) => {
+		
+		$crate::askama_template! ($_resource_name, $_template_name, $_context_descriptor, $_trait_descriptor, $_template_path);
+		
+		
+		#[ allow (dead_code) ]
+		impl $_resource_name {
+			
+			pub fn into_handler (self) -> impl $crate::hss::Handler {
+				$crate::hss::HandlerSimpleSyncWrapper::new (self)
 			}
 		}
 		
@@ -203,6 +232,10 @@ macro_rules! askama_document {
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
+			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _self = Self {
@@ -304,6 +337,10 @@ macro_rules! askama_document {
 #[ macro_export ]
 macro_rules! askama_context_type {
 	
+	( () ) => {
+		$crate::askama_context_type! ({ type : () })
+	};
+	
 	( $_context_type : ty ) => {
 		$crate::askama_context_type! ({ type : $_context_type })
 	};
@@ -317,6 +354,10 @@ macro_rules! askama_context_type {
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
 macro_rules! askama_context_new {
+	
+	( (), $_extensions : expr ) => {
+		$crate::askama_context_new! ({ type : () }, $_extensions)
+	};
 	
 	( $_context_type : ty, $_extensions : expr ) => {
 		$crate::askama_context_new! ({ type : $_context_type }, $_extensions)
@@ -378,8 +419,12 @@ macro_rules! askama_context_new {
 #[ macro_export ]
 macro_rules! askama_trait_impl {
 	
+	( $_template_name : ident, () ) => {
+		$crate::askama_trait_impl! ($_template_name, { trait : $crate::AskamaTraitDefault });
+	};
+	
 	( $_template_name : ident, $_trait_type : ty ) => {
-		$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type })
+		$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type });
 	};
 	
 	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
@@ -411,6 +456,10 @@ macro_rules! resource {
 		
 		#[ allow (dead_code) ]
 		impl $_resource_name {
+			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self ();
@@ -467,6 +516,10 @@ macro_rules! resource {
 		
 		#[ allow (dead_code) ]
 		impl $_resource_name {
+			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self {
@@ -530,6 +583,10 @@ macro_rules! resource_sass_dynamic {
 		
 		#[ allow (dead_code) ]
 		impl $_resource_name {
+			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self {
@@ -598,6 +655,10 @@ macro_rules! resource_markdown_dynamic {
 		
 		#[ allow (dead_code) ]
 		impl $_resource_name {
+			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				let _self = Self {
@@ -695,6 +756,10 @@ macro_rules! route {
 		
 		impl $_route_name {
 			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
+			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				use ::std::convert::From as _;
 				use $crate::StaticResource as _;
@@ -748,6 +813,10 @@ macro_rules! route_sitemap {
 		pub(crate) struct $_route_name ($crate::hss::Route);
 		
 		impl $_route_name {
+			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				Self::new (& $crate::hss::Extensions::new ())
+			}
 			
 			pub fn new (_extensions : &$crate::hss::Extensions) -> $crate::errors::HandlerResult<Self> {
 				use $crate::errors::ResultExtWrap as _;
