@@ -24,7 +24,7 @@ macro_rules! askama_template {
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_template_name {
+		pub struct $_template_name {
 			pub context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
 			pub __is_production : bool,
 			pub __is_development : bool,
@@ -46,14 +46,14 @@ macro_rules! askama_template {
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
-			pub(crate) struct $_resource_name {
+			pub struct $_resource_name {
 				template : ::std::sync::Arc<$_template_name>,
 			}
 		}
 		
 		$crate::cfg_builder_askama_dynamic_enabled! {
 			#[ allow (non_camel_case_types) ]
-			pub(crate) struct $_resource_name {}
+			pub struct $_resource_name {}
 		}
 		
 		#[ allow (dead_code) ]
@@ -195,7 +195,7 @@ macro_rules! askama_document {
 		#[ derive (::askama::Template) ]
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_template_name {
+		pub struct $_template_name {
 			pub context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
 			pub document : ::std::sync::Arc<$crate::AskamaDocument>,
 			pub metadata : ::std::sync::Arc<$crate::AskamaDocumentMetadata>,
@@ -234,14 +234,14 @@ macro_rules! askama_document {
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
-			pub(crate) struct $_resource_name {
+			pub struct $_resource_name {
 				template : ::std::sync::Arc<$_template_name>,
 			}
 		}
 		
 		$crate::cfg_builder_askama_dynamic_enabled! {
 			#[ allow (non_camel_case_types) ]
-			pub(crate) struct $_resource_name {}
+			pub struct $_resource_name {}
 		}
 		
 		#[ allow (dead_code) ]
@@ -481,13 +481,13 @@ macro_rules! resource {
 	( $_resource_name : ident, $_content_type : tt, embedded, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_resource_name ();
+		pub struct $_resource_name {};
 		
 		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
 			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
-				let _self = Self ();
+				let _self = Self {};
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
@@ -535,7 +535,7 @@ macro_rules! resource {
 	( $_resource_name : ident, $_content_type : tt, dynamic, $_resource_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_resource_name {
+		pub struct $_resource_name {
 			resource : $crate::hss::FileResource,
 		}
 		
@@ -598,7 +598,7 @@ macro_rules! resource_sass_dynamic {
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_resource_name {
+		pub struct $_resource_name {
 			source : &'static ::std::path::Path,
 		}
 		
@@ -664,7 +664,7 @@ macro_rules! resource_markdown_dynamic {
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_header_path : tt, $_footer_path : tt, $_description : literal ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_resource_name {
+		pub struct $_resource_name {
 			source : &'static ::std::path::Path,
 			header : ::std::option::Option<&'static ::std::path::Path>,
 			footer : ::std::option::Option<&'static ::std::path::Path>,
@@ -765,7 +765,7 @@ macro_rules! route {
 	( $_route_name : ident, $_resource_name : ty, $_route_path : literal, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_route_name ($crate::hss::Route);
+		pub struct $_route_name ($crate::hss::Route);
 		
 		impl $_route_name {
 			
@@ -819,7 +819,7 @@ macro_rules! route_sitemap {
 	( $_route_name : ident, $_route_path : literal, $_prefix : literal, $_format : ident, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_route_name ($crate::hss::Route);
+		pub struct $_route_name ($crate::hss::Route);
 		
 		impl $_route_name {
 			
@@ -947,7 +947,7 @@ macro_rules! routes {
 	( $_name : ident, [ $( $_route : ty, )* ] ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_name ($crate::hss::Routes);
+		pub struct $_name ($crate::hss::Routes);
 		
 		impl $_name {
 			
@@ -1026,7 +1026,7 @@ macro_rules! dependencies {
 	( $_name : ident, [ $( $_dependency : literal, )* ] ) => {
 		
 		#[ allow (non_camel_case_types) ]
-		pub(crate) struct $_name ();
+		pub struct $_name ();
 		
 		impl $_name {
 			

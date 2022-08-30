@@ -18,7 +18,7 @@ fn main () -> ::hyper_static_server::errors::MainResult {
 #[ derive (::std::fmt::Debug) ]
 #[ derive (::serde::Deserialize) ]
 #[ allow (dead_code) ]
-struct ExampleAskamaContext {
+pub struct ExampleAskamaContext {
 	some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
 }
 
