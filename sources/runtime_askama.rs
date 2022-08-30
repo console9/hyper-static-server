@@ -36,11 +36,7 @@ pub trait AskamaContext
 		fail! (0xe41380ce, "context can't be created with defaults!");
 	}
 	
-	fn new_with_extensions (_extensions : &hss::Extensions) -> AskamaResult<Self> {
-		Self::new_with_defaults ()
-	}
-	
-	fn new_with_deserialization (_encoding : &str, _data : &[u8], _extensions : &hss::Extensions) -> AskamaResult<Self> {
+	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
 		fail! (0x97024f74, "context can't be deserialized!");
 	}
 }
@@ -52,7 +48,7 @@ impl AskamaContext for () {
 		Ok (())
 	}
 	
-	fn new_with_deserialization (_encoding : &str, _data : &[u8], _extensions : &hss::Extensions) -> AskamaResult<Self> {
+	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
 		Ok (())
 	}
 }
@@ -104,7 +100,7 @@ pub trait AskamaContextSerde
 #[ cfg (feature = "runtime-askama-serde") ]
 impl <S : AskamaContextSerde> AskamaContext for S {
 	
-	fn new_with_deserialization (_encoding : &str, _data : &[u8], _extensions : &hss::Extensions) -> AskamaResult<Self> {
+	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
 		Self::new_with_serde (_encoding, _data)
 	}
 }

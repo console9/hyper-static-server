@@ -9,7 +9,7 @@ fn main () -> ::hyper_static_server::errors::MainResult {
 	
 	use ::hyper_static_server::errors::ResultExtWrap as _;
 	
-	let _routes = Routes::new () .else_wrap (0x6836acf2) ?;
+	let _routes = Routes::new_with_defaults () .else_wrap (0x6836acf2) ?;
 	
 	return ::hyper_static_server::main (_routes);
 }
@@ -31,10 +31,5 @@ trait ExampleAskamaTrait : ::hyper_static_server::AskamaTrait<Context = ()> {
 		use ::std::convert::From as _;
 		::std::string::String::from ("hello")
 	}
-}
-
-
-pub mod resources {
-	::hyper_static_server::askama_template! (ExampleResource, ExampleTemplate, (), (), "_empty.txt");
 }
 
