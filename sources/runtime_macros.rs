@@ -25,7 +25,7 @@ macro_rules! askama_template {
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_template_name {
-			pub context : $crate::askama_context_type! ($_context_descriptor),
+			pub context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
@@ -35,7 +35,8 @@ macro_rules! askama_template {
 			type Context = $crate::askama_context_type! ($_context_descriptor);
 			
 			fn context (&self) -> &Self::Context {
-				&self.context
+				use ::std::convert::AsRef as _;
+				::std::sync::Arc::as_ref (&self.context)
 			}
 		}
 		
@@ -46,7 +47,7 @@ macro_rules! askama_template {
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
 			pub(crate) struct $_resource_name {
-				template : $_template_name,
+				template : ::std::sync::Arc<$_template_name>,
 			}
 		}
 		
@@ -60,8 +61,10 @@ macro_rules! askama_template {
 			
 			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
 				$crate::cfg_builder_askama_dynamic_disabled! {
+					let _template = Self::template_build () ?;
+					let _template = ::std::sync::Arc::new (_template);
 					let _self = Self {
-							template : Self::template_build () ?,
+							template : _template,
 						};
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
@@ -71,20 +74,30 @@ macro_rules! askama_template {
 			}
 			
 			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+				use ::std::convert::AsRef as _;
+				use $crate::errors::ResultExtWrap as _;
+				let _template = self.template_arc () ?;
+				let _template = ::std::sync::Arc::as_ref (&_template);
+				::askama::Template::render (_template) .else_wrap (0xe73feb57)
+			}
+			
+			fn template_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$_template_name>> {
+				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
-					let _template = &self.template;
+					let _template = ::std::sync::Arc::clone (&self.template);
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					let _template = Self::template_build () ?;
-					let _template = &_template;
+					let _template = ::std::sync::Arc::new (_template);
 				}
-				::askama::Template::render (_template) .else_wrap (0xe73feb57)
+				$crate::errors::HandlerResult::Ok (_template)
 			}
 			
 			fn template_build () -> $crate::errors::HandlerResult<$_template_name> {
 				use $crate::errors::ResultExtWrap as _;
 				let _context = $crate::askama_context_new! ($_context_descriptor) .else_wrap (0x3fd73d1f) ?;
+				let _context = ::std::sync::Arc::new (_context);
 				let _template = $_template_name {
 						context : _context,
 						__is_production : $crate::cfg_if_production! ({ true } | { false }),
@@ -183,9 +196,9 @@ macro_rules! askama_document {
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_template_name {
-			pub context : $crate::askama_context_type! ($_context_descriptor),
-			pub document : $crate::AskamaDocument,
-			pub metadata : $crate::AskamaDocumentMetadata,
+			pub context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
+			pub document : ::std::sync::Arc<$crate::AskamaDocument>,
+			pub metadata : ::std::sync::Arc<$crate::AskamaDocumentMetadata>,
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
@@ -195,18 +208,21 @@ macro_rules! askama_document {
 			type Context = $crate::askama_context_type! ($_context_descriptor);
 			
 			fn context (&self) -> &Self::Context {
-				&self.context
+				use ::std::convert::AsRef as _;
+				::std::sync::Arc::as_ref (&self.context)
 			}
 		}
 		
 		impl $crate::AskamaDocumentTemplate for $_template_name {
 			
 			fn document (&self) -> &$crate::AskamaDocument {
-				&self.document
+				use ::std::convert::AsRef as _;
+				::std::sync::Arc::as_ref (&self.document)
 			}
 			
 			fn metadata (&self) -> &$crate::AskamaDocumentMetadata {
-				&self.metadata
+				use ::std::convert::AsRef as _;
+				::std::sync::Arc::as_ref (&self.metadata)
 			}
 		}
 		
@@ -219,7 +235,7 @@ macro_rules! askama_document {
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
 			pub(crate) struct $_resource_name {
-				template : $_template_name,
+				template : ::std::sync::Arc<$_template_name>,
 			}
 		}
 		
@@ -233,8 +249,10 @@ macro_rules! askama_document {
 			
 			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
 				$crate::cfg_builder_askama_dynamic_disabled! {
+					let _template = Self::template_build () ?;
+					let _template = ::std::sync::Arc::new (_template);
 					let _self = Self {
-							template : Self::template_build () ?,
+							template : _template,
 						};
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
@@ -244,15 +262,24 @@ macro_rules! askama_document {
 			}
 			
 			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+				use ::std::convert::AsRef as _;
+				use $crate::errors::ResultExtWrap as _;
+				let _template = self.template_arc () ?;
+				let _template = ::std::sync::Arc::as_ref (&_template);
+				::askama::Template::render (_template) .else_wrap (0x216e0521)
+			}
+			
+			fn template_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$_template_name>> {
+				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
-					let _template = &self.template;
+					let _template = ::std::sync::Arc::clone (&self.template);
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					let _template = Self::template_build () ?;
-					let _template = &_template;
+					let _template = ::std::sync::Arc::new (_template);
 				}
-				::askama::Template::render (_template) .else_wrap (0x216e0521)
+				$crate::errors::HandlerResult::Ok (_template)
 			}
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
@@ -280,7 +307,10 @@ macro_rules! askama_document {
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
 				let _context = $crate::askama_context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
+				let _context = ::std::sync::Arc::new (_context);
 				let _document = $crate::AskamaDocument { title : _title, body : _body };
+				let _document = ::std::sync::Arc::new (_document);
+				let _metadata = ::std::sync::Arc::new (_metadata);
 				let _template = $_template_name {
 						context : _context,
 						document : _document,
@@ -427,6 +457,10 @@ macro_rules! askama_trait_impl {
 		impl $_trait_type for $_template_name {}
 	};
 }
+
+
+
+
 
 
 
