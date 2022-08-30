@@ -73,7 +73,7 @@ macro_rules! askama_template {
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+			fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
 				use ::std::convert::AsRef as _;
 				use $crate::errors::ResultExtWrap as _;
 				let _template = self.template_arc () ?;
@@ -261,7 +261,7 @@ macro_rules! askama_document {
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+			fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
 				use ::std::convert::AsRef as _;
 				use $crate::errors::ResultExtWrap as _;
 				let _template = self.template_arc () ?;
@@ -612,7 +612,7 @@ macro_rules! resource_sass_dynamic {
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+			fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::support_sass::compile_sass (self.source) .else_wrap (0xbe93dd79)
 			}
@@ -682,7 +682,7 @@ macro_rules! resource_markdown_dynamic {
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
+			fn render (&self) -> $crate::errors::HandlerResult<::std::string::String> {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::support_markdown::compile_markdown_html_from_path (self.source, self.header, self.footer, ::std::option::Option::None) .else_wrap (0x0622a827)
 			}

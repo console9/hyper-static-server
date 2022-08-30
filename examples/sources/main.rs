@@ -5,7 +5,7 @@
 ::hyper_static_server::builder_generated! ();
 
 
-fn main () -> ::hyper_static_server::errors::MainResult {
+pub fn main () -> ::hyper_static_server::errors::MainResult {
 	
 	use ::hyper_static_server::errors::ResultExtWrap as _;
 	
@@ -19,14 +19,14 @@ fn main () -> ::hyper_static_server::errors::MainResult {
 #[ derive (::serde::Deserialize) ]
 #[ allow (dead_code) ]
 pub struct ExampleAskamaContext {
-	some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
+	pub some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
 }
 
 impl ::hyper_static_server::AskamaContextSerde for ExampleAskamaContext {}
 
 
 #[ allow (dead_code) ]
-trait ExampleAskamaTrait : ::hyper_static_server::AskamaTrait<Context = ()> {
+pub trait ExampleAskamaTrait : ::hyper_static_server::AskamaTrait<Context = ()> {
 	fn some_fn (&self) -> ::std::string::String {
 		use ::std::convert::From as _;
 		::std::string::String::from ("hello")
