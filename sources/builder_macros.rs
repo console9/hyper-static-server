@@ -4,6 +4,12 @@
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
 macro_rules! builder_macros {
 	
@@ -242,8 +248,15 @@ macro_rules! builder_macros {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_css {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -269,8 +282,12 @@ macro_rules! builder_call_asset_css {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets-sass") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_sass {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -296,8 +313,12 @@ macro_rules! builder_call_asset_sass {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_js {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -326,8 +347,15 @@ macro_rules! builder_call_asset_js {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_image {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -353,8 +381,12 @@ macro_rules! builder_call_asset_image {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_assets_images {
 	( $_builder : ident, { $_sources : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -401,8 +433,17 @@ macro_rules! builder_call_assets_images {
 }
 
 
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_icon {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -428,8 +469,12 @@ macro_rules! builder_call_asset_icon {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_assets_icons {
 	( $_builder : ident, { $_sources : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -476,8 +521,17 @@ macro_rules! builder_call_assets_icons {
 }
 
 
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_favicon {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -503,8 +557,18 @@ macro_rules! builder_call_asset_favicon {
 	};
 }
 
+
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_assets_favicons {
 	( $_builder : ident, { $_sources : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -551,8 +615,17 @@ macro_rules! builder_call_assets_favicons {
 }
 
 
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_font {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -578,8 +651,12 @@ macro_rules! builder_call_asset_font {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_assets_fonts {
 	( $_builder : ident, { $_sources : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -626,8 +703,17 @@ macro_rules! builder_call_assets_fonts {
 }
 
 
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset {
 	( $_builder : ident, { $_source : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -655,8 +741,12 @@ macro_rules! builder_call_asset {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_assets {
 	( $_builder : ident, { $_sources : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -707,8 +797,17 @@ macro_rules! builder_call_assets {
 }
 
 
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_asset_watch {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -721,8 +820,12 @@ macro_rules! builder_call_asset_watch {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-assets") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_assets_watch {
 	( $_builder : ident, { $_sources : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -746,8 +849,15 @@ macro_rules! builder_call_assets_watch {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_askama {
 	( $_builder : ident, { $_source : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -779,8 +889,12 @@ macro_rules! builder_call_askama {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_askamas {
 	( $_builder : ident, { $_sources : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -837,8 +951,17 @@ macro_rules! builder_call_askamas {
 }
 
 
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_askama_watch {
 	( $_builder : ident, { $_source : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -851,8 +974,12 @@ macro_rules! builder_call_askama_watch {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-askama") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_askamas_watch {
 	( $_builder : ident, { $_sources : literal } ) => {
 		$crate::builder_call! ($_builder,
@@ -876,9 +1003,16 @@ macro_rules! builder_call_askamas_watch {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-askama") ]
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_markdown_askama {
 	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -901,9 +1035,13 @@ macro_rules! builder_call_markdown_askama {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-askama") ]
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_markdowns_askama {
 	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -950,8 +1088,15 @@ macro_rules! builder_call_markdowns_askama {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_markdown {
 	( $_builder : ident, { $_source : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -981,8 +1126,12 @@ macro_rules! builder_call_markdown {
 	};
 }
 
+
+
+
 #[ cfg (feature = "builder-markdown") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_markdowns {
 	( $_builder : ident, { $_sources : literal }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -1039,8 +1188,15 @@ macro_rules! builder_call_markdowns {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "builder-sitemaps") ]
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_sitemap {
 	( $_builder : ident, { prefix : $_prefix : literal, format : $_format : ident }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
@@ -1056,7 +1212,14 @@ macro_rules! builder_call_sitemap {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call {
 	
 	( $_builder : ident, $_method : ident, ( $( $_argument : expr , )* ), ( $_code : literal ) ) => {
@@ -1068,6 +1231,7 @@ macro_rules! builder_call {
 
 
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_route_path {
 	( $_builder : expr, default) => {
 		&()
@@ -1090,6 +1254,7 @@ macro_rules! builder_call_route_path {
 
 
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! builder_call_route_extensions {
 	( $_builder : expr, default ) => {
 		&()
@@ -1104,6 +1269,12 @@ macro_rules! builder_call_route_extensions {
 		::std::stringify! ($_extensions)
 	};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 
 
 
@@ -1136,7 +1307,7 @@ macro_rules! build_with_defaults {
 
 
 #[ macro_export ]
-macro_rules! main_build_with_defaults {
+macro_rules! build_with_defaults_main_fn {
 	
 	( $_resources : tt ) => {
 		
@@ -1148,4 +1319,10 @@ macro_rules! main_build_with_defaults {
 		}
 	};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 

@@ -2,5 +2,5 @@
 #![ no_implicit_prelude ]
 
 
-::hyper_static_server::main_build_with_defaults! ("./routes.in");
+::hyper_static_server::build_with_defaults_main_fn! ("./routes.in");
 

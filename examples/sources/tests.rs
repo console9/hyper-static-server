@@ -4,6 +4,6 @@ pub mod resources {
 }
 
 pub mod contexts {
-	::hyper_static_server::askama_context! (ExampleContextBuilder, ());
+	::hyper_static_server::context! (ExampleContextBuilder, ());
 }
 

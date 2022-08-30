@@ -4,6 +4,8 @@
 
 
 
+// ################################################################################
+// ################################################################################
 
 
 
@@ -25,14 +27,14 @@ macro_rules! askama_template {
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub struct $_template_name {
-			pub context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
+			pub context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
 			pub __is_production : bool,
 			pub __is_development : bool,
 		}
 		
 		impl $crate::AskamaTemplate for $_template_name {
 			
-			type Context = $crate::askama_context_type! ($_context_descriptor);
+			type Context = $crate::context_type! ($_context_descriptor);
 			
 			fn context (&self) -> &Self::Context {
 				use ::std::convert::AsRef as _;
@@ -96,7 +98,7 @@ macro_rules! askama_template {
 			
 			fn template_build () -> $crate::errors::HandlerResult<$_template_name> {
 				use $crate::errors::ResultExtWrap as _;
-				let _context = $crate::askama_context_new! ($_context_descriptor) .else_wrap (0x3fd73d1f) ?;
+				let _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x3fd73d1f) ?;
 				let _context = ::std::sync::Arc::new (_context);
 				let _template = $_template_name {
 						context : _context,
@@ -108,6 +110,12 @@ macro_rules! askama_template {
 		}
 	};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 
 
 
@@ -173,6 +181,12 @@ macro_rules! askama {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
 macro_rules! askama_document {
@@ -196,7 +210,7 @@ macro_rules! askama_document {
 		#[ template (path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub struct $_template_name {
-			pub context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
+			pub context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
 			pub document : ::std::sync::Arc<$crate::AskamaDocument>,
 			pub metadata : ::std::sync::Arc<$crate::AskamaDocumentMetadata>,
 			pub __is_production : bool,
@@ -205,7 +219,7 @@ macro_rules! askama_document {
 		
 		impl $crate::AskamaTemplate for $_template_name {
 			
-			type Context = $crate::askama_context_type! ($_context_descriptor);
+			type Context = $crate::context_type! ($_context_descriptor);
 			
 			fn context (&self) -> &Self::Context {
 				use ::std::convert::AsRef as _;
@@ -302,7 +316,7 @@ macro_rules! askama_document {
 					let _metadata = ::std::fs::read_to_string ($_metadata_path) .else_wrap (0xc07d6b78) ?;
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
-				let _context = $crate::askama_context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
+				let _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
 				let _context = ::std::sync::Arc::new (_context);
 				let _document = $crate::AskamaDocument { title : _title, body : _body };
 				let _document = ::std::sync::Arc::new (_document);
@@ -360,19 +374,49 @@ macro_rules! askama_document {
 
 
 
+// ################################################################################
+// ################################################################################
 
 
 
 
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
-macro_rules! askama_context {
+#[ doc (hidden) ]
+macro_rules! askama_trait_impl {
+	
+	( $_template_name : ident, () ) => {
+		$crate::askama_trait_impl! ($_template_name, { trait : $crate::AskamaTraitDefault });
+	};
+	
+	( $_template_name : ident, $_trait_type : ty ) => {
+		$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type });
+	};
+	
+	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
+		
+		impl $_trait_type for $_template_name {}
+	};
+}
+
+
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! context {
 	
 	( $_builder_name : ident, $_context_descriptor : tt ) => {
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			pub struct $_builder_name {
-				context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
+				context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
 			}
 		}
 		
@@ -397,7 +441,7 @@ macro_rules! askama_context {
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn context_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>> {
+			pub fn context_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$crate::context_type! ($_context_descriptor)>> {
 				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -410,9 +454,9 @@ macro_rules! askama_context {
 				$crate::errors::HandlerResult::Ok (_context)
 			}
 			
-			fn context_build () -> $crate::errors::HandlerResult<$crate::askama_context_type! ($_context_descriptor)> {
+			fn context_build () -> $crate::errors::HandlerResult<$crate::context_type! ($_context_descriptor)> {
 				use $crate::errors::ResultExtWrap as _;
-				let _context = $crate::askama_context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
+				let _context = $crate::context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
 				$crate::errors::HandlerResult::Ok (_context)
 			}
 		}
@@ -424,14 +468,15 @@ macro_rules! askama_context {
 
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
-macro_rules! askama_context_type {
+#[ doc (hidden) ]
+macro_rules! context_type {
 	
 	( () ) => {
-		$crate::askama_context_type! ({ type : () })
+		$crate::context_type! ({ type : () })
 	};
 	
 	( $_context_type : ty ) => {
-		$crate::askama_context_type! ({ type : $_context_type })
+		$crate::context_type! ({ type : $_context_type })
 	};
 	
 	( { type : $_context_type : ty $( , $( $_ : tt )+ )* } ) => {
@@ -440,16 +485,19 @@ macro_rules! askama_context_type {
 }
 
 
+
+
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
-macro_rules! askama_context_new {
+#[ doc (hidden) ]
+macro_rules! context_new {
 	
 	( () ) => {
-		$crate::askama_context_new! ({ type : () })
+		$crate::context_new! ({ type : () })
 	};
 	
 	( $_context_type : ty ) => {
-		$crate::askama_context_new! ({ type : $_context_type })
+		$crate::context_new! ({ type : $_context_type })
 	};
 	
 	( { type : $_context_type : ty } ) => {
@@ -459,22 +507,22 @@ macro_rules! askama_context_new {
 	};
 	
 	( { type : $_context_type : ty, json : $_context_path : literal } ) => {
-		$crate::askama_context_new! ({ type : $_context_type, deserialize : ("json", $_context_path) })
+		$crate::context_new! ({ type : $_context_type, deserialize : ("json", $_context_path) })
 	};
 	( { type : $_context_type : ty, toml : $_context_path : literal } ) => {
-		$crate::askama_context_new! ({ type : $_context_type, deserialize : ("toml", $_context_path) })
+		$crate::context_new! ({ type : $_context_type, deserialize : ("toml", $_context_path) })
 	};
 	( { type : $_context_type : ty, yaml : $_context_path : literal } ) => {
-		$crate::askama_context_new! ({ type : $_context_type, deserialize : ("yaml", $_context_path) })
+		$crate::context_new! ({ type : $_context_type, deserialize : ("yaml", $_context_path) })
 	};
 	
 	( { type : $_context_type : ty, deserialize : ( $_context_encoding : literal, $_context_path : literal ) } ) => {
 		{
 			$crate::cfg_builder_askama_dynamic_disabled! {
-				let _context = $crate::askama_context_new! ({ type : $_context_type, (deserialize, embedded) : ($_context_encoding, $_context_path)});
+				let _context = $crate::context_new! ({ type : $_context_type, (deserialize, embedded) : ($_context_encoding, $_context_path)});
 			}
 			$crate::cfg_builder_askama_dynamic_enabled! {
-				let _context = $crate::askama_context_new! ({ type : $_context_type, (deserialize, dynamic) : ($_context_encoding, $_context_path)});
+				let _context = $crate::context_new! ({ type : $_context_type, (deserialize, dynamic) : ($_context_encoding, $_context_path)});
 			}
 			_context
 		}
@@ -501,31 +549,8 @@ macro_rules! askama_context_new {
 
 
 
-
-
-
-
-#[ cfg (feature = "runtime-askama") ]
-#[ macro_export ]
-macro_rules! askama_trait_impl {
-	
-	( $_template_name : ident, () ) => {
-		$crate::askama_trait_impl! ($_template_name, { trait : $crate::AskamaTraitDefault });
-	};
-	
-	( $_template_name : ident, $_trait_type : ty ) => {
-		$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type });
-	};
-	
-	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
-		
-		impl $_trait_type for $_template_name {}
-	};
-}
-
-
-
-
+// ################################################################################
+// ################################################################################
 
 
 
@@ -662,8 +687,15 @@ macro_rules! resource {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
 #[ cfg (all (feature = "builder-assets-sass-dynamic", not (feature = "production"))) ]
+#[ doc (hidden) ]
 macro_rules! resource_sass_dynamic {
 	
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : literal ) => {
@@ -731,8 +763,15 @@ macro_rules! resource_sass_dynamic {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
 #[ cfg (all (feature = "builder-markdown-dynamic", not (feature = "production"))) ]
+#[ doc (hidden) ]
 macro_rules! resource_markdown_dynamic {
 	
 	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_header_path : tt, $_footer_path : tt, $_description : literal ) => {
@@ -806,6 +845,7 @@ macro_rules! resource_markdown_dynamic {
 
 #[ macro_export ]
 #[ cfg (all (feature = "builder-markdown-dynamic", not (feature = "production"))) ]
+#[ doc (hidden) ]
 macro_rules! resource_markdown_refresher {
 	
 	( $_refresher_name : ident, $_source_path : tt, $_body_path : tt, $_title_path : tt, $_metadata_path : tt, $_frontmatter_path : tt ) => {
@@ -831,6 +871,12 @@ macro_rules! resource_markdown_refresher {
 		}
 	};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 
 
 
@@ -884,6 +930,12 @@ macro_rules! route {
 		}
 	};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 
 
 
@@ -945,7 +997,14 @@ macro_rules! route_sitemap {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! route_extensions {
 	
 	( $_route_extensions : tt ) => {
@@ -959,6 +1018,7 @@ macro_rules! route_extensions {
 
 
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! route_extensions_insert {
 	
 	( $_route_extensions : ident, () ) => {
@@ -980,6 +1040,7 @@ macro_rules! route_extensions_insert {
 
 
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! route_extensions_insert_one {
 	
 	( $_route_extensions : ident, debug, $_debug : expr ) => {
@@ -1013,6 +1074,12 @@ macro_rules! route_extensions_insert_one {
 		}
 	};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 
 
 
@@ -1096,7 +1163,14 @@ macro_rules! routes {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! dependencies {
 	
 	
@@ -1129,7 +1203,14 @@ macro_rules! dependencies {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! resource_content_type {
 	
 	( text ) => { $crate::hss::ContentType::Text };
@@ -1157,6 +1238,12 @@ macro_rules! resource_content_type {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
 macro_rules! builder_generated {
 	
@@ -1169,7 +1256,14 @@ macro_rules! builder_generated {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
+#[ doc (hidden) ]
 macro_rules! resource_path {
 	
 	
@@ -1208,8 +1302,15 @@ macro_rules! resource_path {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
 #[ cfg (feature = "production") ]
+#[ doc (hidden) ]
 macro_rules! cfg_if_production {
 	( { $( $_then_token : tt )* } | { $( $_else_token : tt )* } ) => { $( $_then_token )* };
 	( { $( $_then_token : tt )* } ) => { $( $_then_token )* };
@@ -1217,6 +1318,7 @@ macro_rules! cfg_if_production {
 
 #[ macro_export ]
 #[ cfg (not (feature = "production")) ]
+#[ doc (hidden) ]
 macro_rules! cfg_if_production {
 	( { $( $_then_token : tt )* } | { $( $_else_token : tt )* } ) => { $( $_else_token )* };
 	( { $( $_then_token : tt )* } ) => {};
@@ -1225,14 +1327,22 @@ macro_rules! cfg_if_production {
 
 
 
+// ################################################################################
+// ################################################################################
+
+
+
+
 #[ macro_export ]
 #[ cfg (any (not (feature = "builder-askama-dynamic"), feature = "production")) ]
+#[ doc (hidden) ]
 macro_rules! cfg_builder_askama_dynamic_disabled {
 	( $( $_token : tt )* ) => { $( $_token )* };
 }
 
 #[ macro_export ]
 #[ cfg (all (feature = "builder-askama-dynamic", not (feature = "production"))) ]
+#[ doc (hidden) ]
 macro_rules! cfg_builder_askama_dynamic_disabled {
 	( $( $_token : tt )* ) => {};
 }
@@ -1240,6 +1350,7 @@ macro_rules! cfg_builder_askama_dynamic_disabled {
 
 #[ macro_export ]
 #[ cfg (all (feature = "builder-askama-dynamic", not (feature = "production"))) ]
+#[ doc (hidden) ]
 macro_rules! cfg_builder_askama_dynamic_enabled {
 	( $( $_token : tt )* ) => {
 		$( $_token )*
@@ -1248,7 +1359,14 @@ macro_rules! cfg_builder_askama_dynamic_enabled {
 
 #[ macro_export ]
 #[ cfg (any (not (feature = "builder-askama-dynamic"), feature = "production")) ]
+#[ doc (hidden) ]
 macro_rules! cfg_builder_askama_dynamic_enabled {
 	( $( $_token : tt )* ) => {};
 }
+
+
+
+
+// ################################################################################
+// ################################################################################
 
