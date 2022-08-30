@@ -97,8 +97,10 @@ macro_rules! askama_template {
 			}
 			
 			fn template_build () -> $crate::errors::HandlerResult<$_template_name> {
+				use $crate::AskamaContext as _;
 				use $crate::errors::ResultExtWrap as _;
-				let _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x3fd73d1f) ?;
+				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x3fd73d1f) ?;
+				_context.hook_initialize () ?;
 				let _context = ::std::sync::Arc::new (_context);
 				let _template = $_template_name {
 						context : _context,
@@ -297,6 +299,7 @@ macro_rules! askama_document {
 			}
 			
 			fn template_build () -> $crate::errors::HandlerResult<$_template_name> {
+				use $crate::AskamaContext as _;
 				use $crate::errors::ResultExtWrap as _;
 				use ::std::convert::From as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -316,7 +319,8 @@ macro_rules! askama_document {
 					let _metadata = ::std::fs::read_to_string ($_metadata_path) .else_wrap (0xc07d6b78) ?;
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
-				let _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
+				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
+				_context.hook_initialize () ?;
 				let _context = ::std::sync::Arc::new (_context);
 				let _document = $crate::AskamaDocument { title : _title, body : _body };
 				let _document = ::std::sync::Arc::new (_document);
@@ -455,8 +459,10 @@ macro_rules! context {
 			}
 			
 			fn context_build () -> $crate::errors::HandlerResult<$crate::context_type! ($_context_descriptor)> {
+				use $crate::AskamaContext as _;
 				use $crate::errors::ResultExtWrap as _;
-				let _context = $crate::context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
+				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
+				_context.hook_initialize () ?;
 				$crate::errors::HandlerResult::Ok (_context)
 			}
 		}

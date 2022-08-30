@@ -8,6 +8,10 @@ use crate::errors::*;
 
 
 
+
+
+
+
 pub trait AskamaTemplate
 		where Self : Sized + 'static
 {
@@ -29,6 +33,10 @@ pub trait AskamaTraitDefault : AskamaTrait {}
 
 
 
+
+
+
+
 pub trait AskamaContext
 		where Self : Sized + 'static
 {
@@ -39,7 +47,14 @@ pub trait AskamaContext
 	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
 		fail! (0x97024f74, "context can't be deserialized!");
 	}
+	
+	#[ doc (hidden) ]
+	fn hook_initialize (&mut self) -> hss::HandlerResult {
+		Ok (())
+	}
 }
+
+
 
 
 impl AskamaContext for () {
@@ -94,6 +109,11 @@ pub trait AskamaContextSerde
 				fail! (0x95017b94, "encoding `{}` not supported", _encoding),
 		}
 	}
+	
+	#[ doc (hidden) ]
+	fn hook_initialize (&mut self) -> hss::HandlerResult {
+		Ok (())
+	}
 }
 
 
@@ -101,7 +121,12 @@ pub trait AskamaContextSerde
 impl <S : AskamaContextSerde> AskamaContext for S {
 	
 	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
-		Self::new_with_serde (_encoding, _data)
+		<Self as AskamaContextSerde>::new_with_serde (_encoding, _data)
+	}
+	
+	#[ doc (hidden) ]
+	fn hook_initialize (&mut self) -> hss::HandlerResult {
+		<Self as AskamaContextSerde>::hook_initialize (self)
 	}
 }
 
@@ -134,6 +159,10 @@ pub trait AskamaDocumentTrait
 
 
 pub trait AskamaDocumentTraitDefault : AskamaDocumentTrait {}
+
+
+
+
 
 
 
