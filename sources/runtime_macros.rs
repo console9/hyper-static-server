@@ -81,7 +81,7 @@ macro_rules! askama_template {
 				::askama::Template::render (_template) .else_wrap (0xe73feb57)
 			}
 			
-			fn template_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$_template_name>> {
+			pub fn template_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$_template_name>> {
 				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -127,10 +127,10 @@ macro_rules! askama {
 			$_description : literal
 	) => {
 		
+		
 		$crate::askama_template! ($_resource_name, $_template_name, $_context_descriptor, $_trait_descriptor, $_template_path);
 		
 		
-		#[ allow (dead_code) ]
 		impl $_resource_name {
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
@@ -269,7 +269,7 @@ macro_rules! askama_document {
 				::askama::Template::render (_template) .else_wrap (0x216e0521)
 			}
 			
-			fn template_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$_template_name>> {
+			pub fn template_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$_template_name>> {
 				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -280,10 +280,6 @@ macro_rules! askama_document {
 					let _template = ::std::sync::Arc::new (_template);
 				}
 				$crate::errors::HandlerResult::Ok (_template)
-			}
-			
-			pub fn into_handler (self) -> impl $crate::hss::Handler {
-				$crate::hss::HandlerSimpleSyncWrapper::new (self)
 			}
 			
 			fn template_build () -> $crate::errors::HandlerResult<$_template_name> {
@@ -322,6 +318,13 @@ macro_rules! askama_document {
 			}
 		}
 		
+		impl $_resource_name {
+			
+			pub fn into_handler (self) -> impl $crate::hss::Handler {
+				$crate::hss::HandlerSimpleSyncWrapper::new (self)
+			}
+		}
+		
 		impl $crate::StaticResource for $_resource_name {
 			
 			fn content_type (&self) -> $crate::hss::ContentType {
@@ -349,6 +352,68 @@ macro_rules! askama_document {
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
 				$crate::errors::HandlerResult::Ok (())
+			}
+		}
+	};
+}
+
+
+
+
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama_context {
+	
+	( $_builder_name : ident, $_context_descriptor : tt ) => {
+		
+		$crate::cfg_builder_askama_dynamic_disabled! {
+			pub struct $_builder_name {
+				context : ::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>,
+			}
+		}
+		
+		$crate::cfg_builder_askama_dynamic_enabled! {
+			pub struct $_builder_name {}
+		}
+		
+		#[ allow (dead_code) ]
+		impl $_builder_name {
+			
+			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				$crate::cfg_builder_askama_dynamic_disabled! {
+					let _context = Self::context_build () ?;
+					let _context = ::std::sync::Arc::new (_context);
+					let _self = Self {
+							context : _context,
+						};
+				}
+				$crate::cfg_builder_askama_dynamic_enabled! {
+					let _self = Self {};
+				}
+				$crate::errors::HandlerResult::Ok (_self)
+			}
+			
+			pub fn context_arc (&self) -> $crate::errors::HandlerResult<::std::sync::Arc<$crate::askama_context_type! ($_context_descriptor)>> {
+				use ::std::clone::Clone as _;
+				use $crate::errors::ResultExtWrap as _;
+				$crate::cfg_builder_askama_dynamic_disabled! {
+					let _context = ::std::sync::Arc::clone (&self.context);
+				}
+				$crate::cfg_builder_askama_dynamic_enabled! {
+					let _context = Self::context_build () ?;
+					let _context = ::std::sync::Arc::new (_context);
+				}
+				$crate::errors::HandlerResult::Ok (_context)
+			}
+			
+			fn context_build () -> $crate::errors::HandlerResult<$crate::askama_context_type! ($_context_descriptor)> {
+				use $crate::errors::ResultExtWrap as _;
+				let _context = $crate::askama_context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
+				$crate::errors::HandlerResult::Ok (_context)
 			}
 		}
 	};
@@ -491,15 +556,18 @@ macro_rules! resource {
 				$crate::errors::HandlerResult::Ok (_self)
 			}
 			
-			pub fn into_handler (self) -> impl $crate::hss::Handler {
-				self
-			}
-			
 			const RESOURCE : $crate::hss::EmbeddedResource =
 					$crate::hss::EmbeddedResource::new_const (
 							::std::include_bytes! ($crate::resource_path! ($_resource_path)),
 							::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
 						);
+		}
+		
+		impl $_resource_name {
+			
+			pub fn into_handler (self) -> impl $crate::hss::Handler {
+				self
+			}
 		}
 		
 		impl $crate::StaticResource for $_resource_name {
@@ -552,6 +620,9 @@ macro_rules! resource {
 					};
 				$crate::errors::HandlerResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				self
@@ -616,6 +687,9 @@ macro_rules! resource_sass_dynamic {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::support_sass::compile_sass (self.source) .else_wrap (0xbe93dd79)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)
@@ -686,6 +760,9 @@ macro_rules! resource_markdown_dynamic {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::support_markdown::compile_markdown_html_from_path (self.source, self.header, self.footer, ::std::option::Option::None) .else_wrap (0x0622a827)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			pub fn into_handler (self) -> impl $crate::hss::Handler {
 				$crate::hss::HandlerSimpleSyncWrapper::new (self)

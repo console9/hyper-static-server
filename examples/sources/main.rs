@@ -53,3 +53,8 @@ pub mod generated {
 	::hyper_static_server::builder_generated! ();
 }
 
+
+
+
+pub mod tests;
+
