@@ -4,7 +4,7 @@
 
 pub mod resources {
 	
-	::hyper_static_server::askama_template! (ExampleResource, ExampleTemplate, (), (), "_empty.txt");
+	::hyper_static_server::askama_template! (ExampleResource, ExampleTemplate, !, !, "_empty.txt");
 }
 
 

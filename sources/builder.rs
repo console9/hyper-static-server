@@ -329,8 +329,8 @@ impl Builder {
 		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source) ?;
 		
-		let (_context_type, _context_path) = _context.unwrap_or (("()", None));
-		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaTraitDefault");
+		let (_context_type, _context_path) = _context.unwrap_or (("!", None));
+		let _trait_type = _trait.unwrap_or ("!");
 		
 		if let Some (_context_path) = _context_path {
 			
@@ -518,17 +518,17 @@ impl Builder {
 			String::new ()
 		};
 		
-		let _trait_type = _trait.unwrap_or ("::hyper_static_server::AskamaDocumentTraitDefault");
+		let _trait_type = _trait.unwrap_or ("!");
 		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			if let Some (_context_type) = _context {
 				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, {:?}) }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
 			} else {
-				let _context_type = _context.unwrap_or ("()");
+				let _context_type = _context.unwrap_or ("!");
 				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
 			}
 		} else {
-			let _context_type = _context.unwrap_or ("()");
+			let _context_type = _context.unwrap_or ("!");
 			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?}, {:?}, {} {:?});", _id, _id, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 		}
 		

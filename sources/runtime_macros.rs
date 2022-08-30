@@ -389,7 +389,11 @@ macro_rules! askama_document {
 #[ doc (hidden) ]
 macro_rules! askama_trait_impl {
 	
-	( $_template_name : ident, () ) => {
+	( $_template_name : ident, ! ) => {
+		$crate::askama_trait_impl! ($_template_name, { trait : ! });
+	};
+	
+	( $_template_name : ident, { trait : ! } ) => {
 		$crate::askama_trait_impl! ($_template_name, { trait : $crate::AskamaTraitDefault });
 	};
 	
@@ -477,16 +481,20 @@ macro_rules! context {
 #[ doc (hidden) ]
 macro_rules! context_type {
 	
+	( ! ) => {
+		()
+	};
+	
 	( () ) => {
-		$crate::context_type! ({ type : () })
+		()
 	};
 	
 	( $_context_type : ty ) => {
-		$crate::context_type! ({ type : $_context_type })
+		$_context_type
 	};
 	
-	( { type : $_context_type : ty $( , $( $_ : tt )+ )* } ) => {
-		$_context_type
+	( { type : $_context_type : tt $( , $( $_ : tt )+ )* } ) => {
+		$crate::context_type! ( $_context_type )
 	};
 }
 
@@ -498,8 +506,16 @@ macro_rules! context_type {
 #[ doc (hidden) ]
 macro_rules! context_new {
 	
+	( ! ) => {
+		$crate::context_new! ({ type : () })
+	};
+	
 	( () ) => {
 		$crate::context_new! ({ type : () })
+	};
+	
+	( { type : ! $( , $( $_rest : tt )+ )* } ) => {
+		$crate::context_new! ( { type : () $( , $( $_rest )+ )* } )
 	};
 	
 	( $_context_type : ty ) => {
