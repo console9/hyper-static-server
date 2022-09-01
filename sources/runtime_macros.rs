@@ -917,7 +917,6 @@ macro_rules! resource_markdown_refresher {
 		#[ allow (non_camel_case_types) ]
 		pub(crate) struct $_refresher_name {}
 		
-		#[ allow (dead_code) ]
 		impl $_refresher_name {
 			
 			fn refresh () -> $crate::errors::ResourceResult {

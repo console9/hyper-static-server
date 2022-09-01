@@ -3,7 +3,6 @@
 use crate::hss;
 
 
-#[ allow (unused_imports) ]
 use ::std::{
 		
 		str::FromStr as _,
@@ -11,7 +10,6 @@ use ::std::{
 	};
 
 
-#[ allow (unused_imports) ]
 use crate::hss::{
 		
 		ResponseExt as _,

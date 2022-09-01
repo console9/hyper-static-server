@@ -2,7 +2,6 @@
 
 
 
-#[ allow (unused_imports) ]
 use ::std::{
 		
 		cell,
@@ -1129,7 +1128,6 @@ impl Builder {
 		Ok (())
 	}
 	
-	#[ allow (dead_code) ]
 	fn dependencies_exclude (&mut self, _path : &Path) -> BuilderResult {
 		
 		self.dependencies.remove (_path.into ());
@@ -1408,7 +1406,6 @@ fn token_tree_parse (_string : &str) -> BuilderResult<proc_macro2::TokenTree> {
 
 
 
-#[ allow (dead_code) ]
 fn fingerprint_data (_data : impl AsRef<[u8]>) -> String {
 	use blake2::Digest as _;
 	let mut _hasher = blake2::Blake2b::new ();
