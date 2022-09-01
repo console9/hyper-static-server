@@ -16,6 +16,8 @@
 	runtime-all
 	runtime-all-dynamic
 	runtime-macros
+	runtime-context
+	runtime-context-serde
 	runtime-askama
 	runtime-askama-serde
 	runtime-sitemaps

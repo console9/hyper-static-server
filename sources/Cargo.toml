@@ -83,6 +83,8 @@ exporter-all-dynamic = [
 runtime-all = [
 	"runtime",
 	"runtime-macros",
+	"runtime-context",
+	"runtime-context-serde",
 	"runtime-askama",
 	"runtime-askama-serde",
 	"runtime-sitemaps",
@@ -135,22 +137,33 @@ runtime = [
 	"hyper-simple-server/hss-extensions",
 	"hyper-simple-server/hss-runtime",
 	"hyper-simple-server/hss-exports",
+	"once_cell",
 ]
 
 runtime-macros = [
 	"runtime",
 ]
 
-runtime-askama = [
+runtime-context = [
 	"runtime",
 ]
 
-runtime-askama-serde = [
-	"runtime-askama",
+runtime-context-serde = [
+	"runtime-context",
 	"serde",
 	"toml",
 	"serde_yaml",
 	"serde_json",
+]
+
+runtime-askama = [
+	"runtime",
+	"runtime-context",
+]
+
+runtime-askama-serde = [
+	"runtime-askama",
+	"runtime-context-serde",
 ]
 
 runtime-sitemaps = [
@@ -265,6 +278,7 @@ serde = { version = "1.0.143", default-features = false, features = ["std", "der
 serde_json = { version = "1.0.83", default-features = false, features = ["std"], optional = true }
 serde_yaml = { version = "0.8.26", default-features = false, features = [], optional = true }
 toml = { version = "0.5.9", default-features = false, features = [], optional = true }
+once_cell = { version = "1.13.1", default-features = false, features = ["std"], optional = true }
 
 vrl-errors = { version = "*", default-features = false, features = [] }
 

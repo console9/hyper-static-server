@@ -4,7 +4,7 @@
 
 pub mod resources {
 	
-	::hyper_static_server::askama_template! (ExampleResource, ExampleTemplate, !, !, "_empty.txt");
+	::hyper_static_server::askama_template! (ExampleTemplateResource, ExampleTemplate, !, !, "_empty.txt");
 }
 
 
@@ -13,17 +13,17 @@ pub mod resources {
 pub mod contexts {
 	
 	
-	::hyper_static_server::context! (ExampleContextBuilder, ExampleContext);
+	::hyper_static_server::context! (ExampleContextResource, ExampleContext);
 	
 	
 	#[ derive (::serde::Deserialize) ]
 	pub struct ExampleContext {}
 	
 	
-	impl ::hyper_static_server::AskamaContextSerde for ExampleContext {
+	impl ::hyper_static_server::ContextSerde for ExampleContext {
 		
-		fn hook_initialize (&mut self) -> ::hyper_static_server::errors::ResourceResult {
-			::hyper_static_server::errors::ResourceResult::Ok (())
+		fn hook_initialize (&mut self) -> ::hyper_static_server::errors::ContextResult {
+			::hyper_static_server::errors::ContextResult::Ok (())
 		}
 	}
 }

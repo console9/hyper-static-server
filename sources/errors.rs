@@ -18,6 +18,9 @@ pub use ::vrl_errors::*;
 #[ cfg (feature = "runtime") ]
 ::vrl_errors::define_error! (pub SingletonError, result : SingletonResult);
 
+#[ cfg (feature = "runtime-context") ]
+::vrl_errors::define_error! (pub ContextError, result : ContextResult);
+
 #[ cfg (feature = "runtime-askama") ]
 ::vrl_errors::define_error! (pub AskamaError, result : AskamaResult);
 

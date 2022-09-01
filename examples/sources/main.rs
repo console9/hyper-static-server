@@ -26,7 +26,7 @@ pub mod model {
 		pub some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
 	}
 	
-	impl ::hyper_static_server::AskamaContextSerde for ExampleAskamaContext {}
+	impl ::hyper_static_server::ContextSerde for ExampleAskamaContext {}
 	
 	
 	pub trait ExampleAskamaTrait : ::hyper_static_server::AskamaTrait<Context = ()> {

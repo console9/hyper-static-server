@@ -102,13 +102,26 @@ macro_rules! askama_template {
 			}
 		}
 		
+		impl $crate::ContextResource for $_resource_name {
+			
+			type Context = $crate::context_type! ($_context_descriptor);
+			
+			fn context_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$crate::context_type! ($_context_descriptor)>> {
+				use ::std::clone::Clone as _;
+				use $crate::AskamaResource as _;
+				let _template = self.template_arc () ?;
+				let _context = ::std::sync::Arc::clone (&_template.context);
+				$crate::errors::ResourceResult::Ok (_context)
+			}
+		}
+		
 		impl $_resource_name {
 			
 			fn template_build () -> $crate::errors::ResourceResult<$_template_name> {
-				use $crate::AskamaContext as _;
+				use $crate::Context as _;
 				use $crate::errors::ResultExtWrap as _;
 				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x3fd73d1f) ?;
-				_context.hook_initialize () ?;
+				_context.hook_initialize () .else_wrap (0x7f713e8a) ?;
 				let _context = ::std::sync::Arc::new (_context);
 				let _template = $_template_name {
 						context : _context,
@@ -325,10 +338,23 @@ macro_rules! askama_document {
 		
 		impl $crate::AskamaDocumentResource for $_resource_name {}
 		
+		impl $crate::ContextResource for $_resource_name {
+			
+			type Context = $crate::context_type! ($_context_descriptor);
+			
+			fn context_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$crate::context_type! ($_context_descriptor)>> {
+				use ::std::clone::Clone as _;
+				use $crate::AskamaResource as _;
+				let _template = self.template_arc () ?;
+				let _context = ::std::sync::Arc::clone (&_template.context);
+				$crate::errors::ResourceResult::Ok (_context)
+			}
+		}
+		
 		impl $_resource_name {
 			
 			fn template_build () -> $crate::errors::ResourceResult<$_template_name> {
-				use $crate::AskamaContext as _;
+				use $crate::Context as _;
 				use $crate::errors::ResultExtWrap as _;
 				use ::std::convert::From as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -349,7 +375,7 @@ macro_rules! askama_document {
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
 				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
-				_context.hook_initialize () ?;
+				_context.hook_initialize () .else_wrap (0x2b4b7e98) ?;
 				let _context = ::std::sync::Arc::new (_context);
 				let _document = $crate::AskamaDocument { title : _title, body : _body };
 				let _document = ::std::sync::Arc::new (_document);
@@ -456,7 +482,7 @@ macro_rules! askama_trait_impl {
 
 
 
-#[ cfg (feature = "runtime-askama") ]
+#[ cfg (feature = "runtime-context") ]
 #[ macro_export ]
 macro_rules! context {
 	
@@ -489,9 +515,11 @@ macro_rules! context {
 			}
 		}
 		
-		impl $_resource_name {
+		impl $crate::ContextResource for $_resource_name {
 			
-			pub fn context_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$crate::context_type! ($_context_descriptor)>> {
+			type Context = $crate::context_type! ($_context_descriptor);
+			
+			fn context_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$crate::context_type! ($_context_descriptor)>> {
 				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -503,12 +531,15 @@ macro_rules! context {
 				}
 				$crate::errors::ResourceResult::Ok (_context)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			fn context_build () -> $crate::errors::ResourceResult<$crate::context_type! ($_context_descriptor)> {
-				use $crate::AskamaContext as _;
+				use $crate::Context as _;
 				use $crate::errors::ResultExtWrap as _;
-				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
-				_context.hook_initialize () ?;
+				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x05b078cf) ?;
+				_context.hook_initialize () .else_wrap (0x63b40698) ?;
 				$crate::errors::ResourceResult::Ok (_context)
 			}
 			
@@ -527,7 +558,7 @@ macro_rules! context {
 
 
 
-#[ cfg (feature = "runtime-askama") ]
+#[ cfg (feature = "runtime-context") ]
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! context_type {
@@ -552,7 +583,7 @@ macro_rules! context_type {
 
 
 
-#[ cfg (feature = "runtime-askama") ]
+#[ cfg (feature = "runtime-context") ]
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! context_new {
@@ -575,7 +606,7 @@ macro_rules! context_new {
 	
 	( { type : $_context_type : ty } ) => {
 		{
-			<$_context_type as $crate::AskamaContext>::new_with_defaults ()
+			<$_context_type as $crate::Context>::new_with_defaults ()
 		}
 	};
 	
@@ -605,7 +636,7 @@ macro_rules! context_new {
 		{
 			let _encoding : &str = $_context_encoding;
 			let _data : &[u8] = ::std::include_bytes! ($_context_path);
-			<$_context_type as $crate::AskamaContext>::new_with_deserialization (_encoding, _data)
+			<$_context_type as $crate::Context>::new_with_deserialization (_encoding, _data)
 		}
 	};
 	
@@ -614,7 +645,7 @@ macro_rules! context_new {
 			use $crate::errors::ResultExtWrap as _;
 			let _encoding : &str = $_context_encoding;
 			let _data = ::std::fs::read ($_context_path) .else_wrap (0x98ea260c) ?;
-			<$_context_type as $crate::AskamaContext>::new_with_deserialization (_encoding, &_data)
+			<$_context_type as $crate::Context>::new_with_deserialization (_encoding, &_data)
 		}
 	};
 }
