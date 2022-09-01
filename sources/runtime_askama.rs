@@ -3,9 +3,6 @@
 use crate::hss;
 
 
-use ::std::sync::Arc;
-
-
 use crate::errors::*;
 
 
@@ -209,56 +206,6 @@ impl AskamaDocumentMetadata {
 	
 	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
 		Ok (Self ())
-	}
-}
-
-
-
-
-
-
-
-
-pub struct Singleton <T : Send + Sync + 'static> {
-	cell : ::once_cell::sync::OnceCell<SingletonResult<T>>,
-	builder : fn () -> SingletonResult<T>,
-}
-
-
-impl <T : Send + Sync + 'static> Singleton<T> {
-	
-	pub const fn new (_builder : fn () -> SingletonResult<T>) -> Self {
-		Self {
-				cell : ::once_cell::sync::OnceCell::new (),
-				builder : _builder,
-			}
-	}
-	
-	pub fn get (&self) -> SingletonResult<&T> {
-		match self.cell.get_or_init (|| (self.builder) ()) {
-			Ok (_value) =>
-				Ok (_value),
-			Err (_error) =>
-				Err (_error.clone ()),
-		}
-	}
-}
-
-
-
-
-pub type SingletonArc <T> = Singleton<Arc<T>>;
-
-
-impl <T : Send + Sync + 'static> Singleton<Arc<T>> {
-	
-	pub fn get_arc (&self) -> SingletonResult<Arc<T>> {
-		match self.get () {
-			Ok (_arc) =>
-				Ok (Arc::clone (_arc)),
-			Err (_error) =>
-				Err (_error.clone ()),
-		}
 	}
 }
 
