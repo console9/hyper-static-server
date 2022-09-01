@@ -28,6 +28,23 @@ use crate::errors::*;
 
 
 
+
+
+
+
+pub trait Resource
+		where Self : Sized
+{
+	fn new_with_defaults () -> ResourceResult<Self>;
+}
+
+
+
+
+
+
+
+
 pub trait StaticResource
 		where Self : Sized
 {

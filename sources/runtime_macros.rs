@@ -58,10 +58,9 @@ macro_rules! askama_template {
 			pub struct $_resource_name {}
 		}
 		
-		#[ allow (dead_code) ]
-		impl $_resource_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _template = Self::TEMPLATE_SINGLETON.get_arc () .else_wrap (0x1fa565bb) ?;
@@ -74,6 +73,9 @@ macro_rules! askama_template {
 				}
 				$crate::errors::ResourceResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			fn render (&self) -> $crate::errors::ResourceResult<::std::string::String> {
 				use ::std::convert::AsRef as _;
@@ -271,10 +273,9 @@ macro_rules! askama_document {
 			pub struct $_resource_name {}
 		}
 		
-		#[ allow (dead_code) ]
-		impl $_resource_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _template = Self::TEMPLATE_SINGLETON.get_arc () .else_wrap (0xfb2b3835) ?;
@@ -287,6 +288,9 @@ macro_rules! askama_document {
 				}
 				$crate::errors::ResourceResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			fn render (&self) -> $crate::errors::ResourceResult<::std::string::String> {
 				use ::std::convert::AsRef as _;
@@ -442,22 +446,21 @@ macro_rules! askama_trait_impl {
 #[ macro_export ]
 macro_rules! context {
 	
-	( $_builder_name : ident, $_context_descriptor : tt ) => {
+	( $_resource_name : ident, $_context_descriptor : tt ) => {
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
-			pub struct $_builder_name {
+			pub struct $_resource_name {
 				context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
 			}
 		}
 		
 		$crate::cfg_builder_askama_dynamic_enabled! {
-			pub struct $_builder_name {}
+			pub struct $_resource_name {}
 		}
 		
-		#[ allow (dead_code) ]
-		impl $_builder_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
 					let _context = Self::CONTEXT_SINGLETON.get_arc () .else_wrap (0xa1d3b84e) ?;
@@ -470,6 +473,9 @@ macro_rules! context {
 				}
 				$crate::errors::ResourceResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			pub fn context_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$crate::context_type! ($_context_descriptor)>> {
 				use ::std::clone::Clone as _;
@@ -626,13 +632,15 @@ macro_rules! resource {
 		#[ allow (non_camel_case_types) ]
 		pub struct $_resource_name {};
 		
-		#[ allow (dead_code) ]
-		impl $_resource_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				let _self = Self {};
 				$crate::errors::ResourceResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			const RESOURCE : $crate::hss::EmbeddedResource =
 					$crate::hss::EmbeddedResource::new_const (
@@ -685,10 +693,9 @@ macro_rules! resource {
 			resource : $crate::hss::FileResource,
 		}
 		
-		#[ allow (dead_code) ]
-		impl $_resource_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				let _self = Self {
 						resource : $crate::hss::FileResource::new (
 								$crate::resource_path! ($_resource_path),
@@ -758,15 +765,17 @@ macro_rules! resource_sass_dynamic {
 			source : &'static ::std::path::Path,
 		}
 		
-		#[ allow (dead_code) ]
-		impl $_resource_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				let _self = Self {
 						source : ::std::path::Path::new ($crate::resource_path! ($_source_path)),
 					};
 				$crate::errors::ResourceResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			fn render (&self) -> $crate::errors::ResourceResult<::std::string::String> {
 				use $crate::errors::ResultExtWrap as _;
@@ -836,10 +845,9 @@ macro_rules! resource_markdown_dynamic {
 			footer : ::std::option::Option<&'static ::std::path::Path>,
 		}
 		
-		#[ allow (dead_code) ]
-		impl $_resource_name {
+		impl $crate::Resource for $_resource_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				let _self = Self {
 						source : ::std::path::Path::new ($crate::resource_path! ($_source_path)),
 						header : $crate::resource_path! ($_header_path) .map (::std::path::Path::new::<str>),
@@ -847,6 +855,9 @@ macro_rules! resource_markdown_dynamic {
 					};
 				$crate::errors::ResourceResult::Ok (_self)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			fn render (&self) -> $crate::errors::ResourceResult<::std::string::String> {
 				use $crate::errors::ResultExtWrap as _;
@@ -943,12 +954,12 @@ macro_rules! route {
 		#[ allow (non_camel_case_types) ]
 		pub struct $_route_name ($crate::hss::Route);
 		
-		impl $_route_name {
+		impl $crate::Resource for $_route_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				use ::std::convert::From as _;
 				use $crate::StaticResource as _;
-				let _resource = <$_resource_name>::new_with_defaults () ?;
+				let _resource = <$_resource_name as $crate::Resource>::new_with_defaults () ?;
 				// let _ : &dyn $crate::StaticResource = &_resource;
 				let _path = ::std::string::String::from ($_route_path);
 				let _description = _resource.description ();
@@ -1003,9 +1014,9 @@ macro_rules! route_sitemap {
 		#[ allow (non_camel_case_types) ]
 		pub struct $_route_name ($crate::hss::Route);
 		
-		impl $_route_name {
+		impl $crate::Resource for $_route_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::StaticResource as _;
 				use ::std::convert::From as _;
@@ -1146,9 +1157,9 @@ macro_rules! routes {
 		#[ allow (non_camel_case_types) ]
 		pub struct $_name ($crate::hss::Routes);
 		
-		impl $_name {
+		impl $crate::Resource for $_name {
 			
-			pub fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
 				use $crate::errors::ResultExtWrap as _;
 				use ::std::iter::IntoIterator as _;
 				let _routes = Self::routes_with_defaults () ?;
@@ -1169,7 +1180,7 @@ macro_rules! routes {
 				let _routes = ::std::vec! (
 						$(
 							{
-								let _route : $_route = <$_route>::new_with_defaults () ?;
+								let _route : $_route = <$_route as $crate::Resource>::new_with_defaults () ?;
 								// let _ : &dyn $crate::StaticRoute = &_route;
 								let _route = _route.into_route ();
 								_route
