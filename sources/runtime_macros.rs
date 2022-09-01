@@ -62,9 +62,9 @@ macro_rules! askama_template {
 		impl $_resource_name {
 			
 			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
-					let _template = Self::template_build () ?;
-					let _template = ::std::sync::Arc::new (_template);
+					let _template = Self::TEMPLATE_SINGLETON.get_arc () .else_wrap (0x1fa565bb) ?;
 					let _self = Self {
 							template : _template,
 						};
@@ -108,6 +108,15 @@ macro_rules! askama_template {
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
 					};
 				$crate::errors::HandlerResult::Ok (_template)
+			}
+			
+			$crate::cfg_builder_askama_dynamic_disabled! {
+				const TEMPLATE_SINGLETON : $crate::SingletonArc<$_template_name> = $crate::SingletonArc::new (|| {
+						use $crate::errors::ResultExtWrap as _;
+						let _template = Self::template_build () .else_wrap (0xe2bf20f2) ?;
+						let _template = ::std::sync::Arc::new (_template);
+						::std::result::Result::Ok (_template)
+					});
 			}
 		}
 	};
@@ -264,9 +273,9 @@ macro_rules! askama_document {
 		impl $_resource_name {
 			
 			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
-					let _template = Self::template_build () ?;
-					let _template = ::std::sync::Arc::new (_template);
+					let _template = Self::TEMPLATE_SINGLETON.get_arc () .else_wrap (0xfb2b3835) ?;
 					let _self = Self {
 							template : _template,
 						};
@@ -333,6 +342,15 @@ macro_rules! askama_document {
 						__is_development : $crate::cfg_if_production! ({ false } | { true }),
 					};
 				$crate::errors::HandlerResult::Ok (_template)
+			}
+			
+			$crate::cfg_builder_askama_dynamic_disabled! {
+				const TEMPLATE_SINGLETON : $crate::SingletonArc<$_template_name> = $crate::SingletonArc::new (|| {
+						use $crate::errors::ResultExtWrap as _;
+						let _template = Self::template_build () .else_wrap (0xce62b3d7) ?;
+						let _template = ::std::sync::Arc::new (_template);
+						::std::result::Result::Ok (_template)
+					});
 			}
 		}
 		
@@ -436,9 +454,9 @@ macro_rules! context {
 		impl $_builder_name {
 			
 			pub fn new_with_defaults () -> $crate::errors::HandlerResult<Self> {
+				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
-					let _context = Self::context_build () ?;
-					let _context = ::std::sync::Arc::new (_context);
+					let _context = Self::CONTEXT_SINGLETON.get_arc () .else_wrap (0xa1d3b84e) ?;
 					let _self = Self {
 							context : _context,
 						};
@@ -468,6 +486,15 @@ macro_rules! context {
 				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0xfc4e0a63) ?;
 				_context.hook_initialize () ?;
 				$crate::errors::HandlerResult::Ok (_context)
+			}
+			
+			$crate::cfg_builder_askama_dynamic_disabled! {
+				const CONTEXT_SINGLETON : $crate::SingletonArc<$crate::context_type! ($_context_descriptor)> = $crate::SingletonArc::new (|| {
+						use $crate::errors::ResultExtWrap as _;
+						let _context = Self::context_build () .else_wrap (0x8565ef0c) ?;
+						let _context = ::std::sync::Arc::new (_context);
+						::std::result::Result::Ok (_context)
+					});
 			}
 		}
 	};
