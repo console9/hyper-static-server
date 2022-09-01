@@ -26,8 +26,7 @@ pub trait AskamaTemplate
 
 
 pub trait AskamaTrait
-		where
-			Self : AskamaTemplate,
+		where Self : AskamaTemplate
 {}
 
 
@@ -43,16 +42,16 @@ pub trait AskamaTraitDefault : AskamaTrait {}
 pub trait AskamaContext
 		where Self : Sized + 'static
 {
-	fn new_with_defaults () -> AskamaResult<Self> {
+	fn new_with_defaults () -> ResourceResult<Self> {
 		fail! (0xe41380ce, "context can't be created with defaults!");
 	}
 	
-	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
+	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> ResourceResult<Self> {
 		fail! (0x97024f74, "context can't be deserialized!");
 	}
 	
 	#[ doc (hidden) ]
-	fn hook_initialize (&mut self) -> hss::HandlerResult {
+	fn hook_initialize (&mut self) -> ResourceResult {
 		Ok (())
 	}
 }
@@ -62,11 +61,11 @@ pub trait AskamaContext
 
 impl AskamaContext for () {
 	
-	fn new_with_defaults () -> AskamaResult<()> {
+	fn new_with_defaults () -> ResourceResult<Self> {
 		Ok (())
 	}
 	
-	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
+	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> ResourceResult<Self> {
 		Ok (())
 	}
 }
@@ -80,7 +79,7 @@ pub trait AskamaContextSerde
 				Self : Sized + 'static,
 				Self : ::serde::de::DeserializeOwned,
 {
-	fn new_with_serde <'a> (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
+	fn new_with_serde <'a> (_encoding : &str, _data : &[u8]) -> ResourceResult<Self> {
 		match _encoding {
 			
 			#[ cfg (feature = "toml") ]
@@ -114,7 +113,7 @@ pub trait AskamaContextSerde
 	}
 	
 	#[ doc (hidden) ]
-	fn hook_initialize (&mut self) -> hss::HandlerResult {
+	fn hook_initialize (&mut self) -> ResourceResult {
 		Ok (())
 	}
 }
@@ -123,12 +122,12 @@ pub trait AskamaContextSerde
 #[ cfg (feature = "runtime-askama-serde") ]
 impl <S : AskamaContextSerde> AskamaContext for S {
 	
-	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> AskamaResult<Self> {
+	fn new_with_deserialization (_encoding : &str, _data : &[u8]) -> ResourceResult<Self> {
 		<Self as AskamaContextSerde>::new_with_serde (_encoding, _data)
 	}
 	
 	#[ doc (hidden) ]
-	fn hook_initialize (&mut self) -> hss::HandlerResult {
+	fn hook_initialize (&mut self) -> ResourceResult {
 		<Self as AskamaContextSerde>::hook_initialize (self)
 	}
 }
@@ -192,7 +191,7 @@ pub struct AskamaDocumentHeading {
 #[ cfg (feature = "runtime-askama-serde") ]
 impl AskamaDocumentMetadata {
 	
-	pub fn load_from_json (_json : &str) -> AskamaResult<Self> {
+	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
 		::serde_json::from_str (_json) .else_wrap (0x6410e85f)
 	}
 }
@@ -208,7 +207,7 @@ pub struct AskamaDocumentMetadata ();
 #[ cfg (not (feature = "runtime-askama-serde")) ]
 impl AskamaDocumentMetadata {
 	
-	pub fn load_from_json (_json : &str) -> AskamaResult<Self> {
+	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
 		Ok (Self ())
 	}
 }
@@ -224,9 +223,6 @@ pub struct Singleton <T : Send + Sync + 'static> {
 	cell : ::once_cell::sync::OnceCell<SingletonResult<T>>,
 	builder : fn () -> SingletonResult<T>,
 }
-
-
-::vrl_errors::define_error! (pub SingletonError, result : SingletonResult);
 
 
 impl <T : Send + Sync + 'static> Singleton<T> {

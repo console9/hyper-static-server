@@ -22,8 +22,8 @@ pub mod contexts {
 	
 	impl ::hyper_static_server::AskamaContextSerde for ExampleContext {
 		
-		fn hook_initialize (&mut self) -> ::hyper_static_server::errors::HandlerResult {
-			::hyper_static_server::errors::HandlerResult::Ok (())
+		fn hook_initialize (&mut self) -> ::hyper_static_server::errors::ResourceResult {
+			::hyper_static_server::errors::ResourceResult::Ok (())
 		}
 	}
 }

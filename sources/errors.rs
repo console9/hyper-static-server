@@ -12,6 +12,12 @@ pub use ::vrl_errors::*;
 #[ cfg (feature = "exporter") ]
 ::vrl_errors::define_error! (pub ExportError, result : ExportResult);
 
+#[ cfg (feature = "runtime") ]
+::vrl_errors::define_error! (pub ResourceError, result : ResourceResult);
+
+#[ cfg (feature = "runtime") ]
+::vrl_errors::define_error! (pub SingletonError, result : SingletonResult);
+
 #[ cfg (feature = "runtime-askama") ]
 ::vrl_errors::define_error! (pub AskamaError, result : AskamaResult);
 
