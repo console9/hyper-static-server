@@ -75,7 +75,9 @@ macro_rules! askama_template {
 			}
 		}
 		
-		impl $_resource_name {
+		impl $crate::AskamaResource for $_resource_name {
+			
+			type Template = $_template_name;
 			
 			fn render (&self) -> $crate::errors::ResourceResult<::std::string::String> {
 				use ::std::convert::AsRef as _;
@@ -86,7 +88,7 @@ macro_rules! askama_template {
 				_outcome.else_wrap (0x32bdca54)
 			}
 			
-			pub fn template_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$_template_name>> {
+			fn template_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$_template_name>> {
 				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -98,6 +100,9 @@ macro_rules! askama_template {
 				}
 				$crate::errors::ResourceResult::Ok (_template)
 			}
+		}
+		
+		impl $_resource_name {
 			
 			fn template_build () -> $crate::errors::ResourceResult<$_template_name> {
 				use $crate::AskamaContext as _;
@@ -182,6 +187,7 @@ macro_rules! askama {
 			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::hss::ResponseExt as _;
+				use $crate::AskamaResource as _;
 				use $crate::StaticResource as _;
 				let _body = self.render () .else_wrap (0x0707a06d) ?;
 				_response.set_status_200 ();
@@ -290,7 +296,9 @@ macro_rules! askama_document {
 			}
 		}
 		
-		impl $_resource_name {
+		impl $crate::AskamaResource for $_resource_name {
+			
+			type Template = $_template_name;
 			
 			fn render (&self) -> $crate::errors::ResourceResult<::std::string::String> {
 				use ::std::convert::AsRef as _;
@@ -301,7 +309,7 @@ macro_rules! askama_document {
 				_outcome.else_wrap (0xfbf47116)
 			}
 			
-			pub fn template_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$_template_name>> {
+			fn template_arc (&self) -> $crate::errors::ResourceResult<::std::sync::Arc<$_template_name>> {
 				use ::std::clone::Clone as _;
 				use $crate::errors::ResultExtWrap as _;
 				$crate::cfg_builder_askama_dynamic_disabled! {
@@ -313,6 +321,11 @@ macro_rules! askama_document {
 				}
 				$crate::errors::ResourceResult::Ok (_template)
 			}
+		}
+		
+		impl $crate::AskamaDocumentResource for $_resource_name {}
+		
+		impl $_resource_name {
 			
 			fn template_build () -> $crate::errors::ResourceResult<$_template_name> {
 				use $crate::AskamaContext as _;
@@ -390,6 +403,7 @@ macro_rules! askama_document {
 			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::hss::ResponseExt as _;
+				use $crate::AskamaResource as _;
 				use $crate::StaticResource as _;
 				let _body = self.render () .else_wrap (0x53a2c22f) ?;
 				_response.set_status_200 ();

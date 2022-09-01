@@ -3,6 +3,20 @@
 use crate::hss;
 
 
+use ::std::{
+		
+		sync::Arc,
+		
+	};
+
+
+use crate::{
+		
+		Resource,
+		
+	};
+
+
 use crate::errors::*;
 
 
@@ -12,18 +26,35 @@ use crate::errors::*;
 
 
 
-pub trait AskamaTemplate
-		where Self : Sized + 'static
+pub trait AskamaResource
+		where
+			Self : Resource,
 {
+	type Template : AskamaTemplate;
 	
+	fn template_arc (&self) -> ResourceResult<Arc<Self::Template>>;
+	
+	fn render (&self) -> ResourceResult<String>;
+}
+
+
+
+
+pub trait AskamaTemplate
+		where
+			Self : Sized + 'static,
+{
 	type Context : AskamaContext;
 	
 	fn context (&self) -> &Self::Context;
 }
 
 
+
+
 pub trait AskamaTrait
-		where Self : AskamaTemplate
+		where
+			Self : AskamaTemplate,
 {}
 
 
@@ -36,8 +67,104 @@ pub trait AskamaTraitDefault : AskamaTrait {}
 
 
 
+pub trait AskamaDocumentResource
+		where
+			Self : AskamaResource,
+			<Self as AskamaResource>::Template : AskamaDocumentTemplate,
+{}
+
+
+
+
+pub trait AskamaDocumentTemplate
+		where
+			Self : AskamaTemplate,
+{
+	fn document (&self) -> &AskamaDocument;
+	fn metadata (&self) -> &AskamaDocumentMetadata;
+}
+
+
+
+
+pub trait AskamaDocumentTrait
+		where
+			Self : AskamaDocumentTemplate,
+			Self : AskamaTrait,
+{}
+
+
+pub trait AskamaDocumentTraitDefault : AskamaDocumentTrait {}
+
+
+
+
+
+
+
+
+#[ derive (Debug, Clone) ]
+pub struct AskamaDocument {
+	pub title : String,
+	pub body : String,
+}
+
+
+
+
+#[ cfg (feature = "runtime-askama-serde") ]
+#[ derive (Debug, Clone) ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
+pub struct AskamaDocumentMetadata {
+	pub title : Option<String>,
+	pub headings : Option<Vec<AskamaDocumentHeading>>,
+}
+
+
+#[ cfg (feature = "runtime-askama-serde") ]
+#[ derive (serde::Serialize, serde::Deserialize) ]
+#[ derive (Debug, Clone) ]
+pub struct AskamaDocumentHeading {
+	pub level : u8,
+	pub text : Option<String>,
+	pub anchor : Option<String>,
+}
+
+
+#[ cfg (feature = "runtime-askama-serde") ]
+impl AskamaDocumentMetadata {
+	
+	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
+		::serde_json::from_str (_json) .else_wrap (0x6410e85f)
+	}
+}
+
+
+
+
+#[ cfg (not (feature = "runtime-askama-serde")) ]
+#[ derive (Debug, Clone) ]
+pub struct AskamaDocumentMetadata ();
+
+
+#[ cfg (not (feature = "runtime-askama-serde")) ]
+impl AskamaDocumentMetadata {
+	
+	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
+		Ok (Self ())
+	}
+}
+
+
+
+
+
+
+
+
 pub trait AskamaContext
-		where Self : Sized + 'static
+		where
+			Self : Sized + 'static,
 {
 	fn new_with_defaults () -> ResourceResult<Self> {
 		fail! (0xe41380ce, "context can't be created with defaults!");
@@ -73,8 +200,8 @@ impl AskamaContext for () {
 #[ cfg (feature = "runtime-askama-serde") ]
 pub trait AskamaContextSerde
 		where
-				Self : Sized + 'static,
-				Self : ::serde::de::DeserializeOwned,
+			Self : Sized + 'static,
+			Self : ::serde::de::DeserializeOwned,
 {
 	fn new_with_serde <'a> (_encoding : &str, _data : &[u8]) -> ResourceResult<Self> {
 		match _encoding {
@@ -126,86 +253,6 @@ impl <S : AskamaContextSerde> AskamaContext for S {
 	#[ doc (hidden) ]
 	fn hook_initialize (&mut self) -> ResourceResult {
 		<Self as AskamaContextSerde>::hook_initialize (self)
-	}
-}
-
-
-
-
-
-
-
-
-#[ derive (Debug, Clone) ]
-pub struct AskamaDocument {
-	pub title : String,
-	pub body : String,
-}
-
-
-pub trait AskamaDocumentTemplate : AskamaTemplate {
-	
-	fn document (&self) -> &AskamaDocument;
-	fn metadata (&self) -> &AskamaDocumentMetadata;
-}
-
-
-pub trait AskamaDocumentTrait
-		where
-			Self : AskamaDocumentTemplate,
-			Self : AskamaTrait,
-{}
-
-
-pub trait AskamaDocumentTraitDefault : AskamaDocumentTrait {}
-
-
-
-
-
-
-
-
-#[ cfg (feature = "runtime-askama-serde") ]
-#[ derive (Debug, Clone) ]
-#[ derive (serde::Serialize, serde::Deserialize) ]
-pub struct AskamaDocumentMetadata {
-	pub title : Option<String>,
-	pub headings : Option<Vec<AskamaDocumentHeading>>,
-}
-
-
-#[ cfg (feature = "runtime-askama-serde") ]
-#[ derive (serde::Serialize, serde::Deserialize) ]
-#[ derive (Debug, Clone) ]
-pub struct AskamaDocumentHeading {
-	pub level : u8,
-	pub text : Option<String>,
-	pub anchor : Option<String>,
-}
-
-
-#[ cfg (feature = "runtime-askama-serde") ]
-impl AskamaDocumentMetadata {
-	
-	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
-		::serde_json::from_str (_json) .else_wrap (0x6410e85f)
-	}
-}
-
-
-
-
-#[ cfg (not (feature = "runtime-askama-serde")) ]
-#[ derive (Debug, Clone) ]
-pub struct AskamaDocumentMetadata ();
-
-
-#[ cfg (not (feature = "runtime-askama-serde")) ]
-impl AskamaDocumentMetadata {
-	
-	pub fn load_from_json (_json : &str) -> ResourceResult<Self> {
-		Ok (Self ())
 	}
 }
 
