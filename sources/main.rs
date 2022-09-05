@@ -56,8 +56,9 @@ pub fn main_serve_with_static (_routes : impl Into<hss::Routes>, _configuration 
 	
 	let _routes = _routes.into ();
 	let _handler = crate::server::StaticHandler::new (_routes);
+	let _handler = hss::HandlerDynArc::new (_handler);
 	
-	return hss::main_with_handler_dyn (_handler, _configuration, _arguments);
+	return hss::main_with_handler (_handler, _configuration, _arguments);
 }
 
 
