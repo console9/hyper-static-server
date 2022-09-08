@@ -2,6 +2,8 @@
 
 use ::std::{
 		
+		fmt::Debug,
+		
 		sync::Arc,
 		
 	};
@@ -124,4 +126,56 @@ impl <S : ContextSerde> Context for S {
 		<Self as ContextSerde>::hook_initialize (self)
 	}
 }
+
+
+
+
+pub trait ValueDebug : Debug {
+	
+	
+	fn debug (&self) -> String {
+		format! ("{:?}", self)
+	}
+	
+	
+	fn debug_pretty (&self) -> String {
+		format! ("{:#?}", self)
+	}
+	
+	
+	fn debug_indent_askama (&self, _level : &usize, _indent : &str, _indent_prefix : &str, _indent_suffix : &str, _terminator : &str) -> String {
+		let _indent = if _indent.is_empty () { None } else { Some (_indent) };
+		let _indent_prefix = if _indent_prefix.is_empty () { None } else { Some (_indent_prefix) };
+		let _indent_suffix = if _indent_suffix.is_empty () { None } else { Some (_indent_suffix) };
+		let _terminator = Some (_terminator);
+		self.debug_indent (*_level, _indent, _indent_prefix, _indent_suffix, _terminator)
+	}
+	
+	fn debug_indent (&self, _level : usize, _indent : Option<&str>, _indent_prefix : Option<&str>, _indent_suffix : Option<&str>, _terminator : Option<&str>) -> String {
+		
+		let _pretty = self.debug_pretty ();
+		
+		let _indent_level = _level;
+		let _indent_infix = _indent.unwrap_or ("    ");
+		let _indent_prefix = _indent_prefix.unwrap_or ("");
+		let _indent_suffix = _indent_suffix.unwrap_or ("");
+		let _terminator = _terminator.unwrap_or ("\n");
+		
+		let mut _buffer = String::new ();
+		for _line in _pretty.split ("\n") {
+			_buffer.push_str (_indent_prefix);
+			for _ in 0 .. _indent_level {
+				_buffer.push_str (_indent_infix);
+			}
+			_buffer.push_str (_indent_suffix);
+			_buffer.push_str (_line);
+			_buffer.push_str (_terminator);
+		}
+		
+		_buffer
+	}
+}
+
+
+impl <V> ValueDebug for V where V : Debug {}
 
