@@ -316,7 +316,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		let _content_type = "html";
+		let _content_type = detect_content_type_from_extension (_source) ?;
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
 		} else {
@@ -500,7 +500,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		let _content_type = "html";
+		let _content_type = detect_content_type_from_extension (_template) ?;
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("markdown_askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
 		} else {
