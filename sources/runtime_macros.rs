@@ -233,9 +233,9 @@ macro_rules! askama_document {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
-			$_body_path : literal,
-			$_title_path : literal,
-			$_metadata_path : literal,
+			$_body_path : tt,
+			$_title_path : tt,
+			$_metadata_path : tt,
 			$( $_refresher_name : ident, )?
 			$_description : literal
 	) => {
@@ -362,16 +362,19 @@ macro_rules! askama_document {
 						::std::compile_error! ("`refresher` not supported without dynamic feature!");
 						type _refresher_type = $_refresher_name;
 					)?
-					let _body = ::std::string::String::from (::std::include_str! ($_body_path));
-					let _title = ::std::string::String::from (::std::include_str! ($_title_path));
-					let _metadata = ::std::include_str! ($_metadata_path);
+					let _body = ::std::string::String::from (::std::include_str! ($crate::resource_path! ($_body_path)));
+					let _title = ::std::string::String::from (::std::include_str! ($crate::resource_path! ($_title_path)));
+					let _metadata = ::std::include_str! ($crate::resource_path! ($_metadata_path));
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (_metadata) .else_wrap (0x9fa06da0) ?;
 				}
 				$crate::cfg_builder_askama_dynamic_enabled! {
 					$( $_refresher_name::refresh () ?; )?
-					let _body = ::std::fs::read_to_string ($_body_path) .else_wrap (0x222c7659) ?;
-					let _title = ::std::fs::read_to_string ($_title_path) .else_wrap (0x32c4e114) ?;
-					let _metadata = ::std::fs::read_to_string ($_metadata_path) .else_wrap (0xc07d6b78) ?;
+					let _body_path : &str = $crate::resource_path! ($_body_path);
+					let _title_path : &str = $crate::resource_path! ($_title_path);
+					let _metadata_path : &str = $crate::resource_path! ($_metadata_path);
+					let _body = ::std::fs::read_to_string (_body_path) .else_wrap (0x222c7659) ?;
+					let _title = ::std::fs::read_to_string (_title_path) .else_wrap (0x32c4e114) ?;
+					let _metadata = ::std::fs::read_to_string (_metadata_path) .else_wrap (0xc07d6b78) ?;
 					let _metadata = $crate::AskamaDocumentMetadata::load_from_json (&_metadata) .else_wrap (0x93f8e36e) ?;
 				}
 				let mut _context = $crate::context_new! ($_context_descriptor) .else_wrap (0x01992727) ?;
@@ -610,17 +613,17 @@ macro_rules! context_new {
 		}
 	};
 	
-	( { type : $_context_type : ty, json : $_context_path : literal } ) => {
+	( { type : $_context_type : ty, json : $_context_path : tt } ) => {
 		$crate::context_new! ({ type : $_context_type, deserialize : ("json", $_context_path) })
 	};
-	( { type : $_context_type : ty, toml : $_context_path : literal } ) => {
+	( { type : $_context_type : ty, toml : $_context_path : tt } ) => {
 		$crate::context_new! ({ type : $_context_type, deserialize : ("toml", $_context_path) })
 	};
-	( { type : $_context_type : ty, yaml : $_context_path : literal } ) => {
+	( { type : $_context_type : ty, yaml : $_context_path : tt } ) => {
 		$crate::context_new! ({ type : $_context_type, deserialize : ("yaml", $_context_path) })
 	};
 	
-	( { type : $_context_type : ty, deserialize : ( $_context_encoding : literal, $_context_path : literal ) } ) => {
+	( { type : $_context_type : ty, deserialize : ( $_context_encoding : literal, $_context_path : tt ) } ) => {
 		{
 			$crate::cfg_builder_askama_dynamic_disabled! {
 				let _context = $crate::context_new! ({ type : $_context_type, (deserialize, embedded) : ($_context_encoding, $_context_path)});
@@ -632,19 +635,20 @@ macro_rules! context_new {
 		}
 	};
 	
-	( { type : $_context_type : ty, (deserialize, embedded) : ( $_context_encoding : literal, $_context_path : literal ) } ) => {
+	( { type : $_context_type : ty, (deserialize, embedded) : ( $_context_encoding : literal, $_context_path : tt ) } ) => {
 		{
 			let _encoding : &str = $_context_encoding;
-			let _data : &[u8] = ::std::include_bytes! ($_context_path);
+			let _data : &[u8] = ::std::include_bytes! ($crate::resource_path! ($_context_path));
 			<$_context_type as $crate::Context>::new_with_deserialization (_encoding, _data)
 		}
 	};
 	
-	( { type : $_context_type : ty, (deserialize, dynamic) : ( $_context_encoding : literal, $_context_path : literal ) } ) => {
+	( { type : $_context_type : ty, (deserialize, dynamic) : ( $_context_encoding : literal, $_context_path : tt ) } ) => {
 		{
 			use $crate::errors::ResultExtWrap as _;
 			let _encoding : &str = $_context_encoding;
-			let _data = ::std::fs::read ($_context_path) .else_wrap (0x98ea260c) ?;
+			let _context_path : &str = $crate::resource_path! ($_context_path);
+			let _data = ::std::fs::read (_context_path) .else_wrap_with_format (0x98ea260c, ::std::format_args! ("path: `{}`", _context_path)) ?;
 			<$_context_type as $crate::Context>::new_with_deserialization (_encoding, &_data)
 		}
 	};
@@ -741,9 +745,10 @@ macro_rules! resource {
 		impl $crate::Resource for $_resource_name {
 			
 			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+				let _resource_path : &str = $crate::resource_path! ($_resource_path);
 				let _self = Self {
 						resource : $crate::hss::FileResource::new (
-								$crate::resource_path! ($_resource_path),
+								_resource_path,
 								::std::option::Option::Some ($crate::resource_content_type! ($_content_type)),
 								false,
 							)
@@ -813,8 +818,9 @@ macro_rules! resource_sass_dynamic {
 		impl $crate::Resource for $_resource_name {
 			
 			fn new_with_defaults () -> $crate::errors::ResourceResult<Self> {
+				let _source_path : &str = $crate::resource_path! ($_source_path);
 				let _self = Self {
-						source : ::std::path::Path::new ($crate::resource_path! ($_source_path)),
+						source : ::std::path::Path::new (_source_path),
 					};
 				$crate::errors::ResourceResult::Ok (_self)
 			}
@@ -1384,6 +1390,9 @@ macro_rules! resource_path {
 	( ( relative_to_cwd, None ) ) => {
 		::std::option::Option::None
 	};
+	( ( absolute, None ) ) => {
+		::std::option::Option::None
+	};
 	( None ) => {
 		::std::option::Option::None
 	};
@@ -1395,14 +1404,21 @@ macro_rules! resource_path {
 	( ( relative_to_cwd, Some ( $_path : literal ) ) ) => {
 		::std::option::Option::Some ( $crate::resource_path! ( ( relative_to_cwd, $_path ) ) )
 	};
+	( ( absolute, Some ( $_path : literal ) ) ) => {
+		::std::option::Option::Some ( $crate::resource_path! ( ( absolute, $_path ) ) )
+	};
 	( Some ( $_path : literal ) ) => {
 		::std::option::Option::Some ( $crate::resource_path! ( $_path ) )
 	};
+	
 	
 	( ( relative_to_crate, $_path : literal ) ) => {
 		::std::concat! (::std::env! ("CARGO_MANIFEST_DIR"), "/", $_path)
 	};
 	( ( relative_to_cwd, $_path : literal ) ) => {
+		$_path
+	};
+	( ( absolute, $_path : literal ) ) => {
 		$_path
 	};
 	( $_path : literal ) => {
