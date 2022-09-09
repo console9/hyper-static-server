@@ -859,7 +859,7 @@ macro_rules! builder_call_assets_watch {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_askama {
-	( $_builder : ident, { $_source : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_source : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askama, (
 					$_source,
@@ -896,7 +896,7 @@ macro_rules! builder_call_askama {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_askamas {
-	( $_builder : ident, { $_sources : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
@@ -919,7 +919,7 @@ macro_rules! builder_call_askamas {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x2a28230c));
 	};
-	( $_builder : ident, { $_sources : literal, glob : $_glob : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources : literal, glob : $_glob : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_askamas, (
 					$_sources,
@@ -1014,7 +1014,7 @@ macro_rules! builder_call_askamas_watch {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_markdown_askama {
-	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown_askama, (
 					$_source_markdown,
@@ -1043,7 +1043,7 @@ macro_rules! builder_call_markdown_askama {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_markdowns_askama {
-	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
@@ -1063,7 +1063,7 @@ macro_rules! builder_call_markdowns_askama {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x84a5049c));
 	};
-	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : ty )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,

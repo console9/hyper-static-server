@@ -470,9 +470,24 @@ macro_rules! askama_trait_impl {
 		$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type });
 	};
 	
+	( $_template_name : ident, { trait : [ $( $_trait_type : ty ),+ ] } ) => {
+		
+		$crate::askama_trait_impl! ($_template_name, { traits : [ $( $_trait_type ),+ ] });
+	};
+	
 	( $_template_name : ident, { trait : $_trait_type : ty } ) => {
 		
 		impl $_trait_type for $_template_name {}
+	};
+	
+	( $_template_name : ident, [ $( $_trait_type : ty ),+ ] ) => {
+		$crate::askama_trait_impl! ($_template_name, { traits : [ $( $_trait_type ),+ ] });
+	};
+	
+	( $_template_name : ident, { traits : [ $( $_trait_type : ty ),+ ] } ) => {
+		$(
+			$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type });
+		)+
 	};
 }
 
