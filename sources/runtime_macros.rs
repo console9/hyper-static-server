@@ -12,11 +12,10 @@
 
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
-macro_rules! askama_template {
+macro_rules! askama_template_only {
 	
 	
 	(
-			$_resource_name : ident,
 			$_template_name : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
@@ -45,6 +44,34 @@ macro_rules! askama_template {
 		impl $crate::AskamaTrait for $_template_name {}
 		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
+	};
+}
+
+
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama_template {
+	
+	
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
+			$_template_path : literal
+	) => {
+		
+		
+		$crate::askama_template_only! ($_template_name, $_context_descriptor, $_trait_descriptor, $_template_path);
+		
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
@@ -223,21 +250,14 @@ macro_rules! askama {
 
 #[ cfg (feature = "runtime-askama") ]
 #[ macro_export ]
-macro_rules! askama_document {
+macro_rules! askama_document_template_only {
 	
 	
 	(
-			$_resource_name : ident,
 			$_template_name : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_content_type : tt,
-			$_template_path : literal,
-			$_body_path : tt,
-			$_title_path : tt,
-			$_metadata_path : tt,
-			$( $_refresher_name : ident, )?
-			$_description : literal
+			$_template_path : literal
 	) => {
 		
 		#[ derive (::askama::Template) ]
@@ -279,6 +299,40 @@ macro_rules! askama_document {
 		impl $crate::AskamaDocumentTrait for $_template_name {}
 		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
+	};
+}
+
+
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama_document_template {
+	
+	
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
+			$_content_type : tt,
+			$_template_path : literal,
+			$_body_path : tt,
+			$_title_path : tt,
+			$_metadata_path : tt,
+			$( $_refresher_name : ident, )?
+			$_description : literal
+	) => {
+		
+		
+		$crate::askama_document_template_only! ($_template_name, $_context_descriptor, $_trait_descriptor, $_template_path);
+		
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
 			#[ allow (non_camel_case_types) ]
@@ -402,6 +456,40 @@ macro_rules! askama_document {
 					});
 			}
 		}
+	};
+}
+
+
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+macro_rules! askama_document {
+	
+	
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
+			$_content_type : tt,
+			$_template_path : literal,
+			$_body_path : tt,
+			$_title_path : tt,
+			$_metadata_path : tt,
+			$( $_refresher_name : ident, )?
+			$_description : literal
+	) => {
+		
+		
+		$crate::askama_document_template! ($_resource_name, $_template_name, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $( $_refresher_name, )? $_description);
+		
 		
 		impl $_resource_name {
 			
