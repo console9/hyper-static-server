@@ -15,7 +15,8 @@ use ::std::{
 		path,
 		rc,
 		
-		collections::BTreeSet,
+		collections::{BTreeSet, HashMap},
+		hash::{Hash, Hasher},
 		iter::Iterator,
 		path::{Path, PathBuf},
 		
@@ -213,7 +214,8 @@ impl BuilderConfiguration {
 pub struct Builder {
 	configuration : BuilderConfiguration,
 	generated : String,
-	counter : u32,
+	id_counter : u32,
+	id_fingerprints : HashMap<String, u32>,
 	route_names : Vec<String>,
 	dependencies : BTreeSet<PathBuf>,
 }
@@ -225,7 +227,8 @@ impl Builder {
 		Self {
 				configuration : _configuration,
 				generated : String::with_capacity (1024 * 1024),
-				counter : 1,
+				id_counter : 1,
+				id_fingerprints : HashMap::new (),
 				route_names : Vec::new (),
 				dependencies : BTreeSet::new (),
 			}
@@ -331,6 +334,9 @@ impl Builder {
 		let (_context_type, _context_path) = _context.unwrap_or (("!", None));
 		let _trait_type = _trait.unwrap_or ("!");
 		
+		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template, _context_type, _trait_type));
+		let _template_define = !_template_exists;
+		
 		if let Some (_context_path) = _context_path {
 			
 			let _sources = self.configuration.sources.as_ref () .map (PathBuf::as_path);
@@ -345,9 +351,9 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _id, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _description) .infallible (0x3258a4c6);
+			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _description) .infallible (0x3258a4c6);
 		} else {
-			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _id, _context_type, _trait_type, _content_type, _template, _description) .infallible (0x35966385);
+			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _description) .infallible (0x35966385);
 		}
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
 		
@@ -517,18 +523,20 @@ impl Builder {
 			String::new ()
 		};
 		
+		let _context_type = _context.unwrap_or ("!");
 		let _trait_type = _trait.unwrap_or ("!");
 		
+		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template, _context_type, _trait_type));
+		let _template_define = !_template_exists;
+		
 		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
-			if let Some (_context_type) = _context {
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _id, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
+			if let Some (_) = _context {
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
 			} else {
-				let _context_type = _context.unwrap_or ("!");
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _id, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
+				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
 			}
 		} else {
-			let _context_type = _context.unwrap_or ("!");
-			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _id, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
+			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 		}
 		
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
@@ -1166,9 +1174,24 @@ impl Builder {
 	
 	
 	fn generate_id (&mut self) -> String {
-		let _id = self.counter;
-		self.counter += 1;
+		let _id = self.id_counter;
+		self.id_counter += 1;
 		format! ("{:04}", _id)
+	}
+	
+	
+	fn generate_id_by_key (&mut self, _key : & impl Hash) -> (String, bool) {
+		let _fingerprint = fingerprint_key (_key);
+		let (_id, _exists) = if let Some (_id) = self.id_fingerprints.get (&_fingerprint) {
+			(*_id, true)
+		} else {
+			let _id = self.id_counter;
+			self.id_counter += 1;
+			self.id_fingerprints.insert (_fingerprint, _id);
+			(_id, false)
+		};
+		let _id = format! ("{:04}", _id);
+		(_id, _exists)
 	}
 }
 
@@ -1410,6 +1433,27 @@ fn fingerprint_data (_data : impl AsRef<[u8]>) -> String {
 	use blake2::Digest as _;
 	let mut _hasher = blake2::Blake2b::new ();
 	_hasher.update (_data.as_ref ());
+	let _hash = _hasher.finalize ();
+	format! ("{:x}", _hash)
+}
+
+
+fn fingerprint_key (_key : & impl Hash) -> String {
+	use blake2::Digest as _;
+	
+	struct BlakeHasher (blake2::Blake2b);
+	impl Hasher for BlakeHasher {
+		fn finish (&self) -> u64 {
+			::vrl_errors::panic! (unreachable, 0x2914336f);
+		}
+		fn write (&mut self, _data : &[u8]) -> () {
+			self.0.update (_data);
+		}
+	}
+	
+	let mut _hasher = BlakeHasher (blake2::Blake2b::new ());
+	_key.hash (&mut _hasher);
+	let mut _hasher = _hasher.0;
 	let _hash = _hasher.finalize ();
 	format! ("{:x}", _hash)
 }
