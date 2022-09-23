@@ -1014,14 +1014,18 @@ macro_rules! builder_call_askamas_watch {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_markdown_askama {
-	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
+	( $_builder : ident, { $_source_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdown_askama, (
 					$_source_markdown,
 					$_source_template,
 					{
-						let _context = ::std::option::Option::<&str>::None;
-						$( let _context = ::std::option::Option::Some (::std::stringify! ($_context_type)); )?
+						let _context = ::std::option::Option::<(&str, ::std::option::Option<&str>)>::None;
+						$(
+							let _context_path = ::std::option::Option::<&str>::None;
+							$( let _context_path = ::std::option::Option::Some ($_context_path); )?
+							let _context = ::std::option::Option::Some ((::std::stringify! ($_context_type), _context_path));
+						)?
 						_context
 					},
 					{
@@ -1043,15 +1047,19 @@ macro_rules! builder_call_markdown_askama {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_markdowns_askama {
-	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, template : $_source_template : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
 					::std::option::Option::None,
 					$_source_template,
 					{
-						let _context = ::std::option::Option::<&str>::None;
-						$( let _context = ::std::option::Option::Some (::std::stringify! ($_context_type)); )?
+						let _context = ::std::option::Option::<(&str, ::std::option::Option<&str>)>::None;
+						$(
+							let _context_path = ::std::option::Option::<&str>::None;
+							$( let _context_path = ::std::option::Option::Some ($_context_path); )?
+							let _context = ::std::option::Option::Some ((::std::stringify! ($_context_type), _context_path));
+						)?
 						_context
 					},
 					{
@@ -1063,15 +1071,19 @@ macro_rules! builder_call_markdowns_askama {
 					$crate::builder_call_route_extensions! ($_builder, $_route),
 				), (0x84a5049c));
 	};
-	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context_type : ty )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
+	( $_builder : ident, { $_sources_markdown : literal, glob : $_glob : literal, template : $_source_template : literal $( , context : $_context_type : ty $( , context_from : $_context_path : literal )? )? $( , trait : $_trait_type : tt )? }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_markdowns_askama, (
 					$_sources_markdown,
 					::std::option::Option::Some ($_glob),
 					$_source_template,
 					{
-						let _context = ::std::option::Option::<&str>::None;
-						$( let _context = ::std::option::Option::Some (::std::stringify! ($_context_type)); )?
+						let _context = ::std::option::Option::<(&str, ::std::option::Option<&str>)>::None;
+						$(
+							let _context_path = ::std::option::Option::<&str>::None;
+							$( let _context_path = ::std::option::Option::Some ($_context_path); )?
+							let _context = ::std::option::Option::Some ((::std::stringify! ($_context_type), _context_path));
+						)?
 						_context
 					},
 					{

@@ -352,9 +352,12 @@ impl Builder {
 			self.dependencies_include (&_context_path) ?;
 			
 			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _description) .infallible (0x3258a4c6);
+			
 		} else {
+			
 			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _description) .infallible (0x35966385);
 		}
+		
 		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
 		
 		Ok (())
@@ -393,7 +396,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _context : Option<&str>, _trait : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_markdown_askama (&mut self, _source_markdown_0 : &str, _source_template_0 : &str, _context : Option<(&str, Option<&str>)>, _trait : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -413,7 +416,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _context : Option<&str>, _trait : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
+	pub fn route_markdowns_askama (&mut self, _sources_markdown_0 : &str, _glob : Option<&str>, _source_template_0 : &str, _context : Option<(&str, Option<&str>)>, _trait : Option<&str>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized)) -> BuilderResult {
 		
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
@@ -442,7 +445,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _context : Option<&str>, _trait : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+	fn route_markdown_askama_0 (&mut self, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _context : Option<(&str, Option<&str>)>, _trait : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _relative_markdown_1 = _relative_markdown.with_extension ("");
 		
@@ -523,19 +526,38 @@ impl Builder {
 			String::new ()
 		};
 		
-		let _context_type = _context.unwrap_or ("!");
+		let (_context_type, _context_path) = _context.unwrap_or (("!", None));
 		let _trait_type = _trait.unwrap_or ("!");
 		
 		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template, _context_type, _trait_type));
 		let _template_define = !_template_exists;
 		
-		if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
+		if let Some (_context_path) = _context_path {
+			
+			let _sources = self.configuration.sources.as_ref () .map (PathBuf::as_path);
+			let (_, _context_path) = self.resolve_file (None, _context_path) ?;
+			let _context_encoding = match _context_path.extension () .else_wrap (0x893cc9af) ? .to_str () .else_wrap (0xe8b645dd) ? {
+				"toml" => "toml",
+				"yaml" => "yaml",
+				"json" => "json",
+				_ =>
+					fail! (0xb75238c9, "{}", _context_path.display ()),
+			};
+			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
+			self.dependencies_include (&_context_path) ?;
+			
+			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xfb99fcfc);
+			
+		} else if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
+			
 			if let Some (_) = _context {
 				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
 			} else {
 				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
 			}
+			
 		} else {
+			
 			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 		}
 		
