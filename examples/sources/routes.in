@@ -48,6 +48,10 @@
 	markdown_askama! ({"_/with-frontmatter-toml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/examples/markdown/askama/with-context/with-frontmatter-toml");
 	markdown_askama! ({"_/with-frontmatter-yaml.md", template : "_/markdown-with-frontmatter.html", context : ExampleAskamaContext} => "/examples/markdown/askama/with-context/with-frontmatter-yaml");
 	
+	markdown_askama! ({"_/with-context.md", template : "_/markdown-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.json"} => "/examples/markdown/askama/with-context/with-context-json");
+	markdown_askama! ({"_/with-context.md", template : "_/markdown-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.toml"} => "/examples/markdown/askama/with-context/with-context-toml");
+	markdown_askama! ({"_/with-context.md", template : "_/markdown-with-context.html", context : ExampleAskamaContext, context_from : "./files/context.yaml"} => "/examples/markdown/askama/with-context/with-context-yaml");
+	
 	
 	asset! ("./markdown/hello.md" => "/examples/markdown/text/hello");
 	assets! ({"./markdown", glob : "*.md"} => "/examples/markdowns-recursive/text");

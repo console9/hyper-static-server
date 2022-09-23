@@ -32,7 +32,7 @@ html:root {
 		& > main {
 			#askama-context,
 			#markdown-metadata,
-			#markdown-frontmatter {
+			#markdown-context {
 				background : #420000;
 				white-space : pre-wrap;
 			}
