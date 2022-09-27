@@ -1351,12 +1351,12 @@ macro_rules! route_extensions_insert {
 	( $_route_extensions : ident, {} ) => {
 	};
 	
-	( $_route_extensions : ident, { $_key : ident $( , $( $_rest : tt )+ )* } ) => {
+	( $_route_extensions : ident, { $_key : ident $( , $( $_rest : tt )* )* } ) => {
 		$crate::route_extensions_insert_one! ($_route_extensions, $_key);
 		$crate::route_extensions_insert! ($_route_extensions, { $( $( $_rest )* ),* });
 	};
 	
-	( $_route_extensions : ident, { $_key : ident : $_value : tt $( , $( $_rest : tt )+ )* } ) => {
+	( $_route_extensions : ident, { $_key : ident : $_value : tt $( , $( $_rest : tt )* )* } ) => {
 		$crate::route_extensions_insert_one! ($_route_extensions, $_key, $_value);
 		$crate::route_extensions_insert! ($_route_extensions, { $( $( $_rest )* ),* });
 	};
