@@ -111,6 +111,10 @@
 	asset! ("./files/data.txt" => {"/routes/with-extensions/d-5", extensions : {sitemap : {frequency : default, priority : 0.7}}});
 	asset! ("./files/data.txt" => {"/routes/with-extensions/d-6", extensions : {sitemap : {frequency : default, priority : default}}});
 	asset! ("./files/data.txt" => {"/routes/with-extensions/d-7", extensions : {sitemap, debug : "custom-debug-with-sitemap"}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/e-8", extensions : {sitemap : {updated : "2022-03-04"}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/e-9", extensions : {sitemap : {frequency : default, updated : "2022-03-04"}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/e-10", extensions : {sitemap : {frequency : default, priority : 0.5, updated : "2022-03-04"}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/e-11", extensions : {sitemap : {frequency : default, priority : default, updated : "2022-03-04"}}});
 	
 	
 	// ################################################################################

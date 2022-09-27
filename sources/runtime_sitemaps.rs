@@ -53,6 +53,9 @@ pub enum SitemapFrequency {
 pub struct SitemapPriority (f32);
 
 
+pub struct SitemapUpdated (u64);
+
+
 
 
 impl SitemapFormat {
@@ -131,12 +134,48 @@ impl SitemapPriority {
 }
 
 
+impl SitemapUpdated {
+	
+	pub fn to_u64 (&self) -> u64 {
+		self.0
+	}
+	
+	pub fn from_str (_string : &str) -> SitemapResult<Option<Self>> {
+		match _string {
+			"default" =>
+				Ok (None),
+			_ => {
+					let _date = ::chrono::NaiveDate::parse_from_str (_string, "%Y-%m-%d") .else_wrap (0x9acb71c0) ?;
+					let _date = ::chrono::DateTime::<::chrono::Utc>::from_utc (_date.and_hms (0, 0, 0), ::chrono::Utc);
+					Self::from_u64 (_date.timestamp () as u64)
+				}
+		}
+	}
+	
+	pub fn from_u64 (_value : u64) -> SitemapResult<Option<Self>> {
+		if _value > 4294967296 {
+			fail! (0x47d27218);
+		}
+		Ok (Some (Self (_value)))
+	}
+	
+	pub fn from_str_must (_string : &str) -> Option<Self> {
+		Self::from_str (_string) .else_panic (0xe56c6f8f)
+	}
+	
+	pub fn from_u64_must (_value : u64) -> Option<Self> {
+		Self::from_u64 (_value) .else_panic (0x93a18a2e)
+	}
+}
+
+
 
 
 pub struct RouteSitemapEntry {
 	pub included : Option<bool>,
 	pub frequency : Option<SitemapFrequency>,
 	pub priority : Option<SitemapPriority>,
+	pub updated : Option<SitemapUpdated>,
 }
 
 
@@ -147,6 +186,7 @@ impl RouteSitemapEntry {
 				included : None,
 				frequency : None,
 				priority : None,
+				updated : None,
 			}
 	}
 }
@@ -273,6 +313,10 @@ impl hss::HandlerSimpleSync for RoutesSitemapResource {
 					}
 					if let Some (_priority) = _route_entry.priority.as_ref () {
 						_builder.priority (_priority.to_f32 ());
+					}
+					if let Some (_updated) = _route_entry.updated.as_ref () {
+						use ::chrono::TimeZone as _;
+						_builder.lastmod (::chrono::Utc.timestamp (_updated.to_u64 () as i64, 0));
 					}
 					let _entry = _builder.build () .else_wrap (0x155cdb8f) ?;
 					_entries.push (_entry);
