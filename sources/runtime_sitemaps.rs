@@ -144,6 +144,14 @@ impl SitemapUpdated {
 		match _string {
 			"default" =>
 				Ok (None),
+			"now" => {
+					let _date = ::chrono::Utc::now ();
+					Self::from_u64 (_date.timestamp () as u64)
+				}
+			"today" => {
+					let _date = ::chrono::Utc::now () .date () .and_hms (0, 0, 0);
+					Self::from_u64 (_date.timestamp () as u64)
+				}
 			_ => {
 					let _date = ::chrono::NaiveDate::parse_from_str (_string, "%Y-%m-%d") .else_wrap (0x9acb71c0) ?;
 					let _date = ::chrono::DateTime::<::chrono::Utc>::from_utc (_date.and_hms (0, 0, 0), ::chrono::Utc);

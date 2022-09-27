@@ -115,7 +115,9 @@
 	asset! ("./files/data.txt" => {"/routes/with-extensions/e-9", extensions : {sitemap : {frequency : default, updated : "2022-03-04"}}});
 	asset! ("./files/data.txt" => {"/routes/with-extensions/e-10", extensions : {sitemap : {frequency : default, priority : 0.5, updated : "2022-03-04"}}});
 	asset! ("./files/data.txt" => {"/routes/with-extensions/e-11", extensions : {sitemap : {frequency : default, priority : default, updated : "2022-03-04"}}});
-	asset! ("./files/data.txt" => {"/routes/with-extensions/f-12", extensions : {debug : "custom-debug",}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/e-12", extensions : {sitemap : {frequency : default, priority : default, updated : "today"}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/e-13", extensions : {sitemap : {frequency : default, priority : default, updated : "now"}}});
+	asset! ("./files/data.txt" => {"/routes/with-extensions/f-14", extensions : {debug : "custom-debug",}});
 	
 	
 	// ################################################################################
