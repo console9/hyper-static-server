@@ -122,6 +122,7 @@
 	
 	sitemap! ({prefix : "https://example.com/", format : xml} => "/sitemap.xml");
 	sitemap! ({prefix : "https://example.com/", format : text} => "/sitemap.txt");
+	sitemap! ({prefix : SITE_URL_ABSOLUTE, format : text} => "/sitemap-2.txt");
 	
 	
 	// ################################################################################

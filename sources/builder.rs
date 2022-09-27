@@ -950,13 +950,14 @@ impl Builder {
 		
 		let _route = _route_builder.build (Path::new (""), Path::new (""), None, None) ?;
 		let _extensions = _extensions_builder.build () ?;
+		let _prefix = token_tree_parse (_prefix) ?;
 		let _format = token_tree_parse (_format) ?;
 		
 		let _id = self.generate_id ();
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::route_sitemap! (Route_{}, {:?}, {:?}, {}, {});", _id, _route, _prefix, _format, _extensions) .infallible (0x5f529a53);
+		writeln! (self.generated, "::hyper_static_server::route_sitemap! (Route_{}, {:?}, {}, {}, {});", _id, _route, _prefix, _format, _extensions) .infallible (0x5f529a53);
 		
 		Ok (())
 	}

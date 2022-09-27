@@ -49,6 +49,9 @@ pub mod generated {
 		};
 	
 	
+	const SITE_URL_ABSOLUTE : &'static str = "https://example.com/";
+	
+	
 	::hyper_static_server::builder_generated! ();
 }
 

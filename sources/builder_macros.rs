@@ -1210,10 +1210,10 @@ macro_rules! builder_call_markdowns {
 #[ macro_export ]
 #[ doc (hidden) ]
 macro_rules! builder_call_sitemap {
-	( $_builder : ident, { prefix : $_prefix : literal, format : $_format : ident }, $_route : tt ) => {
+	( $_builder : ident, { prefix : $_prefix : tt, format : $_format : ident }, $_route : tt ) => {
 		$crate::builder_call! ($_builder,
 				route_sitemap, (
-					$_prefix,
+					::std::stringify! ($_prefix),
 					::std::stringify! ($_format),
 					$crate::builder_call_route_path! ($_builder, exact, $_route),
 					$crate::builder_call_route_extensions! ($_builder, $_route),

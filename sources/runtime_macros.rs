@@ -1268,7 +1268,7 @@ macro_rules! route {
 macro_rules! route_sitemap {
 	
 	
-	( $_route_name : ident, $_route_path : literal, $_prefix : literal, $_format : ident, $_route_extensions : tt ) => {
+	( $_route_name : ident, $_route_path : literal, $_prefix : expr, $_format : ident, $_route_extensions : tt ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub struct $_route_name ($crate::hss::Route);
@@ -1279,6 +1279,7 @@ macro_rules! route_sitemap {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::StaticResource as _;
 				use ::std::convert::From as _;
+				#[ allow (unused_parens) ]
 				let _prefix = ::std::string::String::from ($_prefix);
 				let _format = $crate::SitemapFormat::from_str_must (::std::stringify! ($_format));
 				let _resource = $crate::RoutesSitemapResource::new (_prefix, _format) .else_wrap (0x255df805) ?;
