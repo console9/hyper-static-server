@@ -307,6 +307,6 @@ pub fn export_route_matched_0 (_route_matched : hss::RouteMatched, _runtime : &h
 fn export_body (_body : hss::BodyDynBox, _runtime : &hss::Runtime) -> ExportResult<Vec<u8>> {
 	
 	let mut _body = _body;
-	return _body.consume_to_vec (Some (_runtime)) .else_wrap (0x5a7fe685);
+	return _body.consume_to_vec (None, Some (_runtime)) .else_wrap (0x5a7fe685);
 }
 
