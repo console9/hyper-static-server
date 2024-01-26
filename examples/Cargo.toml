@@ -3,8 +3,11 @@
 [package]
 name = "hyper-static-server-example"
 version = "0.0.0"
-license = "MIT"
+publish = false
 edition = "2021"
+rust-version = "1.75"
+license = "MIT"
+
 build = "./sources/build.rs"
 
 
