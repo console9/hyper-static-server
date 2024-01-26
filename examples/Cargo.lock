@@ -56,7 +56,7 @@ checksum = "23b62fc65de8e4e7f52534fb52b0f3ed04746ae267519eef2a83941e8085068b"
 [[package]]
 name = "askama_patched"
 version = "0.10.5"
-source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
+source = "git+https://github.com/cipriancraciun/askama?branch=development#18836db5967126369e787e74f6f6cd206427c9c1"
 dependencies = [
  "askama_patched_derive",
  "askama_patched_escape",
@@ -66,7 +66,7 @@ dependencies = [
 [[package]]
 name = "askama_patched_derive"
 version = "0.10.5"
-source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
+source = "git+https://github.com/cipriancraciun/askama?branch=development#18836db5967126369e787e74f6f6cd206427c9c1"
 dependencies = [
  "askama_patched_shared",
  "proc-macro2",
@@ -76,12 +76,12 @@ dependencies = [
 [[package]]
 name = "askama_patched_escape"
 version = "0.10.1"
-source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
+source = "git+https://github.com/cipriancraciun/askama?branch=development#18836db5967126369e787e74f6f6cd206427c9c1"
 
 [[package]]
 name = "askama_patched_shared"
 version = "0.11.1"
-source = "git+https://github.com/cipriancraciun/askama?branch=console9#18836db5967126369e787e74f6f6cd206427c9c1"
+source = "git+https://github.com/cipriancraciun/askama?branch=development#18836db5967126369e787e74f6f6cd206427c9c1"
 dependencies = [
  "askama_patched_escape",
  "humansize",
@@ -529,6 +529,7 @@ dependencies = [
 [[package]]
 name = "hyper-simple-server"
 version = "0.6.0"
+source = "git+https://github.com/console9/hyper-simple-server?branch=development#d588e259dbea9d660418837f013877febfd36b47"
 dependencies = [
  "bytes",
  "futures",
@@ -547,6 +548,7 @@ dependencies = [
 [[package]]
 name = "hyper-static-server"
 version = "0.6.0"
+source = "git+https://github.com/console9/hyper-static-server?branch=development#3bf2bd5bc0b1b2fce12eee2d45c55628c65269c5"
 dependencies = [
  "any_ascii",
  "blake2",
