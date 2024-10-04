@@ -1,9 +1,10 @@
 
 
-pub use ::hyper_simple_server::errors::*;
-
-
 pub use ::vrl_errors::*;
+
+
+#[ cfg (feature = "hyper-simple-server") ]
+pub use ::hyper_simple_server::errors::*;
 
 
 #[ cfg (feature = "support-builder") ]
