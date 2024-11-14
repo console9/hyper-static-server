@@ -22,8 +22,8 @@ path = "./sources/main.rs"
 
 hyper-static-server = { version = "*", default-features = false, features = [] }
 
-# askama = { version = "*", default-features = true }
-askama = { package = "askama_patched", version = "*", default-features = true }
+askama = { version = "*", default-features = true }
+#~ askama = { package = "askama_patched", version = "*", default-features = true }
 
 serde = { version = "*", default-features = true }
 
@@ -82,7 +82,7 @@ vrl-cli-arguments = { git = "https://github.com/volution/volution-rust-libraries
 # vrl-errors = { path = "../.dependencies/volution-rust-libraries/sources/errors" }
 # vrl-cli-arguments = { path = "../.dependencies/volution-rust-libraries/sources/cli-arguments" }
 
-askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "development" }
+#~ askama_patched = { git = "https://github.com/cipriancraciun/askama", branch = "development" }
 # askama_patched = { path = "../.dependencies/askama_patched/askama_patched" }
 
 

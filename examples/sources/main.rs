@@ -43,6 +43,10 @@ pub mod model {
 pub mod generated {
 	
 	
+	use ::std::prelude::v1::*;
+	use ::std::format;
+	
+	
 	use crate::model::{
 			ExampleAskamaContext,
 			ExampleAskamaTrait,
