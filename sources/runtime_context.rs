@@ -143,12 +143,12 @@ pub trait ValueDebug : Debug {
 	}
 	
 	
-	fn debug_indent_askama (&self, _level : &usize, _indent : &str, _indent_prefix : &str, _indent_suffix : &str, _terminator : &str) -> String {
+	fn debug_indent_askama (&self, _level : usize, _indent : &str, _indent_prefix : &str, _indent_suffix : &str, _terminator : &str) -> String {
 		let _indent = if _indent.is_empty () { None } else { Some (_indent) };
 		let _indent_prefix = if _indent_prefix.is_empty () { None } else { Some (_indent_prefix) };
 		let _indent_suffix = if _indent_suffix.is_empty () { None } else { Some (_indent_suffix) };
 		let _terminator = Some (_terminator);
-		self.debug_indent (*_level, _indent, _indent_prefix, _indent_suffix, _terminator)
+		self.debug_indent (_level, _indent, _indent_prefix, _indent_suffix, _terminator)
 	}
 	
 	fn debug_indent (&self, _level : usize, _indent : Option<&str>, _indent_prefix : Option<&str>, _indent_suffix : Option<&str>, _terminator : Option<&str>) -> String {
