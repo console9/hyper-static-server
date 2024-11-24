@@ -457,7 +457,7 @@ dependencies = [
 [[package]]
 name = "hyper-simple-server"
 version = "0.6.0"
-source = "git+https://github.com/console9/hyper-simple-server?branch=development#d588e259dbea9d660418837f013877febfd36b47"
+source = "git+https://github.com/console9/hyper-simple-server?branch=development#5a331e28d54dc69278fc6d2cf50c4e1f7ff0bef8"
 dependencies = [
  "bytes",
  "futures",

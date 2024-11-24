@@ -519,7 +519,7 @@ dependencies = [
 [[package]]
 name = "hyper-simple-server"
 version = "0.6.0"
-source = "git+https://github.com/console9/hyper-simple-server?branch=development#d588e259dbea9d660418837f013877febfd36b47"
+source = "git+https://github.com/console9/hyper-simple-server?branch=development#5a331e28d54dc69278fc6d2cf50c4e1f7ff0bef8"
 dependencies = [
  "bytes",
  "futures",
@@ -538,7 +538,7 @@ dependencies = [
 [[package]]
 name = "hyper-static-server"
 version = "0.6.0"
-source = "git+https://github.com/console9/hyper-static-server?branch=development#3bf2bd5bc0b1b2fce12eee2d45c55628c65269c5"
+source = "git+https://github.com/console9/hyper-static-server?branch=development#753909c93bbdf1f1b7d00aff8a4539907d3d792a"
 dependencies = [
  "any_ascii",
  "blake2",
