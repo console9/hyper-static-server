@@ -272,7 +272,7 @@ macro_rules! askama {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
+			fn handle (&self, _request : $crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::hss::ResponseExt as _;
 				use $crate::AskamaResource as _;
@@ -621,7 +621,7 @@ macro_rules! askama_document {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
+			fn handle (&self, _request : $crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::hss::ResponseExt as _;
 				use $crate::AskamaResource as _;
@@ -1067,7 +1067,7 @@ macro_rules! resource_sass_dynamic {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
+			fn handle (&self, _request : $crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::hss::ResponseExt as _;
 				use $crate::StaticResource as _;
@@ -1150,7 +1150,7 @@ macro_rules! resource_markdown_dynamic {
 		
 		impl $crate::hss::HandlerSimpleSync for $_resource_name {
 			
-			fn handle (&self, _request : &$crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
+			fn handle (&self, _request : $crate::hss::Request<$crate::hss::Body>, _response : &mut $crate::hss::Response<$crate::hss::Body>) -> $crate::errors::HandlerResult {
 				use $crate::errors::ResultExtWrap as _;
 				use $crate::hss::ResponseExt as _;
 				use $crate::StaticResource as _;
