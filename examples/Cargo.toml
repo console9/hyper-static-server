@@ -65,12 +65,12 @@ production = [
 
 [patch.crates-io]
 
-hyper-static-server = { git = "https://github.com/console9/hyper-static-server", branch = "development" }
+# hyper-static-server = { git = "https://github.com/console9/hyper-static-server", branch = "development" }
 hyper-simple-server = { git = "https://github.com/console9/hyper-simple-server", branch = "development" }
 vrl-errors = { git = "https://github.com/volution/volution-rust-libraries", branch = "development" }
 vrl-cli-arguments = { git = "https://github.com/volution/volution-rust-libraries", branch = "development" }
 
-# hyper-static-server = { path = "../.dependencies/hyper-static-server/sources" }
+hyper-static-server = { path = "../.dependencies/hyper-static-server/sources" }
 # hyper-simple-server = { path = "../.dependencies/hyper-simple-server/sources" }
 # vrl-errors = { path = "../.dependencies/volution-rust-libraries/sources/errors" }
 # vrl-cli-arguments = { path = "../.dependencies/volution-rust-libraries/sources/cli-arguments" }
