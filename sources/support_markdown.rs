@@ -270,7 +270,7 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 		for (_index, _anchor_id) in _headings_anchors.iter () {
 			let _event = _events.get_mut (*_index) .infallible (0xf65facdb);
 			match _event {
-				cmark::Event::Start (cmark::Tag::Heading (_, ref mut _anchor, _)) =>
+				cmark::Event::Start (cmark::Tag::Heading (_, _anchor, _)) =>
 					*_anchor = Some (_anchor_id),
 				_ =>
 					unreachable! ("[eddfdaf1]"),
