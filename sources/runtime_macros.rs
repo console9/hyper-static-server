@@ -64,6 +64,8 @@ macro_rules! askama_template {
 		impl $crate::AskamaTrait for $_template_name {}
 		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
+		
+		$crate::askama_common_impl! ($_template_name);
 	};
 }
 
@@ -278,42 +280,12 @@ macro_rules! askama {
 				use $crate::AskamaResource as _;
 				use $crate::StaticResource as _;
 				let (_request_parts, _request_body) = _request.into_parts ();
-				$_resource_name::request_thread_local () .set (_request_parts);
+				$_template_name::request_thread_local () .set (_request_parts);
 				let _body = self.render () .else_wrap (0x0707a06d) ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
 				_response.set_body (_body);
 				$crate::errors::HandlerResult::Ok (())
-			}
-		}
-		
-		impl $_resource_name {
-			
-			fn request_thread_local () -> &'static ::std::thread::LocalKey<::std::cell::RefCell<$crate::hss::RequestParts>> {
-				::std::thread_local! {
-					static _local : ::std::cell::RefCell<$crate::hss::RequestParts> = ::std::unreachable! ();
-				}
-				&_local
-			}
-		}
-		
-		impl $_template_name {
-			
-			pub fn route_parameter_nth_raw (&self, _index : usize) -> ::std::option::Option<::std::string::String> {
-				$_resource_name::request_thread_local () .with_borrow (
-						|_request| {
-							$crate::hss::RouteMatched::resolve_from_extensions (&_request.extensions)
-								.and_then (|_matched| _matched.try_parameter_nth (_index) .cloned ())
-						})
-			}
-			
-			pub fn route_parameter_nth_parsed <Value : ::std::str::FromStr> (&self, _index : usize) -> ::std::option::Option<Value> {
-				$_resource_name::request_thread_local () .with_borrow (
-						|_request| {
-							$crate::hss::RouteMatched::resolve_from_extensions (&_request.extensions)
-								.and_then (|_matched| _matched.try_parameter_nth (_index))
-								.and_then (|_raw| ::std::str::FromStr::from_str (_raw) .ok ())
-						})
 			}
 		}
 	};
@@ -399,6 +371,8 @@ macro_rules! askama_document_template {
 		impl $crate::AskamaDocumentTrait for $_template_name {}
 		
 		$crate::askama_trait_impl! ($_template_name, $_trait_descriptor);
+		
+		$crate::askama_common_impl! ($_template_name);
 	};
 }
 
@@ -658,6 +632,8 @@ macro_rules! askama_document {
 				use $crate::hss::ResponseExt as _;
 				use $crate::AskamaResource as _;
 				use $crate::StaticResource as _;
+				let (_request_parts, _request_body) = _request.into_parts ();
+				$_template_name::request_thread_local () .set (_request_parts);
 				let _body = self.render () .else_wrap (0x53a2c22f) ?;
 				_response.set_status_200 ();
 				_response.set_content_type (self.content_type ());
@@ -712,6 +688,54 @@ macro_rules! askama_trait_impl {
 		$(
 			$crate::askama_trait_impl! ($_template_name, { trait : $_trait_type });
 		)+
+	};
+}
+
+
+
+
+// ################################################################################
+// ################################################################################
+
+
+
+
+#[ cfg (feature = "runtime-askama") ]
+#[ macro_export ]
+#[ doc (hidden) ]
+macro_rules! askama_common_impl {
+	
+	( $_template_name : ident ) => {
+		
+		impl $_template_name {
+			
+			#[ doc (hidden) ]
+			pub fn route_parameter_nth_raw (&self, _index : usize) -> ::std::option::Option<::std::string::String> {
+				$_template_name::request_thread_local () .with_borrow (
+						|_request| {
+							$crate::hss::RouteMatched::resolve_from_extensions (&_request.extensions)
+								.and_then (|_matched| _matched.try_parameter_nth (_index) .cloned ())
+						})
+			}
+			
+			#[ doc (hidden) ]
+			pub fn route_parameter_nth_parsed <Value : ::std::str::FromStr> (&self, _index : usize) -> ::std::option::Option<Value> {
+				$_template_name::request_thread_local () .with_borrow (
+						|_request| {
+							$crate::hss::RouteMatched::resolve_from_extensions (&_request.extensions)
+								.and_then (|_matched| _matched.try_parameter_nth (_index))
+								.and_then (|_raw| ::std::str::FromStr::from_str (_raw) .ok ())
+						})
+			}
+			
+			#[ doc (hidden) ]
+			pub(crate) fn request_thread_local () -> &'static ::std::thread::LocalKey<::std::cell::RefCell<$crate::hss::RequestParts>> {
+				::std::thread_local! {
+					static _local : ::std::cell::RefCell<$crate::hss::RequestParts> = ::std::unreachable! ();
+				}
+				&_local
+			}
+		}
 	};
 }
 
