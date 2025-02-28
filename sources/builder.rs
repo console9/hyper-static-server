@@ -70,6 +70,8 @@ pub struct BuilderConfiguration {
 	
 	pub outputs : PathBuf,
 	pub generated : PathBuf,
+	
+	pub hss : String,
 }
 
 
@@ -114,6 +116,8 @@ impl Default for BuilderConfiguration {
 		#[ cfg (feature = "builder-assets") ]
 		let _fonts_route_base = Some (PathBuf::from ("/assets/fonts"));
 		
+		let _hss = String::from ("::hyper_static_server");
+		
 		Self {
 				
 				sources : Some (_sources),
@@ -143,6 +147,8 @@ impl Default for BuilderConfiguration {
 				
 				outputs : _outputs,
 				generated : _generated,
+				
+				hss : _hss,
 			}
 	}
 }
@@ -155,6 +161,8 @@ impl BuilderConfiguration {
 		let _sources = Self::resolve_sources () ?;
 		let _outputs = Self::resolve_outputs () ?;
 		let _generated = _outputs.join ("./hss-builder-generated-default.in");
+		
+		let _hss = String::from ("::hyper_static_server");
 		
 		let _builder = Self {
 				
@@ -186,6 +194,8 @@ impl BuilderConfiguration {
 				
 				outputs : _outputs,
 				generated : _generated,
+				
+				hss : _hss,
 			};
 		
 		Ok (_builder)
@@ -267,8 +277,8 @@ impl Builder {
 		
 		let _mode = "auto";
 		
-		writeln! (self.generated, "::hyper_static_server::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", _id, _content_type, _mode, _source, _description) .infallible (0x5fa962ac);
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x46de4cc9);
+		writeln! (self.generated, "{}::resource! (Resource_{}, {}, {}, (relative_to_cwd, {:?}), {:?});", self.configuration.hss, _id, _content_type, _mode, _source, _description) .infallible (0x5fa962ac);
+		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0x46de4cc9);
 		
 		Ok (())
 	}
@@ -351,14 +361,14 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _description) .infallible (0x3258a4c6);
+			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _description) .infallible (0x3258a4c6);
 			
 		} else {
 			
-			writeln! (self.generated, "::hyper_static_server::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _description) .infallible (0x35966385);
+			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _description) .infallible (0x35966385);
 		}
 		
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
+		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
 		
 		Ok (())
 	}
@@ -520,7 +530,7 @@ impl Builder {
 		
 		let _refresher_code = if _refresher {
 			let (_context_encoding, _context_path) = _output_frontmatter.as_ref () .else_panic (0xc27ad812);
-			writeln! (self.generated, "::hyper_static_server::resource_markdown_refresher! (Refresher_{}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}));", _id, _source_markdown, _output_body, _output_title, _output_metadata, _context_path) .infallible (0x2b54879e);
+			writeln! (self.generated, "{}::resource_markdown_refresher! (Refresher_{}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}));", self.configuration.hss, _id, _source_markdown, _output_body, _output_title, _output_metadata, _context_path) .infallible (0x2b54879e);
 			format! ("Refresher_{},", _id)
 		} else {
 			String::new ()
@@ -546,22 +556,22 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xfb99fcfc);
+			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xfb99fcfc);
 			
 		} else if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			
 			if let Some (_) = _context {
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
+				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xed0b221b);
 			} else {
-				writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
+				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xf02b2615);
 			}
 			
 		} else {
 			
-			writeln! (self.generated, "::hyper_static_server::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
+			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {} {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _refresher_code, _description) .infallible (0xd64341cb);
 		}
 		
-		writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xafb30ea0);
+		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0xafb30ea0);
 		
 		Ok (())
 	}
@@ -649,8 +659,8 @@ impl Builder {
 			
 			self.route_names.push (format! ("Route_{}", _id));
 			
-			writeln! (self.generated, "::hyper_static_server::resource_markdown_dynamic! (Resource_{}, {}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?});", _id, "html", _source, _header_source, _footer_source, _description) .infallible (0x15f089dc);
-			writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0xbf41dd16);
+			writeln! (self.generated, "{}::resource_markdown_dynamic! (Resource_{}, {}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?});", self.configuration.hss, _id, "html", _source, _header_source, _footer_source, _description) .infallible (0x15f089dc);
+			writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0xbf41dd16);
 		}
 		
 		Ok (())
@@ -709,8 +719,8 @@ impl Builder {
 			
 			self.route_names.push (format! ("Route_{}", _id));
 			
-			writeln! (self.generated, "::hyper_static_server::resource_sass_dynamic! (Resource_{}, {}, (relative_to_cwd, {:?}), {:?});", _id, "css", _source, _description) .infallible (0xb7dd2208);
-			writeln! (self.generated, "::hyper_static_server::route! (Route_{}, Resource_{}, {:?}, {});", _id, _id, _route, _extensions) .infallible (0x506e8636);
+			writeln! (self.generated, "{}::resource_sass_dynamic! (Resource_{}, {}, (relative_to_cwd, {:?}), {:?});", self.configuration.hss, _id, "css", _source, _description) .infallible (0xb7dd2208);
+			writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0x506e8636);
 		}
 		
 		Ok (())
@@ -956,7 +966,7 @@ impl Builder {
 		
 		self.route_names.push (format! ("Route_{}", _id));
 		
-		writeln! (self.generated, "::hyper_static_server::route_sitemap! (Route_{}, {:?}, {}, {}, {});", _id, _route, _prefix, _format, _extensions) .infallible (0x5f529a53);
+		writeln! (self.generated, "{}::route_sitemap! (Route_{}, {:?}, {}, {}, {});", self.configuration.hss, _id, _route, _prefix, _format, _extensions) .infallible (0x5f529a53);
 		
 		Ok (())
 	}
@@ -998,13 +1008,13 @@ impl Builder {
 		
 		self.dependencies_extend () ?;
 		
-		writeln! (self.generated, "::hyper_static_server::routes! (Routes, [") .infallible (0x4bf5618f);
+		writeln! (self.generated, "{}::routes! (Routes, [", self.configuration.hss) .infallible (0x4bf5618f);
 		for _route_name in self.route_names.into_iter () {
 			writeln! (self.generated, "\t{},", _route_name) .infallible (0x894377dd);
 		}
 		writeln! (self.generated, "]);") .infallible (0x28d1ed4d);
 		
-		writeln! (self.generated, "::hyper_static_server::dependencies! (Dependencies, [") .infallible (0x1a6c02cd);
+		writeln! (self.generated, "{}::dependencies! (Dependencies, [", self.configuration.hss) .infallible (0x1a6c02cd);
 		for _dependency in self.dependencies.iter () {
 			writeln! (self.generated, "\t{:?},", _dependency) .infallible (0x9df69eb7);
 		}
