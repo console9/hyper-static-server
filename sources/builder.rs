@@ -1414,11 +1414,29 @@ fn normalize_route (_path_0 : &Path, _keep_trailing_slash : bool, _force_trailin
 		fail! (0x1e7f7bc0);
 	}
 	
+	let mut _path_components = Vec::new ();
+	for _component in _path_0.components () {
+		use path::Component;
+		match _component {
+			Component::RootDir =>
+				(),
+			Component::CurDir =>
+				(),
+			Component::ParentDir => {
+				_path_components.pop () .else_wrap (0x2d6204f3) ?;
+			}
+			Component::Normal (_) => {
+				_path_components.push (_component);
+			}
+			Component::Prefix (_) => {
+				fail! (0x5e945519);
+			}
+		}
+	}
+	
 	let mut _path = PathBuf::new ();
 	_path.push ("/");
-	for _component in _path_0.components () {
-		_path.push (_component);
-	}
+	_path_components.into_iter () .for_each (|_path_component| _path.push (_path_component));
 	
 	if (_keep_trailing_slash || _force_trailing_slash) && (_path != Path::new ("/")) {
 		if _path_0.to_string_lossy () .ends_with ("/") || _force_trailing_slash {
