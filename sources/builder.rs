@@ -1313,7 +1313,7 @@ pub trait RoutePathBuilder {
 impl RoutePathBuilder for () {
 	
 	fn build (&self, _source_subname : &Path, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> BuilderResult<PathBuf> {
-		generate_route (_source_subname, _route_prefix_hint, _route_infix_hint)
+		generate_route (Some (_source_subname), None, _route_prefix_hint, _route_infix_hint, false, false)
 	}
 }
 
@@ -1322,9 +1322,9 @@ impl RoutePathBuilder for (bool, &str) {
 	
 	fn build (&self, _source_subname : &Path, _source_relative : &Path, _source_path : &Path, _route_prefix_hint : Option<&Path>, _route_infix_hint : Option<&Path>) -> BuilderResult<PathBuf> {
 		if self.0 {
-			generate_route (_source_subname, Some (Path::new (self.1)), None)
+			generate_route (Some (_source_subname), Some (Path::new (self.1)), _route_prefix_hint, _route_infix_hint, false, false)
 		} else {
-			normalize_route (Path::new (self.1), true, false)
+			generate_route (None, Some (Path::new (self.1)), _route_prefix_hint, _route_infix_hint, true, false)
 		}
 	}
 }
@@ -1356,15 +1356,22 @@ impl RouteExtensionsBuilder for str {
 
 
 
-fn generate_route (_subname : &Path, _route_prefix : Option<&Path>, _route_infix : Option<&Path>) -> BuilderResult<PathBuf> {
+fn generate_route (_subname : Option<&Path>, _route_source : Option<&Path>, _route_prefix : Option<&Path>, _route_infix : Option<&Path>, _keep_trailing_slash : bool, _force_trailing_slash : bool) -> BuilderResult<PathBuf> {
 	
-	let _route_prefix = _route_prefix.else_wrap (0x1ba00780) ?;
-	
-	if ! _route_prefix.starts_with ("/") || (_route_prefix.ends_with ("/") && _route_prefix != Path::new ("/")) {
-		fail! (0x6fc9256c);
+	if let Some (_subname) = _subname {
+		if ! _subname.starts_with ("/") || _subname.ends_with ("/") {
+			fail! (0xace09af4);
+		}
 	}
-	if ! _subname.starts_with ("/") || _subname.ends_with ("/") {
-		fail! (0xace09af4);
+	if let Some (_route_source) = _route_source {
+		if ! (_route_source.starts_with ("/") || _route_source.starts_with ("_/")) || (_route_source.ends_with ("/") && _route_source != Path::new ("/")) {
+			fail! (0xd689b1ed);
+		}
+	}
+	if let Some (_route_prefix) = _route_prefix {
+		if ! _route_prefix.starts_with ("/") || (_route_prefix.ends_with ("/") && _route_prefix != Path::new ("/")) {
+			fail! (0x6fc9256c);
+		}
 	}
 	if let Some (_route_infix) = _route_infix {
 		if _route_infix.starts_with ("/") || _route_infix.ends_with ("/") {
@@ -1372,16 +1379,32 @@ fn generate_route (_subname : &Path, _route_prefix : Option<&Path>, _route_infix
 		}
 	}
 	
-	let _subname = _subname.strip_prefix ("/") .else_wrap (0xbd4b80bd) ?;
-	
-	let _route = if let Some (_route_infix) = _route_infix {
-		let _route_infix = _route_infix.strip_prefix ("/") .else_wrap (0x1a7e3353) ?;
-		_route_prefix.join (_route_infix) .join (_subname)
-	} else {
-		_route_prefix.join (_subname)
+	let _route_prefix = match (_route_source, _route_prefix) {
+		(Some (_route_source), Some (_route_prefix)) if _route_source.starts_with ("_/") =>
+			_route_prefix.join (_route_source.strip_prefix ("_/") .else_wrap (0x2cb758a3) ?),
+		(Some (_route_source), _) if _route_source.starts_with ("_/") =>
+			PathBuf::from (_route_source.strip_prefix ("_") .else_wrap (0x749e47aa) ?),
+		(Some (_route_source), _) =>
+			PathBuf::from (_route_source),
+		(None, Some (_route_prefix)) =>
+			PathBuf::from (_route_prefix),
+		(None, None) =>
+			PathBuf::from ("/"),
 	};
 	
-	normalize_route (&_route, false, false)
+	let _route_prefix = if let Some (_route_infix) = _route_infix {
+		_route_prefix.join (_route_infix)
+	} else {
+		_route_prefix
+	};
+	
+	let _route_path = if let Some (_subname) = _subname {
+		_route_prefix.join (_subname.strip_prefix ("/") .else_wrap (0x41b98020) ?)
+	} else {
+		_route_prefix
+	};
+	
+	normalize_route (&_route_path, _keep_trailing_slash, _force_trailing_slash)
 }
 
 
