@@ -226,7 +226,7 @@ macro_rules! askama {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
-			$_description : literal
+			$_description : expr
 	) => {
 		
 		$crate::askama! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_description);
@@ -241,7 +241,7 @@ macro_rules! askama {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
-			$_description : literal
+			$_description : expr
 	) => {
 		
 		
@@ -401,7 +401,7 @@ macro_rules! askama_document_resource {
 			$_title_path : tt,
 			$_metadata_path : tt,
 			$( $_refresher_name : ident, )?
-			$_description : literal
+			$_description : expr
 	) => {
 		$crate::askama_document_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $( $_refresher_name, )? $_description);
 	};
@@ -419,7 +419,7 @@ macro_rules! askama_document_resource {
 			$_title_path : tt,
 			$_metadata_path : tt,
 			$( $_refresher_name : ident, )?
-			$_description : literal
+			$_description : expr
 	) => {
 		
 		
@@ -576,7 +576,7 @@ macro_rules! askama_document {
 			$_title_path : tt,
 			$_metadata_path : tt,
 			$( $_refresher_name : ident, )?
-			$_description : literal
+			$_description : expr
 	) => {
 		$crate::askama_document! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $( $_refresher_name, )? $_description);
 	};
@@ -594,7 +594,7 @@ macro_rules! askama_document {
 			$_title_path : tt,
 			$_metadata_path : tt,
 			$( $_refresher_name : ident, )?
-			$_description : literal
+			$_description : expr
 	) => {
 		
 		
@@ -930,7 +930,7 @@ macro_rules! context_new {
 macro_rules! resource {
 	
 	
-	( $_resource_name : ident, $_content_type : tt, auto, $_resource_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, auto, $_resource_path : tt, $_description : expr ) => {
 		$crate::cfg_if_production! {{
 			$crate::resource! ($_resource_name, $_content_type, embedded, $_resource_path, $_description);
 		} | {
@@ -939,7 +939,7 @@ macro_rules! resource {
 	};
 	
 	
-	( $_resource_name : ident, $_content_type : tt, embedded, $_resource_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, embedded, $_resource_path : tt, $_description : expr ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub struct $_resource_name {}
@@ -998,7 +998,7 @@ macro_rules! resource {
 	};
 	
 	
-	( $_resource_name : ident, $_content_type : tt, dynamic, $_resource_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, dynamic, $_resource_path : tt, $_description : expr ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub struct $_resource_name {
@@ -1071,7 +1071,7 @@ macro_rules! resource {
 #[ doc (hidden) ]
 macro_rules! resource_sass_dynamic {
 	
-	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_description : expr ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub struct $_resource_name {
@@ -1151,7 +1151,7 @@ macro_rules! resource_sass_dynamic {
 #[ doc (hidden) ]
 macro_rules! resource_markdown_dynamic {
 	
-	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_header_path : tt, $_footer_path : tt, $_description : literal ) => {
+	( $_resource_name : ident, $_content_type : tt, $_source_path : tt, $_header_path : tt, $_footer_path : tt, $_description : expr ) => {
 		
 		#[ allow (non_camel_case_types) ]
 		pub struct $_resource_name {
