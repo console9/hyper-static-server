@@ -413,10 +413,10 @@ macro_rules! askama_document_resource {
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
-			$( $_refresher_name : ident, )?
 			$_description : expr
+			$( , $_refresher_name : ident )?
 	) => {
-		$crate::askama_document_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $( $_refresher_name, )? $_description);
+		$crate::askama_document_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
 	};
 	
 	
@@ -431,8 +431,8 @@ macro_rules! askama_document_resource {
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
-			$( $_refresher_name : ident, )?
 			$_description : expr
+			$( , $_refresher_name : ident )?
 	) => {
 		
 		
@@ -588,10 +588,10 @@ macro_rules! askama_document {
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
-			$( $_refresher_name : ident, )?
 			$_description : expr
+			$( , $_refresher_name : ident )?
 	) => {
-		$crate::askama_document! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $( $_refresher_name, )? $_description);
+		$crate::askama_document! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
 	};
 	
 	
@@ -606,12 +606,12 @@ macro_rules! askama_document {
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
-			$( $_refresher_name : ident, )?
 			$_description : expr
+			$( , $_refresher_name : ident )?
 	) => {
 		
 		
-		$crate::askama_document_resource! ($_resource_name, $_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $( $_refresher_name, )? $_description);
+		$crate::askama_document_resource! ($_resource_name, $_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
 		
 		
 		impl $_resource_name {
