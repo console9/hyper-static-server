@@ -225,6 +225,19 @@ macro_rules! askama {
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
 			$_content_type : tt,
+			$_template_path : literal
+	) => {
+		
+		$crate::askama! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, ::std::stringify! ($_template_name (file = $_template_path)));
+	};
+	
+	
+	(
+			$_resource_name : ident,
+			$_template_name : ident,
+			$_context_descriptor : tt,
+			$_trait_descriptor : tt,
+			$_content_type : tt,
 			$_template_path : literal,
 			$_description : expr
 	) => {
@@ -1263,6 +1276,10 @@ macro_rules! resource_markdown_refresher {
 #[ macro_export ]
 macro_rules! route {
 	
+	
+	( $_route_name : ident, $_resource_name : ty, $_route_path : literal ) => {
+		$crate::route! ($_route_name, $_resource_name, $_route_path, ());
+	};
 	
 	( $_route_name : ident, $_resource_name : ty, $_route_path : literal, $_route_extensions : tt ) => {
 		
