@@ -149,6 +149,7 @@ runtime = [
 	"hyper-simple-server/hss-extensions",
 	"hyper-simple-server/hss-runtime",
 	"hyper-simple-server/hss-exports",
+	"hyper-simple-server/hss-resources",
 	"once_cell",
 ]
 
