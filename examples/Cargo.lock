@@ -519,6 +519,7 @@ name = "hyper-static-server"
 version = "0.7.0"
 dependencies = [
  "any_ascii",
+ "askama",
  "blake2",
  "chrono",
  "cpio",
@@ -543,9 +544,7 @@ dependencies = [
 name = "hyper-static-server-example"
 version = "0.0.0"
 dependencies = [
- "askama",
  "hyper-static-server",
- "serde",
 ]
 
 [[package]]
