@@ -9,11 +9,11 @@
 
 name = "hyper-static-server"
 
-version = "0.6.0"
+version = "0.7.0"
 publish = false
 
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.94"
 resolver = "3"
 
 authors = [
@@ -274,7 +274,7 @@ features-none = []
 
 [dependencies]
 
-hyper-simple-server = { version = "0.6.0", default-features = false, optional = true }
+hyper-simple-server = { version = "^0.7", default-features = false, optional = true }
 
 globset = { version = "0.4.9", default-features = false, optional = true }
 pulldown-cmark = { version = "0.9.2", default-features = false, optional = true }
@@ -295,7 +295,7 @@ serde_yaml = { version = "0.8.26", default-features = false, features = [], opti
 toml = { version = "0.5.9", default-features = false, features = [], optional = true }
 once_cell = { version = "1.13.1", default-features = false, features = ["std"], optional = true }
 
-vrl-errors = { version = "*", default-features = false, features = [] }
+vrl-errors = { version = "^0.2", default-features = false, features = [] }
 
 
 
