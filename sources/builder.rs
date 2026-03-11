@@ -322,7 +322,7 @@ impl Builder {
 		
 		let _subname_1 = _subname.with_extension ("");
 		
-		let _template = _relative.strip_prefix ("/") .infallible (0x7285dc26);
+		let _template_path = _relative.strip_prefix ("/") .infallible (0x7285dc26);
 		
 		let _route = _route_builder.build (&_subname_1, _relative, _source, _route_base, None) ?;
 		let _extensions = _extensions_builder.build () ?;
@@ -345,7 +345,7 @@ impl Builder {
 		let (_context_type, _context_path) = _context.unwrap_or (("!", None));
 		let _trait_type = _trait.unwrap_or ("!");
 		
-		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template, _context_type, _trait_type));
+		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template_path, _context_type, _trait_type));
 		let _template_define = !_template_exists;
 		
 		if let Some (_context_path) = _context_path {
@@ -362,11 +362,11 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _template_extension, _description) .infallible (0x3258a4c6);
+			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template_path, _template_extension, _description) .infallible (0x3258a4c6);
 			
 		} else {
 			
-			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _template_extension, _description) .infallible (0x35966385);
+			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template_path, _template_extension, _description) .infallible (0x35966385);
 		}
 		
 		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
@@ -412,7 +412,7 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_subname_template, _relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
 		
-		let _template = _relative_template.strip_prefix ("/") .infallible (0xda5e5ad4);
+		let _template_path = _relative_template.strip_prefix ("/") .infallible (0xda5e5ad4);
 		
 		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source_template) ?;
@@ -422,7 +422,7 @@ impl Builder {
 		
 		let _route_base = Some (Path::new ("/"));
 		
-		self.route_markdown_askama_0 (&_subname_markdown, &_relative_markdown, &_source_markdown, &_template, _context, _trait, _route_base, _route_builder, _extensions_builder, _source_markdown_0, None)
+		self.route_markdown_askama_0 (&_subname_markdown, &_relative_markdown, &_source_markdown, &_template_path, _context, _trait, _route_base, _route_builder, _extensions_builder, _source_markdown_0, None)
 	}
 	
 	#[ cfg (feature = "builder-askama") ]
@@ -432,7 +432,7 @@ impl Builder {
 		let _templates_sources = self.configuration.templates_sources.as_ref () .map (PathBuf::as_path);
 		let (_subname_template, _relative_template, _source_template) = self.resolve_file (_templates_sources, _source_template_0) ?;
 		
-		let _template = _relative_template.strip_prefix ("/") .infallible (0xe0168bd3);
+		let _template_path = _relative_template.strip_prefix ("/") .infallible (0xe0168bd3);
 		
 		#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 		self.dependencies_include (&_source_template) ?;
@@ -447,7 +447,7 @@ impl Builder {
 		
 		for (_subname_markdown, _relative_markdown, _source_markdown) in _files_markdown.into_iter () {
 			
-			self.route_markdown_askama_0 (&_subname_markdown, &_relative_markdown, &_source_markdown, &_template, _context, _trait, _route_base, _route_builder, _extensions_builder, _sources_markdown_0, Some (_relative_markdown.as_path ())) ?;
+			self.route_markdown_askama_0 (&_subname_markdown, &_relative_markdown, &_source_markdown, &_template_path, _context, _trait, _route_base, _route_builder, _extensions_builder, _sources_markdown_0, Some (_relative_markdown.as_path ())) ?;
 		}
 		
 		Ok (())
@@ -456,7 +456,7 @@ impl Builder {
 	
 	#[ cfg (feature = "builder-askama") ]
 	#[ cfg (feature = "builder-markdown") ]
-	fn route_markdown_askama_0 (&mut self, _subname_markdown : &Path, _relative_markdown : &Path, _source_markdown : &Path, _template : &Path, _context : Option<(&str, Option<&str>)>, _trait : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
+	fn route_markdown_askama_0 (&mut self, _subname_markdown : &Path, _relative_markdown : &Path, _source_markdown : &Path, _template_path : &Path, _context : Option<(&str, Option<&str>)>, _trait : Option<&str>, _route_base : Option<&Path>, _route_builder : &(impl RoutePathBuilder + ?Sized), _extensions_builder : &(impl RouteExtensionsBuilder + ?Sized), _source_0 : &str, _source_relative : Option<&Path>) -> BuilderResult {
 		
 		let _subname_markdown_1 = _subname_markdown.with_extension ("");
 		
@@ -520,7 +520,7 @@ impl Builder {
 		
 		let _id = self.generate_id ();
 		
-		let _content_type = detect_content_type_from_extension (_template) ?;
+		let _content_type = detect_content_type_from_extension (_template_path) ?;
 		let _template_extension = detect_askama_template_extension_from_content_type (_content_type) ?;
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("markdown_askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
@@ -541,7 +541,7 @@ impl Builder {
 		let (_context_type, _context_path) = _context.unwrap_or (("!", None));
 		let _trait_type = _trait.unwrap_or ("!");
 		
-		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template, _context_type, _trait_type));
+		let (_template_id, _template_exists) = self.generate_id_by_key (&(_template_path, _context_type, _trait_type));
 		let _template_define = !_template_exists;
 		
 		if let Some (_context_path) = _context_path {
@@ -558,19 +558,19 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xfb99fcfc);
+			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template_path, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xfb99fcfc);
 			
 		} else if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			
 			if let Some (_) = _context {
-				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xed0b221b);
+				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template_path, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xed0b221b);
 			} else {
-				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xf02b2615);
+				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template_path, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xf02b2615);
 			}
 			
 		} else {
 			
-			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xd64341cb);
+			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template_path, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xd64341cb);
 		}
 		
 		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0xafb30ea0);
