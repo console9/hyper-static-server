@@ -42,8 +42,8 @@ macro_rules! askama_template {
 			$_template_path : literal
 	) => {
 		
-		#[ derive (::askama::Template) ]
-		#[ template (path = $_template_path) ]
+		#[ derive ($crate::askama::Template) ]
+		#[ template (askama = $crate::askama, path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub struct $_template_name {
 			pub context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
@@ -146,7 +146,7 @@ macro_rules! askama_resource {
 				use $crate::errors::ResultExtWrap as _;
 				let _template = self.template_arc () ?;
 				let _template = ::std::sync::Arc::as_ref (&_template);
-				let _outcome : $crate::errors::AskamaResult<_> = ::askama::Template::render (_template) .else_wrap (0xe73feb57);
+				let _outcome : $crate::errors::AskamaResult<_> = $crate::askama::Template::render (_template) .else_wrap (0xe73feb57);
 				_outcome.else_wrap (0x32bdca54)
 			}
 			
@@ -345,8 +345,8 @@ macro_rules! askama_document_template {
 			$_template_path : literal
 	) => {
 		
-		#[ derive (::askama::Template) ]
-		#[ template (path = $_template_path) ]
+		#[ derive ($crate::askama::Template) ]
+		#[ template (askama = $crate::askama, path = $_template_path) ]
 		#[ allow (non_camel_case_types) ]
 		pub struct $_template_name {
 			pub context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
@@ -477,7 +477,7 @@ macro_rules! askama_document_resource {
 				use $crate::errors::ResultExtWrap as _;
 				let _template = self.template_arc () ?;
 				let _template = ::std::sync::Arc::as_ref (&_template);
-				let _outcome : $crate::errors::AskamaResult<_> = ::askama::Template::render (_template) .else_wrap (0x216e0521);
+				let _outcome : $crate::errors::AskamaResult<_> = $crate::askama::Template::render (_template) .else_wrap (0x216e0521);
 				_outcome.else_wrap (0xfbf47116)
 			}
 			

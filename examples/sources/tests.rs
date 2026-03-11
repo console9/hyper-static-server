@@ -18,7 +18,8 @@ pub mod contexts {
 	::hyper_static_server::context! (ExampleContextResource, ExampleContext);
 	
 	
-	#[ derive (::serde::Deserialize) ]
+	#[ derive (::hyper_static_server::serde::Deserialize) ]
+	#[ serde (crate = "::hyper_static_server::serde") ]
 	pub struct ExampleContext {}
 	
 	

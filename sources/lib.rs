@@ -119,3 +119,14 @@ pub mod errors;
 #[ cfg (feature = "runtime-hss-exports") ]
 pub use crate::errors::*;
 
+
+
+
+#[ cfg (feature = "askama") ]
+#[ cfg (feature = "runtime-hss-exports") ]
+pub use ::askama;
+
+#[ cfg (feature = "serde") ]
+#[ cfg (feature = "runtime-hss-exports") ]
+pub use ::serde;
+

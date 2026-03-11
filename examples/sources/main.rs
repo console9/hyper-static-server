@@ -21,7 +21,8 @@ pub mod model {
 	
 	
 	#[ derive (::std::fmt::Debug) ]
-	#[ derive (::serde::Deserialize) ]
+	#[ derive (::hyper_static_server::serde::Deserialize) ]
+	#[ serde (crate = "::hyper_static_server::serde") ]
 	pub struct ExampleAskamaContext {
 		pub some_map : ::std::collections::HashMap<::std::string::String, ::std::string::String>,
 	}
