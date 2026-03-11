@@ -23,7 +23,7 @@ path = "./sources/main.rs"
 
 hyper-static-server = { version = "*", default-features = false, features = [] }
 
-askama = { version = "*", default-features = true }
+askama = { version = "^0.14", default-features = true }
 
 serde = { version = "*", default-features = true }
 
