@@ -19,9 +19,10 @@ macro_rules! askama_template {
 			$_template_name : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
-		$crate::askama_template! ($_template_name, true, $_context_descriptor, $_trait_descriptor, $_template_path);
+		$crate::askama_template! ($_template_name, true, $_context_descriptor, $_trait_descriptor, $_template_path, $_template_extension);
 	};
 	
 	
@@ -30,7 +31,8 @@ macro_rules! askama_template {
 			false,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {};
 	
 	
@@ -39,11 +41,12 @@ macro_rules! askama_template {
 			true,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
 		
 		#[ derive ($crate::askama::Template) ]
-		#[ template (askama = $crate::askama, path = $_template_path) ]
+		#[ template (askama = $crate::askama, path = $_template_path, ext = $_template_extension) ]
 		#[ allow (non_camel_case_types) ]
 		pub struct $_template_name {
 			pub context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
@@ -88,10 +91,11 @@ macro_rules! askama_resource {
 			$_template_name : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
 		
-		$crate::askama_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_template_path);
+		$crate::askama_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_template_path, $_template_extension);
 	};
 	
 	
@@ -101,11 +105,12 @@ macro_rules! askama_resource {
 			$_template_define : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
 		
 		
-		$crate::askama_template! ($_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_template_path);
+		$crate::askama_template! ($_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_template_path, $_template_extension);
 		
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
@@ -225,10 +230,11 @@ macro_rules! askama {
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
 			$_content_type : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
 		
-		$crate::askama! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, ::std::stringify! ($_template_name (file = $_template_path)));
+		$crate::askama! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_template_extension, ::std::stringify! ($_template_name (file = $_template_path)));
 	};
 	
 	
@@ -239,10 +245,11 @@ macro_rules! askama {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
+			$_template_extension : literal,
 			$_description : expr
 	) => {
 		
-		$crate::askama! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_description);
+		$crate::askama! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_template_extension, $_description);
 	};
 	
 	
@@ -254,11 +261,12 @@ macro_rules! askama {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
+			$_template_extension : literal,
 			$_description : expr
 	) => {
 		
 		
-		$crate::askama_resource! ($_resource_name, $_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_template_path);
+		$crate::askama_resource! ($_resource_name, $_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_template_path, $_template_extension);
 		
 		
 		impl $_resource_name {
@@ -322,9 +330,10 @@ macro_rules! askama_document_template {
 			$_template_name : ident,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
-		$crate::askama_document_template! ($_template_name, true, $_context_descriptor, $_trait_descriptor, $_template_path);
+		$crate::askama_document_template! ($_template_name, true, $_context_descriptor, $_trait_descriptor, $_template_path, $_template_extension);
 	};
 	
 	
@@ -333,7 +342,8 @@ macro_rules! askama_document_template {
 			false,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {};
 	
 	
@@ -342,11 +352,12 @@ macro_rules! askama_document_template {
 			true,
 			$_context_descriptor : tt,
 			$_trait_descriptor : tt,
-			$_template_path : literal
+			$_template_path : literal,
+			$_template_extension : literal
 	) => {
 		
 		#[ derive ($crate::askama::Template) ]
-		#[ template (askama = $crate::askama, path = $_template_path) ]
+		#[ template (askama = $crate::askama, path = $_template_path, ext = $_template_extension) ]
 		#[ allow (non_camel_case_types) ]
 		pub struct $_template_name {
 			pub context : ::std::sync::Arc<$crate::context_type! ($_context_descriptor)>,
@@ -410,13 +421,14 @@ macro_rules! askama_document_resource {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
+			$_template_extension : literal,
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
 			$_description : expr
 			$( , $_refresher_name : ident )?
 	) => {
-		$crate::askama_document_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
+		$crate::askama_document_resource! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_template_extension, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
 	};
 	
 	
@@ -428,6 +440,7 @@ macro_rules! askama_document_resource {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
+			$_template_extension : literal,
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
@@ -436,7 +449,7 @@ macro_rules! askama_document_resource {
 	) => {
 		
 		
-		$crate::askama_document_template! ($_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_template_path);
+		$crate::askama_document_template! ($_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_template_path, $_template_extension);
 		
 		
 		$crate::cfg_builder_askama_dynamic_disabled! {
@@ -585,13 +598,14 @@ macro_rules! askama_document {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
+			$_template_extension : literal,
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
 			$_description : expr
 			$( , $_refresher_name : ident )?
 	) => {
-		$crate::askama_document! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
+		$crate::askama_document! ($_resource_name, $_template_name, true, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_template_extension, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
 	};
 	
 	
@@ -603,6 +617,7 @@ macro_rules! askama_document {
 			$_trait_descriptor : tt,
 			$_content_type : tt,
 			$_template_path : literal,
+			$_template_extension : literal,
 			$_body_path : tt,
 			$_title_path : tt,
 			$_metadata_path : tt,
@@ -611,7 +626,7 @@ macro_rules! askama_document {
 	) => {
 		
 		
-		$crate::askama_document_resource! ($_resource_name, $_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
+		$crate::askama_document_resource! ($_resource_name, $_template_name, $_template_define, $_context_descriptor, $_trait_descriptor, $_content_type, $_template_path, $_template_extension, $_body_path, $_title_path, $_metadata_path, $_description $( , $_refresher_name )? );
 		
 		
 		impl $_resource_name {

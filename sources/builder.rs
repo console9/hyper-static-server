@@ -330,6 +330,7 @@ impl Builder {
 		let _id = self.generate_id ();
 		
 		let _content_type = detect_content_type_from_extension (_source) ?;
+		let _template_extension = detect_askama_template_extension_from_content_type (_content_type) ?;
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
 		} else {
@@ -361,11 +362,11 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _description) .infallible (0x3258a4c6);
+			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _template_extension, _description) .infallible (0x3258a4c6);
 			
 		} else {
 			
-			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _description) .infallible (0x35966385);
+			writeln! (self.generated, "{}::askama! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, {:?});", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _template_extension, _description) .infallible (0x35966385);
 		}
 		
 		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0x41a5ee4c);
@@ -520,6 +521,7 @@ impl Builder {
 		let _id = self.generate_id ();
 		
 		let _content_type = detect_content_type_from_extension (_template) ?;
+		let _template_extension = detect_askama_template_extension_from_content_type (_content_type) ?;
 		let _description = if let Some (_relative) = _source_relative {
 			format! ("markdown_askama ({}, from = `{}`, file = `...{}`)", _content_type, _source_0, _relative.display ())
 		} else {
@@ -556,19 +558,19 @@ impl Builder {
 			#[ cfg (any (not (feature = "builder-relaxed-dependencies"), feature = "production")) ]
 			self.dependencies_include (&_context_path) ?;
 			
-			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xfb99fcfc);
+			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xfb99fcfc);
 			
 		} else if let Some ((_context_encoding, _context_path)) = _output_frontmatter {
 			
 			if let Some (_) = _context {
-				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xed0b221b);
+				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {}, deserialize : ({:?}, (relative_to_cwd, {:?})) }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _context_encoding, _context_path, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xed0b221b);
 			} else {
-				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xf02b2615);
+				writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xf02b2615);
 			}
 			
 		} else {
 			
-			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xd64341cb);
+			writeln! (self.generated, "{}::askama_document! (Resource_{}, Template_{}, {}, {{ type : {} }}, {{ trait : {} }}, {}, {:?}, {:?}, (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), (relative_to_cwd, {:?}), {:?} {} );", self.configuration.hss, _id, _template_id, _template_define, _context_type, _trait_type, _content_type, _template, _template_extension, _output_body, _output_title, _output_metadata, _description, _refresher_code) .infallible (0xd64341cb);
 		}
 		
 		writeln! (self.generated, "{}::route! (Route_{}, Resource_{}, {:?}, {});", self.configuration.hss, _id, _id, _route, _extensions) .infallible (0xafb30ea0);
@@ -1487,6 +1489,17 @@ fn detect_content_type_from_extension (_source : &Path) -> BuilderResult<&'stati
 	};
 	
 	Ok (_content_type)
+}
+
+
+#[ cfg (feature = "builder-askama") ]
+fn detect_askama_template_extension_from_content_type (_content_type : &str) -> BuilderResult<&'static str> {
+	let _template_extension = match _content_type {
+		"html" => "html",
+		"text" => "txt",
+		_ => fail! (0xe26db2a4),
+	};
+	Ok (_template_extension)
 }
 
 

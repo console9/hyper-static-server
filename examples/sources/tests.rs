@@ -6,7 +6,7 @@ pub mod resources {
 	
 	use ::std::prelude::v1::*;
 	
-	::hyper_static_server::askama_resource! (ExampleTemplateResource, ExampleTemplate, !, !, "_empty.txt");
+	::hyper_static_server::askama_resource! (ExampleTemplateResource, ExampleTemplate, !, !, "_empty.txt", "txt");
 }
 
 
