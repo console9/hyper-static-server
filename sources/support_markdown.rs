@@ -241,30 +241,51 @@ pub fn compile_markdown_from_data (_source : &str, _options : Option<&MarkdownOp
 	
 	let mut _headings_anchors = Vec::new ();
 	if _options.headings_anchors {
-		let mut _generate_next = false;
+		let mut _inside_heading = false;
+		let mut _heading_index = usize::MAX;
+		let mut _anchor_generate = false;
+		let mut _anchor_buffer = String::new ();
 		for (_index, _event) in _events.iter () .enumerate () {
 			match _event {
-				cmark::Event::Start (cmark::Tag::Heading (_, _anchor, _)) =>
+				cmark::Event::Start (cmark::Tag::Heading (_, _anchor, _)) => {
+					if _inside_heading {
+						unreachable! ("[914149c6]");
+					}
+					_inside_heading = true;
+					_heading_index = _index;
 					if _anchor.is_none () {
-						_generate_next = true;
+						_anchor_generate = true;
+					} else {
+						_anchor_generate = false;
 					}
-				cmark::Event::End (cmark::Tag::Heading (_, _, _)) =>
-					if _generate_next {
-						_generate_next = false;
+					_anchor_buffer.clear ();
+				}
+				cmark::Event::End (cmark::Tag::Heading (_, _, _)) => {
+					if ! _inside_heading {
+						unreachable! ("[e7e5e3fa]");
 					}
-				cmark::Event::Text (_text) =>
-					if _generate_next {
-						if ! _text.is_empty () {
-							let _anchor_id = build_markdown_anchor_from_text (_text.as_ref ());
-							if ! _anchor_id.is_empty () {
-								_headings_anchors.push ((_index - 1, _anchor_id));
-							}
+					if _anchor_generate {
+						let _anchor_id = build_markdown_anchor_from_text (_anchor_buffer.as_ref ());
+						if ! _anchor_id.is_empty () {
+							_headings_anchors.push ((_heading_index, _anchor_id));
 						}
 					}
-				_ =>
-					if _generate_next {
-						fail! (0xd9b3a175);
+					_inside_heading = false;
+					_heading_index = usize::MAX;
+					_anchor_generate = false;
+					_anchor_buffer.clear ();
+				}
+				cmark::Event::Text (_text) =>
+					if _inside_heading {
+						if _anchor_generate {
+							_anchor_buffer.push_str (_text.as_ref ());
+						}
 					}
+				_ => {
+					if _inside_heading {
+						eprintln! ("[ww] [ade63f3d]  heading contains non-text elements:  {:?}", _event);
+					}
+				}
 			}
 		}
 		for (_index, _anchor_id) in _headings_anchors.iter () {
